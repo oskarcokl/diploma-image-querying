@@ -1,6 +1,7 @@
 import tornado.ioloop
 import tornado.web
 import json
+import logging
 from tornado.httpclient import AsyncHTTPClient
 
 from tornado.options import define, options, parse_command_line
@@ -14,22 +15,29 @@ class MainHandler(tornado.web.RequestHandler):
         self.write("Hello, world")
 
 
-class HelloHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.write("Hello You made it to a different route")
+class FileUploadHandler(tornado.web.RequestHandler):
+    def post(self):
+        for field_name, files in self.request.files.items():
+            for info in files:
+                filename, content_type = info["filename"], info["content_type"]
+                body = info["body"]
+                logging.info(
+                    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
+                )
+
+        self.write("OK")
 
 
 class JsonHandler(tornado.web.RequestHandler):
     async def get(self):
         response = await self.async_fetch("http://localhost:3000/images")
-        print(type(json.loads(response)[0]))
-        self.write("Just testing some things :^)")
+        json_response = tornado.escape.json_decode(response.body)
+        self.write(json_response)
 
     async def async_fetch(self, url):
         http_client = AsyncHTTPClient()
         response = await http_client.fetch(url)
-        string_value = response.body.decode("utf-8")
-        return string_value
+        return response
 
 
 def main():
@@ -37,8 +45,6 @@ def main():
     app = tornado.web.Application(
         [
             (r"/", MainHandler),
-            (r"/hello", HelloHandler),
-            (r"/json", JsonHandler),
         ],
         debug=options.debug,
     )
