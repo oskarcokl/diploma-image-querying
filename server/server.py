@@ -45,11 +45,17 @@ def main():
     app = tornado.web.Application(
         [
             (r"/", MainHandler),
+            (r"/json", JsonHandler),
         ],
         debug=options.debug,
     )
     app.listen(options.port)
+    server_startup_message()
     tornado.ioloop.IOLoop.current().start()
+
+
+def server_startup_message():
+    print(f"Tornado server is running on port {options.port}")
 
 
 if __name__ == "__main__":
