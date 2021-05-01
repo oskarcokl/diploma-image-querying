@@ -105,3 +105,6 @@ dist
 
 # Mock API db.json
 .db.json
+
+# __pycache__ fiels
+__pycache__
