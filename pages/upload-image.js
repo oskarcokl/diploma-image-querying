@@ -7,17 +7,18 @@ import axios from "axios";
 const API = "http://localhost:8888/";
 
 export default function UploadImage(params) {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState(null);
 
   const onClickHandler = (e) => {
     e.preventDefault();
 
+    console.log("Uploading images to server.");
+
     const data = new FormData();
-    data.append("file", selectedFile);
-
-    console.log(e);
-
-    console.log("Yo you just uploaded a form my guy.");
+    for (let i = 0; i < selectedFiles.length; i++) {
+      //console.log(selectedFiles[i]);
+      data.append("file", selectedFiles[i]);
+    }
 
     axios
       .post(API + "file-upload", data, {
@@ -31,14 +32,13 @@ export default function UploadImage(params) {
   };
 
   const onChangeHandler = (event) => {
-    setSelectedFile(event.target.files[0]);
-    console.log(event.target.files[0]);
+    setSelectedFiles(event.target.files);
   };
 
   return (
     <Container>
       <form>
-        <input type="file" name="file" onChange={onChangeHandler} />
+        <input type="file" name="file" multiple onChange={onChangeHandler} />
         <Button name="Upload image" clickHandler={onClickHandler}></Button>
       </form>
     </Container>
