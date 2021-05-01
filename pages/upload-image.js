@@ -1,4 +1,3 @@
-import Image from "../components/image";
 import Container from "../components/container";
 import Button from "../components/button";
 import { useState } from "react";
@@ -16,7 +15,6 @@ export default function UploadImage(params) {
 
     const data = new FormData();
     for (let i = 0; i < selectedFiles.length; i++) {
-      //console.log(selectedFiles[i]);
       data.append("file", selectedFiles[i]);
     }
 
