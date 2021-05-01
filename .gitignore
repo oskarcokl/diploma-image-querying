@@ -107,4 +107,4 @@ dist
 .db.json
 
 # __pycache__ fiels
-__pycache__
+__pycache__/
