@@ -9,13 +9,33 @@ from tornado.options import define, options, parse_command_line
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
 
+# Coppied from https://stackoverflow.com/questions/35254742/tornado-server-enable-cors-requests
+# Thank you kwarunek :^)
+class BaseHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        print("setting headers!!!")
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 
-class MainHandler(tornado.web.RequestHandler):
+    def post(self):
+        self.write("some post")
+
+    def get(self):
+        self.write("some get")
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
+
+
+class MainHandler(BaseHandler):
     def get(self):
         self.write("Hello, world")
 
 
-class FileUploadHandler(tornado.web.RequestHandler):
+class FileUploadHandler(BaseHandler):
     def post(self):
         for field_name, files in self.request.files.items():
             for info in files:
@@ -28,7 +48,7 @@ class FileUploadHandler(tornado.web.RequestHandler):
         self.write("OK")
 
 
-class JsonHandler(tornado.web.RequestHandler):
+class JsonHandler(BaseHandler):
     async def get(self):
         response = await self.async_fetch("http://localhost:3000/images")
         json_response = tornado.escape.json_decode(response.body)
@@ -46,6 +66,7 @@ def main():
         [
             (r"/", MainHandler),
             (r"/json", JsonHandler),
+            (r"/file-upload", FileUploadHandler),
         ],
         debug=options.debug,
     )
