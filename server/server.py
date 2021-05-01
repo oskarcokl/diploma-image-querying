@@ -2,6 +2,7 @@ import tornado.ioloop
 import tornado.web
 import json
 import logging
+from celery_app import tasks
 from tornado.httpclient import AsyncHTTPClient
 
 from tornado.options import define, options, parse_command_line
@@ -48,6 +49,13 @@ class FileUploadHandler(BaseHandler):
         self.write("OK")
 
 
+class CeleryHandler(BaseHandler):
+    async def get(self):
+        result = tasks.add.apply_async((3, 4), countdown=10).get()
+        print(str(result))
+        self.write(str(result))
+
+
 class JsonHandler(BaseHandler):
     async def get(self):
         response = await self.async_fetch("http://localhost:3000/images")
@@ -67,6 +75,7 @@ def main():
             (r"/", MainHandler),
             (r"/json", JsonHandler),
             (r"/file-upload", FileUploadHandler),
+            (r"/celery", CeleryHandler),
         ],
         debug=options.debug,
     )
