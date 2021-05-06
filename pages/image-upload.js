@@ -44,12 +44,17 @@ export default function UploadImage(params) {
       </Head>
       <Container>
         <PageTitle title="Query By Example" />
-        <form>
+        <form className="flex flex-row justify-center">
           <FileUpload
+            additionalClasses="mx-10"
             name={"file"}
             onChangeHandler={onChangeHandler}
           ></FileUpload>
-          <Button name="Upload image" clickHandler={onClickHandler}></Button>
+          <Button
+            additionalClasses="flex-none"
+            name="Upload image"
+            clickHandler={onClickHandler}
+          ></Button>
         </form>
       </Container>
     </div>
