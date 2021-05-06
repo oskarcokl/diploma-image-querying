@@ -104,7 +104,7 @@ dist
 .tern-port
 
 # Mock API db.json
-.db.json
+db.json
 
-# __pycache__ fiels
-__pycache__/
+# __pycache__ files
+server/celery_app/__pycache__
