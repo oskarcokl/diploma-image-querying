@@ -2,6 +2,7 @@ import tornado.ioloop
 import tornado.web
 import json
 import logging
+import queries
 from celery_app import tasks
 from tornado.httpclient import AsyncHTTPClient
 
@@ -9,6 +10,7 @@ from tornado.options import define, options, parse_command_line
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
+
 
 # Coppied from https://stackoverflow.com/questions/35254742/tornado-server-enable-cors-requests
 # Thank you kwarunek :^)
@@ -68,6 +70,14 @@ class JsonHandler(BaseHandler):
         return response
 
 
+class DatabaseHandler(BaseHandler):
+    def get(self):
+        session = queries.Session("postgresql://postgres@localhost:5432/test")
+        for row in session.query("SELECT * FROM person"):
+            print(row)
+        self.write("Ok")
+
+
 def main():
     parse_command_line()
     app = tornado.web.Application(
@@ -76,6 +86,7 @@ def main():
             (r"/json", JsonHandler),
             (r"/file-upload", FileUploadHandler),
             (r"/celery", CeleryHandler),
+            (r"/db", DatabaseHandler),
         ],
         debug=options.debug,
     )
