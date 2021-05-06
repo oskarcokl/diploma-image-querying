@@ -33,6 +33,7 @@ export default function UploadImage(params) {
   };
 
   const onChangeHandler = (event) => {
+    console.log("Change happend");
     setSelectedFiles(event.target.files);
   };
 
@@ -44,8 +45,10 @@ export default function UploadImage(params) {
       <Container>
         <PageTitle title="Query By Example" />
         <form>
-          <input type="file" name="file" multiple onChange={onChangeHandler} />
-          <FileUpload></FileUpload>
+          <FileUpload
+            name={"file"}
+            onChangeHandler={onChangeHandler}
+          ></FileUpload>
           <Button name="Upload image" clickHandler={onClickHandler}></Button>
         </form>
       </Container>
