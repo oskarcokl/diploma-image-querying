@@ -1,7 +1,9 @@
 import Container from "../components/container";
 import Button from "../components/button";
+import PageTitle from "../components/pageTitle";
 import { useState } from "react";
 import axios from "axios";
+import Head from "next/head";
 
 const API = "http://localhost:8888/";
 
@@ -34,11 +36,17 @@ export default function UploadImage(params) {
   };
 
   return (
-    <Container>
-      <form>
-        <input type="file" name="file" multiple onChange={onChangeHandler} />
-        <Button name="Upload image" clickHandler={onClickHandler}></Button>
-      </form>
-    </Container>
+    <div>
+      <Head>
+        <title>QueryByExample</title>
+      </Head>
+      <Container>
+        <PageTitle title="Query By Example" />
+        <form>
+          <input type="file" name="file" multiple onChange={onChangeHandler} />
+          <Button name="Upload image" clickHandler={onClickHandler}></Button>
+        </form>
+      </Container>
+    </div>
   );
 }
