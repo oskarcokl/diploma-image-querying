@@ -4,6 +4,7 @@ import PageTitle from "../components/pageTitle";
 import { useState } from "react";
 import axios from "axios";
 import Head from "next/head";
+import FileUpload from "../components/fileUpload";
 
 const API = "http://localhost:8888/";
 
@@ -44,6 +45,7 @@ export default function UploadImage(params) {
         <PageTitle title="Query By Example" />
         <form>
           <input type="file" name="file" multiple onChange={onChangeHandler} />
+          <FileUpload></FileUpload>
           <Button name="Upload image" clickHandler={onClickHandler}></Button>
         </form>
       </Container>
