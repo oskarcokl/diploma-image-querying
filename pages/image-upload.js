@@ -8,6 +8,7 @@ import FileUpload from "../components/fileUpload";
 import UploadedImage from "../components/uploadedImage";
 import ImageResults from "../components/imageResults";
 import Navbar from "../components/navbar";
+import SectionTitle from "../components/sectionTitle";
 
 const API = "http://localhost:8888/";
 
@@ -54,6 +55,7 @@ export default function UploadImage(params) {
             styleName="query-example-grid-header"
           />
           <form className="image-upload-container query-example-grid-query">
+            <SectionTitle title="Upload example image" />
             <UploadedImage src={imageSrc} />
             <FileUpload
               additionalClasses=""
