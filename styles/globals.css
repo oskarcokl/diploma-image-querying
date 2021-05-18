@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import "Container.css";
+@import "PageTitle.css";
 
 :root {
   --main: #70c1b3;

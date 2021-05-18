@@ -1,3 +1,3 @@
 export default function PageTitle({ title, styleName }) {
-  return <h1 className={`text-3xl text-center ${styleName}`}>{title}</h1>;
+  return <h1 className={`page-title ${styleName}`}>{title}</h1>;
 }
