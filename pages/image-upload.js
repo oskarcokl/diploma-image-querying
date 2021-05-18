@@ -6,6 +6,7 @@ import axios from "axios";
 import Head from "next/head";
 import FileUpload from "../components/fileUpload";
 import UploadedImage from "../components/uploadedImage";
+import ImageResults from "../components/imageResults";
 
 const API = "http://localhost:8888/";
 
@@ -59,6 +60,7 @@ export default function UploadImage(params) {
             clickHandler={onClickHandler}
           ></Button>
         </form>
+        <ImageResults></ImageResults>
       </Container>
     </div>
   );
