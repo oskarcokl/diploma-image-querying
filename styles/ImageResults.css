@@ -1,0 +1,12 @@
+.result-images-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.result-images-container > * > * {
+  margin-top: 1rem;
+}
+
+.column-2 > * {
+  margin-left: 1rem;
+}
