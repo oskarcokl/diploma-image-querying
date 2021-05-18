@@ -1,3 +1,3 @@
 export default function Container({ children }) {
-  return <div className="container mx-auto py-5">{children}</div>;
+  return <div className="my-container">{children}</div>;
 }
