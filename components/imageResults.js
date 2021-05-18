@@ -1,9 +1,10 @@
 import ResultImage from "./resultImage";
+import SectionTitle from "./sectionTitle";
 
 export default function ImageResults({ srcs }) {
   return (
     <div className="image-results-container">
-      <h2>Results</h2>
+      <SectionTitle title="Results" />
       <div className="result-images-container">
         <div className="column-1">
           <ResultImage></ResultImage>
