@@ -44,7 +44,7 @@ export default function UploadImage(params) {
       </Head>
       <Container>
         <PageTitle title="Query By Example" />
-        <form className="flex flex-row justify-center">
+        <form className="file-upload-form">
           <FileUpload
             additionalClasses="mx-10"
             name={"file"}
