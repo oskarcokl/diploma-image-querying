@@ -1,0 +1,5 @@
+.result-image {
+  object-fit: cover;
+  width: 100px;
+  height: auto;
+}
