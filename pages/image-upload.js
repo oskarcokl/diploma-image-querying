@@ -5,6 +5,7 @@ import { useState } from "react";
 import axios from "axios";
 import Head from "next/head";
 import FileUpload from "../components/fileUpload";
+import UploadedImage from "../components/uploadedImage";
 
 const API = "http://localhost:8888/";
 
@@ -44,18 +45,21 @@ export default function UploadImage(params) {
       </Head>
       <Container>
         <PageTitle title="Query By Example" />
-        <form className="file-upload-form">
-          <FileUpload
-            additionalClasses="mx-10"
-            name={"file"}
-            onChangeHandler={onChangeHandler}
-          ></FileUpload>
-          <Button
-            additionalClasses="flex-none"
-            name="Upload image"
-            clickHandler={onClickHandler}
-          ></Button>
-        </form>
+        <div class="">
+          <form className="image-upload-container">
+            <UploadedImage />
+            <FileUpload
+              additionalClasses="mx-10"
+              name={"file"}
+              onChangeHandler={onChangeHandler}
+            ></FileUpload>
+            <Button
+              additionalClasses="flex-none"
+              name="Upload image"
+              clickHandler={onClickHandler}
+            ></Button>
+          </form>
+        </div>
       </Container>
     </div>
   );
