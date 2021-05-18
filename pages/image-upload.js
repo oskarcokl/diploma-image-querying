@@ -11,6 +11,7 @@ const API = "http://localhost:8888/";
 
 export default function UploadImage(params) {
   const [selectedFiles, setSelectedFiles] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
 
   const onClickHandler = (e) => {
     e.preventDefault();
@@ -33,8 +34,8 @@ export default function UploadImage(params) {
       });
   };
 
-  const onChangeHandler = (event) => {
-    console.log("Change happend");
+  const onChangeHandler = async (event) => {
+    setImageSrc(URL.createObjectURL(event.target.files[0]));
     setSelectedFiles(event.target.files);
   };
 
@@ -45,21 +46,19 @@ export default function UploadImage(params) {
       </Head>
       <Container>
         <PageTitle title="Query By Example" />
-        <div class="">
-          <form className="image-upload-container">
-            <UploadedImage />
-            <FileUpload
-              additionalClasses="mx-10"
-              name={"file"}
-              onChangeHandler={onChangeHandler}
-            ></FileUpload>
-            <Button
-              additionalClasses="flex-none"
-              name="Upload image"
-              clickHandler={onClickHandler}
-            ></Button>
-          </form>
-        </div>
+        <form className="image-upload-container">
+          <UploadedImage src={imageSrc} />
+          <FileUpload
+            additionalClasses="mx-10"
+            name={"file"}
+            onChangeHandler={onChangeHandler}
+          ></FileUpload>
+          <Button
+            additionalClasses="flex-none"
+            name="Upload image"
+            clickHandler={onClickHandler}
+          ></Button>
+        </form>
       </Container>
     </div>
   );
