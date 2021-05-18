@@ -15,6 +15,14 @@ const API = "http://localhost:8888/";
 export default function UploadImage(params) {
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
+  const [resultImages, _setResultImages] = useState([]);
+
+  const setResultImages = (src) => {
+    const temp = [];
+    for (let i = 0; i < 10; i++) temp.push(src);
+
+    _setResultImages(temp);
+  };
 
   const onClickHandler = (e) => {
     e.preventDefault();
@@ -38,7 +46,11 @@ export default function UploadImage(params) {
   };
 
   const onChangeHandler = async (event) => {
-    setImageSrc(URL.createObjectURL(event.target.files[0]));
+    const exampleImageURL = URL.createObjectURL(event.target.files[0]);
+
+    setResultImages(exampleImageURL);
+
+    setImageSrc(exampleImageURL);
     setSelectedFiles(event.target.files);
   };
 
@@ -68,7 +80,10 @@ export default function UploadImage(params) {
               clickHandler={onClickHandler}
             ></Button>
           </form>
-          <ImageResults styleName="query-example-grid-results"></ImageResults>
+          <ImageResults
+            styleName="query-example-grid-results"
+            srcs={resultImages}
+          ></ImageResults>
         </div>
       </Container>
     </div>
