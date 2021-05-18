@@ -7,6 +7,7 @@ import Head from "next/head";
 import FileUpload from "../components/fileUpload";
 import UploadedImage from "../components/uploadedImage";
 import ImageResults from "../components/imageResults";
+import Navbar from "../components/navbar";
 
 const API = "http://localhost:8888/";
 
@@ -46,21 +47,27 @@ export default function UploadImage(params) {
         <title>QueryByExample</title>
       </Head>
       <Container>
-        <PageTitle title="Query By Example" />
-        <form className="image-upload-container">
-          <UploadedImage src={imageSrc} />
-          <FileUpload
-            additionalClasses="mx-10"
-            name={"file"}
-            onChangeHandler={onChangeHandler}
-          ></FileUpload>
-          <Button
-            additionalClasses="flex-none"
-            name="Upload image"
-            clickHandler={onClickHandler}
-          ></Button>
-        </form>
-        <ImageResults></ImageResults>
+        <div className="query-exmaple-grid-container">
+          <Navbar styleName="query-example-grid-navbar"></Navbar>
+          <PageTitle
+            title="Query By Example"
+            styleName="query-example-grid-header"
+          />
+          <form className="image-upload-container query-example-grid-query">
+            <UploadedImage src={imageSrc} />
+            <FileUpload
+              additionalClasses=""
+              name={"file"}
+              onChangeHandler={onChangeHandler}
+            ></FileUpload>
+            <Button
+              additionalClasses="flex-none"
+              name="Upload image"
+              clickHandler={onClickHandler}
+            ></Button>
+          </form>
+          <ImageResults styleName="query-example-grid-results"></ImageResults>
+        </div>
       </Container>
     </div>
   );

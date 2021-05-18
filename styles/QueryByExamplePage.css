@@ -7,3 +7,30 @@
 .image-upload-container > * {
   margin-top: 2rem;
 }
+
+.query-example-grid-header {
+  grid-area: header;
+}
+
+.query-example-grid-navbar {
+  grid-area: navbar;
+}
+
+.query-example-grid-query {
+  grid-area: query;
+}
+
+.query-example-grid-results {
+  grid-area: results;
+}
+
+.query-exmaple-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "navbar navbar"
+    "header header"
+    "query results"
+    "footer footer";
+}
