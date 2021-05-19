@@ -1,0 +1,10 @@
+.result-image {
+  object-fit: cover;
+  width: 230px;
+  height: auto;
+  transition: transform 0.3s;
+}
+
+.result-image:hover {
+  transform: scale(2);
+}

@@ -1,13 +1,15 @@
 .button {
   text-transform: uppercase;
-  background-color: #70c1b3;
-  font-size: larger;
-  font-weight: 600;
+  background-color: var(--main);
+  border-color: var(--main);
+  border-width: 1px;
+  font-size: 1rem;
   padding: 6px 16px;
-  border-radius: 10px;
+  border-radius: 0.5rem;
+  color: #fff;
 }
 
 .button:hover {
-  background-color: #45a191;
+  background-color: var(--main-darker);
   color: white;
 }

@@ -1,0 +1,31 @@
+.file-upload-label {
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--background-color);
+  color: var(--main);
+  border-radius: 0.5rem;
+  letter-spacing: 0.025rem;
+  text-transform: uppercase;
+  border-width: 1px;
+  border-color: var(--main);
+  cursor: pointer;
+}
+
+.file-upload-label:hover {
+  background-color: var(--main);
+  color: #fff;
+}
+
+.file-upload-svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.file-upload-span {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
