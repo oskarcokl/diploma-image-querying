@@ -1,5 +1,44 @@
-import sys
+import argparse
+import os
+import random
+import shutil
 
-if __name__ == "__main__":
-    print(f"Name of the script          : {sys.argv[0]=}")
-    print(f"Argument of the script      : {sys.argv[1:]=}")
+parser = argparse.ArgumentParser(
+    description="Copy N images from one directory to another"
+)
+
+parser.add_argument(
+    "--dest_folder",
+    metavar="d",
+    type=str,
+    help="Folder where you want files to be copied to.",
+)
+
+parser.add_argument(
+    "--src_folder",
+    metavar="s",
+    type=str,
+    help="Folder from where you want to copy files.",
+)
+
+
+parser.add_argument(
+    "--n_elements",
+    metavar="n",
+    type=int,
+    help="Number of elements to copy.",
+)
+
+args = parser.parse_args()
+
+src_dir = args.src_folder
+
+for directory in os.listdir(src_dir):
+    # print(os.path.join(args.src_folder, directory))
+    curr_dir = os.path.join(src_dir, directory)
+    files = [file for file in os.listdir(curr_dir)]
+    for x in range(args.n_elements):
+        copy_file = random.choice(files)
+        shutil.copyfile(
+            os.path.join(curr_dir, copy_file), os.path.join(args.dest_folder, copy_file)
+        )
