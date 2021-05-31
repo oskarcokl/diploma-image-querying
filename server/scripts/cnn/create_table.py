@@ -2,17 +2,7 @@ import psycopg2
 from config import config
 
 
-def create_table():
-    commands = (
-        """
-        CREATE TABLE cbir_index (
-            id SERIAL PRIMARY KEY,
-            image_name VARCHAR(255) NOT NULL,
-            image_vector INTEGER[4096]
-        )
-        """,
-    )
-
+def create_table(commands):
     connection = None
     try:
         params = config()
