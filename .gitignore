@@ -111,3 +111,6 @@ server/celery_app/__pycache__
 
 # Ignore vscode settings
 .vscode
+
+# Ignore db connection setting file
+database.ini
