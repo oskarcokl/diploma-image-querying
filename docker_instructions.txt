@@ -1,0 +1,8 @@
+# Command for creaing postgres docker container with specified database.
+
+sudo docker run -p 5432:5432 -d \                                  
+    -e POSTGRES_PASSWORD=postgres \
+    -e POSTGRES_USER=postgres \
+    -e POSTGRES_DB=image-querying \ 
+    -v pgdata:/var/lib/postgresql/data \
+    postgres
