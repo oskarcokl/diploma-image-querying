@@ -2,7 +2,7 @@ import os
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import psycopg2
-from config import config
+import db_connector
 
 
 class Searcher:
@@ -13,7 +13,4 @@ class Searcher:
         results = {}
         feature_list = []
 
-        try:
-            params = config()
-            connection = psycopg2
-
+        connector = db_connector()

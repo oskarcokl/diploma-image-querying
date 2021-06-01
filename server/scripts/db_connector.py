@@ -2,7 +2,7 @@ import psycopg2
 from config import config
 
 
-class db_connector:
+class DbConnector:
     def __init__(self):
         try:
             params = config()
