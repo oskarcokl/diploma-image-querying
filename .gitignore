@@ -114,3 +114,6 @@ server/celery_app/__pycache__
 
 # Ignore db connection setting file
 database.ini
+
+# Ignore downloaded vgg16 model
+vgg16
