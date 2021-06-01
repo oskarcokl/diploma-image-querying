@@ -1,16 +1,21 @@
-import os
+import sys
+
+sys.path.append("../")
+
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import psycopg2
-import db_connector
+from db_connector import DbConnector
 
 
 class Searcher:
-    def __init__(self, index_path):
-        self.index_path = index_path
-
     def search(self, query_features, n_neigbhours):
         results = {}
         feature_list = []
 
-        connector = db_connector()
+        connector = DbConnector()
+        print(dir(connector))
+
+
+if __name__ == "__main__":
+    Searcher().search("bruh", "cringe")
