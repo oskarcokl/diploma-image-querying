@@ -1,4 +1,8 @@
 import psycopg2
+import sys
+
+sys.path.append("./cnn")
+
 from config import config
 
 
@@ -12,7 +16,10 @@ class DbConnector:
             print(e)
 
     def close(self):
-        if self.cursor is not None:
-            self.cursor.close()
-        if self.connection is not None:
-            self.connection.clos()
+        try:
+            if self.cursor is not None:
+                self.cursor.close()
+            if self.connection is not None:
+                self.connection.clos()
+        except (Exception) as e:
+            print(e)
