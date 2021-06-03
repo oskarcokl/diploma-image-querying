@@ -20,6 +20,6 @@ class DbConnector:
             if self.cursor is not None:
                 self.cursor.close()
             if self.connection is not None:
-                self.connection.clos()
+                self.connection.close()
         except (Exception) as e:
             print(e)
