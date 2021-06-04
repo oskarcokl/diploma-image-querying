@@ -30,8 +30,6 @@ class Searcher:
         neighbor_model = NearestNeighbors(n_neighbors=n_neigbhours)
         neighbor_model.fit(features_array)
 
-        print(query_features.shape)
-
         dist, results = neighbor_model.kneighbors(query_features)
 
         connector.close()
