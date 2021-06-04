@@ -11,7 +11,6 @@ from db_connector import DbConnector
 class Searcher:
     def search(self, query_features, n_neigbhours):
         results = {}
-        feature_list = []
 
         connector = DbConnector()
         connector.cursor.execute("SELECT * FROM cbir_index")
