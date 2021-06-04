@@ -28,8 +28,6 @@ class Searcher:
 
             dist, results = neighbor_model.kneighbors([query_features])
 
-        print(cbir_index_img_paths)
-
         connector.close()
         img_paths = []
 
