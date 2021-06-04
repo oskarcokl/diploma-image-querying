@@ -18,15 +18,21 @@ class Searcher:
         print("Number of indexed images: ", connector.cursor.rowcount)
         cbir_index_features = connector.cursor.fetchall()
         cbir_index_img_paths = []
+        features_array_list = []
 
         for cbir_index_feature_list in cbir_index_features:
             cbir_index_img_paths.append(cbir_index_feature_list[1])
             feature_array = np.array(cbir_index_feature_list[2])
+            features_array_list.append(feature_array)
 
-            neighbor_model = NearestNeighbors(n_neighbors=n_neigbhours)
-            neighbor_model.fit(feature_array)
+        features_array = np.array(features_array_list)
 
-            dist, results = neighbor_model.kneighbors([query_features])
+        neighbor_model = NearestNeighbors(n_neighbors=n_neigbhours)
+        neighbor_model.fit(features_array)
+
+        print(query_features.shape)
+
+        dist, results = neighbor_model.kneighbors(query_features)
 
         connector.close()
         img_paths = []
