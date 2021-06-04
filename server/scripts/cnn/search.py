@@ -61,6 +61,12 @@ if __name__ == "__main__":
     argParser.add_argument(
         "-r", "--result_dir", required=True, help="Path to results directory"
     )
+    argParser.add_argument(
+        "-T",
+        "--terminal",
+        help="Use if you want to call the script from a CLI.",
+        action="store_true",
+    )
     args = vars(argParser.parse_args())
 
-    search(args["query"], args["result_dir"])
+    search(args["query"], args["result_dir"], args["terminal"])
