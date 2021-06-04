@@ -10,7 +10,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 
 
-def search(query_img_path, result_dir):
+def search(query_img_path, result_dir, cli):
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
@@ -34,6 +34,13 @@ def search(query_img_path, result_dir):
 
     (dist, img_paths) = searcher.search(features_query.reshape(1, -1), 10)
 
+    if cli:
+        show_resutls(query_img_path, img_paths)
+    else:
+        return img_paths
+
+
+def show_resutls(query_img_path, img_paths):
     query_img = cv2.imread(query_img_path)
     query_resized = cv2.resize(query_img, (720, 480))
     cv2.imshow("Query", query_resized)
