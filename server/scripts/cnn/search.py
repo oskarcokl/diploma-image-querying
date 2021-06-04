@@ -10,7 +10,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 
 
-def search(query_img_path, result_dir, cli):
+def search(query_img_path, cli):
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
@@ -59,9 +59,6 @@ if __name__ == "__main__":
         "-q", "--query", required=True, help="Path to the query image"
     )
     argParser.add_argument(
-        "-r", "--result_dir", required=True, help="Path to results directory"
-    )
-    argParser.add_argument(
         "-T",
         "--terminal",
         help="Use if you want to call the script from a CLI.",
@@ -69,4 +66,4 @@ if __name__ == "__main__":
     )
     args = vars(argParser.parse_args())
 
-    search(args["query"], args["result_dir"], args["terminal"])
+    search(args["query"], args["terminal"])
