@@ -51,6 +51,11 @@ class FileUploadHandler(BaseHandler):
         self.write("OK")
 
 
+class CBIRHandler(BaseHandler):
+    def get(self):
+        self.write("Here are your similar images.")
+
+
 class CeleryHandler(BaseHandler):
     async def get(self):
         result = tasks.add.apply_async((3, 4), countdown=10).get()
@@ -58,35 +63,14 @@ class CeleryHandler(BaseHandler):
         self.write(str(result))
 
 
-class JsonHandler(BaseHandler):
-    async def get(self):
-        response = await self.async_fetch("http://localhost:3000/images")
-        json_response = tornado.escape.json_decode(response.body)
-        self.write(json_response)
-
-    async def async_fetch(self, url):
-        http_client = AsyncHTTPClient()
-        response = await http_client.fetch(url)
-        return response
-
-
-class DatabaseHandler(BaseHandler):
-    def get(self):
-        session = queries.Session("postgresql://postgres@localhost:5432/test")
-        for row in session.query("SELECT * FROM person"):
-            print(row)
-        self.write("Ok")
-
-
 def main():
     parse_command_line()
     app = tornado.web.Application(
         [
             (r"/", MainHandler),
-            (r"/json", JsonHandler),
             (r"/file-upload", FileUploadHandler),
             (r"/celery", CeleryHandler),
-            (r"/db", DatabaseHandler),
+            (r"/cbir", CBIRHandler),
         ],
         debug=options.debug,
     )
