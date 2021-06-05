@@ -81,6 +81,7 @@ def main():
 
 def server_startup_message():
     print(f"Tornado server is running on port {options.port}")
+    print(f"Connect to server from url: http://localhost:{options.port}/")
 
 
 if __name__ == "__main__":
