@@ -1,7 +1,7 @@
 import psycopg2
 import sys
 
-sys.path.append("./cnn")
+sys.path.append("./cbir")
 
 from config import config
 
