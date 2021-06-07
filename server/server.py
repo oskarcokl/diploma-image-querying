@@ -3,7 +3,7 @@ import tornado.web
 import json
 import logging
 import queries
-from celery_app import tasks
+from celery_app.tasks import add
 from tornado.httpclient import AsyncHTTPClient
 
 from tornado.options import define, options, parse_command_line
@@ -52,13 +52,13 @@ class FileUploadHandler(BaseHandler):
 
 
 class CBIRHandler(BaseHandler):
-    def get(self):
-        self.write("Here are your similar images.")
+    async def get(self):
+        self.write("Hi :)")
 
 
 class CeleryHandler(BaseHandler):
     async def get(self):
-        result = tasks.add.apply_async((3, 4), countdown=10).get()
+        result = add.delay(3, 4).get()
         print(str(result))
         self.write(str(result))
 
