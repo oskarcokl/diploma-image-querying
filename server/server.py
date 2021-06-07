@@ -4,6 +4,7 @@ import json
 import logging
 import queries
 from celery_app.tasks import add
+from celery_app.cbir_tasks import cbir_query
 from tornado.httpclient import AsyncHTTPClient
 
 from tornado.options import define, options, parse_command_line
@@ -53,7 +54,8 @@ class FileUploadHandler(BaseHandler):
 
 class CBIRHandler(BaseHandler):
     async def get(self):
-        self.write("Hi :)")
+        result = cbir_query.delay().get()
+        self.write(result)
 
 
 class CeleryHandler(BaseHandler):
