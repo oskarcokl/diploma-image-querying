@@ -57,9 +57,13 @@ class CBIRQueryHandler(BaseHandler):
         results = cbir_query.delay().get()
         for result in results:
             print(result)
-        result_str = ",".join(results)
+        result_str = ",str(result)".join(results)
 
         self.write(result_str)
+
+    def post(self):
+        for field_name, files in self.request.files.items():
+            print(files)
 
 
 class CeleryHandler(BaseHandler):
@@ -76,7 +80,7 @@ def main():
             (r"/", MainHandler),
             (r"/file-upload", FileUploadHandler),
             (r"/celery", CeleryHandler),
-            (r"/cbir_query", CBIRQueryHandler),
+            (r"/cbir-query", CBIRQueryHandler),
         ],
         debug=options.debug,
     )

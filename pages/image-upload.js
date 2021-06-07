@@ -35,7 +35,7 @@ export default function UploadImage(params) {
     }
 
     axios
-      .post(API + "file-upload", data, {
+      .post(API + "cbir-query", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
