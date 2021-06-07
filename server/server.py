@@ -52,7 +52,7 @@ class FileUploadHandler(BaseHandler):
         self.write("OK")
 
 
-class CBIRHandler(BaseHandler):
+class CBIRQueryHandler(BaseHandler):
     async def get(self):
         result = cbir_query.delay().get()
         self.write(result)
@@ -72,7 +72,7 @@ def main():
             (r"/", MainHandler),
             (r"/file-upload", FileUploadHandler),
             (r"/celery", CeleryHandler),
-            (r"/cbir", CBIRHandler),
+            (r"/cbir_query", CBIRQueryHandler),
         ],
         debug=options.debug,
     )
