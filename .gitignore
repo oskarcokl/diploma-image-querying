@@ -107,7 +107,7 @@ dist
 db.json
 
 # __pycache__ files
-server/celery_app/__pycache__
+__pycache__/
 
 # Ignore vscode settings
 .vscode
