@@ -54,8 +54,12 @@ class FileUploadHandler(BaseHandler):
 
 class CBIRQueryHandler(BaseHandler):
     async def get(self):
-        result = cbir_query.delay().get()
-        self.write(result)
+        results = cbir_query.delay().get()
+        for result in results:
+            print(result)
+        result_str = ",".join(results)
+
+        self.write(result_str)
 
 
 class CeleryHandler(BaseHandler):

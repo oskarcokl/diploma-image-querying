@@ -2,6 +2,7 @@ from re import A
 import sys
 
 sys.path.append("../")
+sys.path.append("./scripts/")
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
@@ -13,6 +14,7 @@ class Searcher:
         results = {}
 
         connector = DbConnector()
+        print(dir(connector))
         connector.cursor.execute("SELECT * FROM cbir_index")
         print("Number of indexed images: ", connector.cursor.rowcount)
         cbir_index_features = connector.cursor.fetchall()
