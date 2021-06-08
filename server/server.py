@@ -3,6 +3,8 @@ import tornado.web
 import json
 import logging
 import queries
+import cv2
+import numpy as np
 from celery_app.tasks import add
 from celery_app.cbir_tasks import cbir_query
 from tornado.httpclient import AsyncHTTPClient
@@ -57,13 +59,15 @@ class CBIRQueryHandler(BaseHandler):
         results = cbir_query.delay().get()
         for result in results:
             print(result)
-        result_str = ",str(result)".join(results)
+        result_str = ",".join(results)
 
         self.write(result_str)
 
     def post(self):
         for field_name, files in self.request.files.items():
-            print(files)
+            results = decode_uploaded_img(files)
+            print(type(results))
+            # print(type(files[0].body))
 
 
 class CeleryHandler(BaseHandler):
@@ -92,6 +96,16 @@ def main():
 def server_startup_message():
     print(f"Tornado server is running on port {options.port}")
     print(f"Connect to server from url: http://localhost:{options.port}/")
+
+
+def decode_uploaded_img(file):
+    img_bytes = file[0].body
+    img_array = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
+    img_array = cv2.resize(img_array, (224, 224))
+    img_array = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
+    # Think image should be RGB after this but couldn't test.
+    # Chechk here if some problem arise.
+    return img_array
 
 
 if __name__ == "__main__":
