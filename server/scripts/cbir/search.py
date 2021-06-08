@@ -11,7 +11,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 
 
-def search(query_img_path=None, query_img_array=None, cli=False):
+def search(query_img_path=None, query_img_list=None, cli=False):
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
@@ -38,6 +38,7 @@ def search(query_img_path=None, query_img_array=None, cli=False):
         except Exception as e:
             print(e)
     else:
+        query_img_array = np.array(query_img_list)
         img_array = np.expand_dims(query_img_array, axis=0)
         img_paths = find_similar_imgs(
             img_array=img_array, model=model, searcher=searcher

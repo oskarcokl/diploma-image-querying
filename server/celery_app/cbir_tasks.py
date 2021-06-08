@@ -6,7 +6,6 @@ from search import search
 
 
 @app.task
-def cbir_query(query_img_path=None, query_img_array=None, cli=False):
-    print(query_img_array)
-    result = search(query_img_array=query_img_array, cli=cli)
+def cbir_query(query_img_path=None, query_img_list=None, cli=False):
+    result = search(query_img_list=query_img_list, cli=cli)
     return result

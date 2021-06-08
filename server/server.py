@@ -65,8 +65,10 @@ class CBIRQueryHandler(BaseHandler):
 
     def post(self):
         for field_name, files in self.request.files.items():
-            results = decode_uploaded_img(files)
-            print(type(results))
+            decoded_img_array = decode_uploaded_img(files)
+            decoded_img_list = decoded_img_array.tolist()
+            results = cbir_query.delay(query_img_list=decoded_img_list, cli=False).get()
+            print(results)
             # print(type(files[0].body))
 
 
