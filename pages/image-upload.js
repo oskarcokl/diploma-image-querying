@@ -19,7 +19,7 @@ export default function UploadImage(params) {
 
   const setResultImages = (src) => {
     const temp = [];
-    for (let i = 0; i < 10; i++) temp.push(src);
+    for (let i = 0; i < src.length; i++) temp.push(src[i]);
 
     _setResultImages(temp);
   };
@@ -44,14 +44,17 @@ export default function UploadImage(params) {
         console.log(e);
       })
       .then((res) => {
-        console.log(res);
+        const imgPaths = res.data.result_imgs;
+        let returnedImages = [];
+        for (let imgPath of imgPaths) {
+          returnedImages.push("/dataset/" + imgPath.split("/")[5]);
+        }
+        setResultImages(returnedImages);
       });
   };
 
   const onChangeHandler = async (event) => {
     const exampleImageURL = URL.createObjectURL(event.target.files[0]);
-
-    setResultImages(exampleImageURL);
 
     setImageSrc(exampleImageURL);
     setSelectedFiles(event.target.files);
