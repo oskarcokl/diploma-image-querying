@@ -1,5 +1,6 @@
 import argparse
 import os
+from absl.logging import get_absl_handler
 import cv2
 import numpy as np
 from searcher import Searcher
@@ -10,7 +11,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 
 
-def search(query_img_path, cli):
+def search(query_img_path=None, query_img_array=None, cli=False):
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
@@ -24,19 +25,23 @@ def search(query_img_path, cli):
 
     searcher = Searcher()
 
-    img = image.load_img(query_img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = preprocess_input(img_array)
-
-    get_fc2_layer_output = K.function([model.layers[0].input], model.layers[21].output)
-    features_query = get_fc2_layer_output([img_array])[0]
-
-    (dist, img_paths) = searcher.search(features_query.reshape(1, -1), 10)
-
     if cli:
-        show_resutls(query_img_path, img_paths)
+        try:
+            img = image.load_img(query_img_path, target_size=(224, 224))
+            img_array = image.img_to_array(img)
+            img_array = np.expand_dims(img_array, axis=0)
+
+            img_paths = find_similar_imgs(
+                img_array=img_array, model=model, searcher=searcher
+            )
+            show_resutls(query_img_path, img_paths)
+        except Exception as e:
+            print(e)
     else:
+        img_array = np.expand_dims(query_img_array, axis=0)
+        img_paths = find_similar_imgs(
+            img_array=img_array, model=model, searcher=searcher
+        )
         return img_paths
 
 
@@ -51,6 +56,15 @@ def show_resutls(query_img_path, img_paths):
         result_resized = cv2.resize(result_img, (720, 480))
         cv2.imshow("Result", result_resized)
         cv2.waitKey(0)
+
+
+def find_similar_imgs(img_array, model, searcher):
+    processed_img_array = preprocess_input(img_array)
+    get_fc2_layer_output = K.function([model.layers[0].input], model.layers[21].output)
+    features_query = get_fc2_layer_output([processed_img_array])[0]
+
+    (dist, img_paths) = searcher.search(features_query.reshape(1, -1), 10)
+    return img_paths
 
 
 if __name__ == "__main__":
