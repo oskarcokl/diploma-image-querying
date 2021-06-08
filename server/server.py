@@ -55,6 +55,10 @@ class FileUploadHandler(BaseHandler):
 
 
 class CBIRQueryHandler(BaseHandler):
+    def set_default_headers(self):
+        self.set_header("Content-Type", "application/json")
+        self.set_header("Access-Control-Allow-Origin", "*")
+
     async def get(self):
         results = cbir_query.delay().get()
         for result in results:
@@ -64,12 +68,16 @@ class CBIRQueryHandler(BaseHandler):
         self.write(result_str)
 
     def post(self):
+        result_json = None
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files)
             decoded_img_list = decoded_img_array.tolist()
-            results = cbir_query.delay(query_img_list=decoded_img_list, cli=False).get()
-            print(results)
-            # print(type(files[0].body))
+            result_imgs = cbir_query.delay(
+                query_img_list=decoded_img_list, cli=False
+            ).get()
+            result = {"result_imgs": result_imgs}
+            result_json = json.dumps(result)
+        self.write(result_json)
 
 
 class CeleryHandler(BaseHandler):

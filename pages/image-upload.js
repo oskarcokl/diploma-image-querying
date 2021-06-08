@@ -40,8 +40,11 @@ export default function UploadImage(params) {
           "Content-Type": "multipart/form-data",
         },
       })
+      .catch((e) => {
+        console.log(e);
+      })
       .then((res) => {
-        console.log(res.statusText);
+        console.log(res);
       });
   };
 
