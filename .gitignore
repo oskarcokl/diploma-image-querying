@@ -117,3 +117,6 @@ database.ini
 
 # Ignore downloaded vgg16 model
 vgg16
+
+# Ignore dataset images still need to figure out a good way of storing them.
+dataset
