@@ -14,8 +14,9 @@ class GMM:
         self.curr_components = 8
         n_feature_vectors, n_features_length = feature_vector_array.shape
 
-        # This is a responsibility vector, not sure what it does yet.
-        self.resp_vector = np.zeros((n_feature_vectors, self.curr_components))
+        # This is a responsibility matrix, the matrix describes,
+        # the probability resp[j,k] thak j is part of cluster k.
+        self.resp_array = np.zeros((n_feature_vectors, self.curr_components))
 
         # Construct array of random indexes which will later be used as the random starting means.
         # replace=False means that the indexes will be unique.
@@ -59,7 +60,6 @@ class GMM:
             self.log_likelihood_trace.append(log_likelihood)
 
         return self, ll
-
 
 
 if __name__ == "__main__":
