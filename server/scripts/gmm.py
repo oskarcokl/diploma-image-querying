@@ -27,9 +27,14 @@ class GMM:
         self.component_range_min = component_range_min
         self.component_range_max = component_range_max
 
-    def gmm_clustering(self, feature_vector_array):
-        # for self.curr_components in range(self.component_range_min, self.component_range_max+1):
-        self.curr_components = 8
+    def get_optimal_clusters(self, feature_vector_array):
+        for i in range(self.component_range_min, self.component_range_max + 1):
+            gmm_model, ll = self.gmm_clustering(feature_vector_array, i)
+            print(ll)
+        pass
+
+    def gmm_clustering(self, feature_vector_array, n_components):
+        self.curr_components = n_components
         n_feature_vectors, n_features_length = feature_vector_array.shape
 
         # This is a responsibility matrix, the matrix describes,
@@ -63,25 +68,22 @@ class GMM:
         self.log_likelihood_trace = []
         self.has_converged = False
 
-        ll = []
 
         # 1000 iterations is arbitrary here. Can be set by user in future.
         for i in range(1000):
-            print(i)
             new_log_likelihood = self._e_step(feature_vector_array)
             self._m_step(feature_vector_array)
 
-            ll.append(new_log_likelihood)
-
             # 0.001 is an arbitrary tolerance which can later be set by the user.
-            print(abs(new_log_likelihood - log_likelihood))
             if abs(new_log_likelihood - log_likelihood) <= 0.01:
+                print("Passed tolerance")
                 self.has_converged = True
+                break
 
             log_likelihood = new_log_likelihood
             self.log_likelihood_trace.append(log_likelihood)
 
-        return self, ll
+        return self
 
     # The e step we estimate the probability that a certain feature vector
     # belongs to a specific component/cluster.
@@ -135,7 +137,7 @@ class GMM:
 if __name__ == "__main__":
     print("Testing GMM class")
 
-    test_data = np.random.rand(20, 100)
+    test_data = np.random.rand(100, 200)
 
     myGmm = GMM()
-    myGmm.gmm_clustering(test_data)
+    myGmm.get_optimal_clusters(test_data)
