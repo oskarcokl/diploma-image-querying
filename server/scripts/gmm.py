@@ -30,6 +30,9 @@ class GMM:
     def get_optimal_clusters(self, feature_vector_array):
         # Current range is for testing only
         # TODO changed range
+        best_gmm_model = None
+        min_T = 0
+
         for i in range(self.component_range_min, self.component_range_min + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
             n_parameters = 3 * i
@@ -37,16 +40,25 @@ class GMM:
             mixture_density_vector = self._compute_mixture_density(
                 gmm_model.weights, gmm_model.resp_array
             )
-            self._compute_T(n_parameters, n_feature_vectors, mixture_density_vector)
+            T = self._compute_T(n_parameters, n_feature_vectors, mixture_density_vector)
+
+            # Update the best gmm model if criteraion T is smaller then current smallest.
+            if T < min_T:
+                min_T = T
+                best_gmm_model = gmm_model
 
         pass
 
+    # Calculates criterion for estimating how good a given GMM model is.
     def _compute_T(self, n_parameters, n_feature_vectors, mixture_density_vector):
         T = -np.log(np.prod(mixture_density_vector)) + (
             (n_parameters / 2) * np.log(n_feature_vectors)
         )
         return T
 
+    # Calculate mixture_density which is then used in calculation the T criterion.
+    # mixture_density is basicaly weight*prob data j belongs to cluster k summed for
+    # all clusters.
     def _compute_mixture_density(self, weights, resp_array):
         weights = np.reshape(weights, (weights.shape[0], 1))
         mixture_density_vector = np.matmul(resp_array, weights)
