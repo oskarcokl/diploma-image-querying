@@ -91,9 +91,11 @@ class GMM:
     def _compute_log_likelihood(self, feature_vector_array):
         for i in range(self.curr_components):
             weight = self.weights[i]
-            likelihood = multivariate_normal(self.means[i], self.covs_array[i]).pdf(
-                feature_vector_array
-            )
+
+            # Getting singular matrix error here. Might just be problem with current data.
+            likelihood = multivariate_normal(
+                mean=self.means[i], cov=self.covs_array[i]
+            ).pdf(feature_vector_array)
             self.resp[:, i] = weight * likelihood
 
         # Sum all probabilitires of all datapoinst for each cluster
