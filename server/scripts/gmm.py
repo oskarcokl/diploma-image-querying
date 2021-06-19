@@ -1,7 +1,6 @@
 # Code written with help from https://github.com/maelfabien/EM_GMM_HMM/blob/master/gmm.py
-from os import WEXITED
 import numpy as np
-from numpy.core.defchararray import replace
+from scipy.stats import norm, multivariate_normal
 
 
 class GMM:
@@ -25,8 +24,8 @@ class GMM:
         )
         self.means = feature_vector_array[the_chosen]
 
-        # Create array of weights. As far as i know now the initial
-        # initialization number may be arbitrary.
+        # Create array of weights. Weights vector needs to sum to 1,
+        # thats why the components at start are 1 / n_components
         self.weights = np.full(self.curr_components, 1 / self.curr_components)
 
         # Create an array of covariance matrices.
@@ -47,7 +46,7 @@ class GMM:
 
         # 1000 iterations is arbitrary here. Can be set by user in future.
         for i in range(1000):
-            new_log_likelihood = self._do_estep(feature_vector_array)
+            new_log_likelihood = self._e_step(feature_vector_array)
             self._do_mstep(feature_vector_array)
 
             ll.append(new_log_likelihood)
@@ -60,6 +59,23 @@ class GMM:
             self.log_likelihood_trace.append(log_likelihood)
 
         return self, ll
+
+    # The e step we estimate the probability that a certain feature vector
+    # belongs to a specific component/cluster.
+    def _e_step(self, feature_vector_array):
+        self._compute_log_likelihood(feature_vector_array)
+        log_likelihood = np.sum(np.log(np.sum(self.resp_array, axis=1)))
+
+    def _compute_log_likelihood(self, feature_vector_array):
+        for i in range(self.curr_components):
+            prior = self.weights[i]
+            likelihood = multivariate_normal(self.means[i], self.covs_array[i]).pdf(
+                feature_vector_array
+            )
+            self.resp[:, k] = prior * likelihood
+
+        log_likelihood = np.sum(np.log(np.sum(self.resp, axis=1)))
+        return log_likelihood
 
 
 if __name__ == "__main__":
