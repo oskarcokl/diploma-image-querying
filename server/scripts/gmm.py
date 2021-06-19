@@ -67,13 +67,15 @@ class GMM:
 
         # 1000 iterations is arbitrary here. Can be set by user in future.
         for i in range(1000):
+            print(i)
             new_log_likelihood = self._e_step(feature_vector_array)
             self._m_step(feature_vector_array)
 
             ll.append(new_log_likelihood)
 
             # 0.001 is an arbitrary tolerance which can later be set by the user.
-            if abs(new_log_likelihood - log_likelihood) <= 0.001:
+            print(abs(new_log_likelihood - log_likelihood))
+            if abs(new_log_likelihood - log_likelihood) <= 0.01:
                 self.has_converged = True
 
             log_likelihood = new_log_likelihood
@@ -95,6 +97,7 @@ class GMM:
             weight = self.weights[i]
 
             # Getting singular matrix error here. Might just be problem with current data.
+            # print(self.covs_array[i])
             likelihood = multivariate_normal(
                 mean=self.means[i], cov=self.covs_array[i], allow_singular=True
             ).pdf(feature_vector_array)
