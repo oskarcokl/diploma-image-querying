@@ -1,4 +1,5 @@
 # Code written with help from https://github.com/maelfabien/EM_GMM_HMM/blob/master/gmm.py
+from re import A
 import numpy as np
 from scipy.stats import norm, multivariate_normal
 
@@ -71,14 +72,39 @@ class GMM:
 
     def _compute_log_likelihood(self, feature_vector_array):
         for i in range(self.curr_components):
-            prior = self.weights[i]
+            weight = self.weights[i]
             likelihood = multivariate_normal(self.means[i], self.covs_array[i]).pdf(
                 feature_vector_array
             )
-            self.resp[:, k] = prior * likelihood
+            self.resp[:, i] = weight * likelihood
 
+        # Sum all probabilitires of all datapoinst for each cluster
+        # use log so we can sum for all datapoinst instead of multiplying it.
         log_likelihood = np.sum(np.log(np.sum(self.resp, axis=1)))
         return log_likelihood
+
+    # Most of calculations are done with matrices but could be just as
+    # easily achieved with loops and vectors.
+    def m_step(self, feature_vector_array):
+
+        # Sum of responsibilities assigned to each clutser.
+        resp_weights = self.resp.sum(axis=0)
+
+        # Calculating new weights from sum of all responsibilities divided by number of features.
+        self.weights = resp_weights / feature_vector_array.shape[0]
+
+        # Multiply probabilities with actual feature vector values
+        weighted_sum = np.dot(self.resp.T, feature_vector_array)
+
+        # Divide previous mutliplication with sumed probabilities do get means.
+        self.means = weighted_sum / resp_weights.reshape(-1, 1)
+
+        for i in range(self.curr_components):
+            diff = (feature_vector_array - self.means[i]).T
+            weighted_sum = np.dot(self.resp[:, i] * diff, diff.T)
+            self.covs[i] = weighted_sum / resp_weights[i]
+
+        return self
 
 
 if __name__ == "__main__":
