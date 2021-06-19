@@ -87,7 +87,7 @@ class GMM:
         log_likelihood = self._compute_log_likelihood(feature_vector_array)
 
         # Normalize resp array over all possible clutser assignments
-        self.resp = self.resp / self.resp.sum(axis=1, keepdims=1)
+        self.resp_array = self.resp_array / self.resp_array.sum(axis=1, keepdims=1)
         return log_likelihood
 
     def _compute_log_likelihood(self, feature_vector_array):
@@ -95,7 +95,9 @@ class GMM:
             weight = self.weights[i]
 
             # Getting singular matrix error here. Might just be problem with current data.
-            likelihood = multivariate_normal(cov=self.covs_array[i])
+            likelihood = multivariate_normal(
+                mean=self.means[i], cov=self.covs_array[i], allow_singular=True
+            ).pdf(feature_vector_array)
             self.resp[:, i] = weight * likelihood
 
         # Sum all probabilitires of all datapoinst for each cluster
@@ -122,7 +124,7 @@ class GMM:
         for i in range(self.curr_components):
             diff = (feature_vector_array - self.means[i]).T
             weighted_sum = np.dot(self.resp[:, i] * diff, diff.T)
-            self.covs[i] = weighted_sum / resp_weights[i]
+            self.covs_array[i] = weighted_sum / resp_weights[i]
 
         return self
 
