@@ -68,7 +68,7 @@ class GMM:
         # 1000 iterations is arbitrary here. Can be set by user in future.
         for i in range(1000):
             new_log_likelihood = self._e_step(feature_vector_array)
-            self._do_mstep(feature_vector_array)
+            self._m_step(feature_vector_array)
 
             ll.append(new_log_likelihood)
 
@@ -98,32 +98,32 @@ class GMM:
             likelihood = multivariate_normal(
                 mean=self.means[i], cov=self.covs_array[i], allow_singular=True
             ).pdf(feature_vector_array)
-            self.resp[:, i] = weight * likelihood
+            self.resp_array[:, i] = weight * likelihood
 
         # Sum all probabilitires of all datapoinst for each cluster
         # use log so we can sum for all datapoinst instead of multiplying it.
-        log_likelihood = np.sum(np.log(np.sum(self.resp, axis=1)))
+        log_likelihood = np.sum(np.log(np.sum(self.resp_array, axis=1)))
         return log_likelihood
 
     # Most of calculations are done with matrices but could be just as
     # easily achieved with loops and vectors.
-    def m_step(self, feature_vector_array):
+    def _m_step(self, feature_vector_array):
 
         # Sum of responsibilities assigned to each clutser.
-        resp_weights = self.resp.sum(axis=0)
+        resp_weights = self.resp_array.sum(axis=0)
 
         # Calculating new weights from sum of all responsibilities divided by number of features.
         self.weights = resp_weights / feature_vector_array.shape[0]
 
         # Multiply probabilities with actual feature vector values
-        weighted_sum = np.dot(self.resp.T, feature_vector_array)
+        weighted_sum = np.dot(self.resp_array.T, feature_vector_array)
 
         # Divide previous mutliplication with sumed probabilities do get means.
         self.means = weighted_sum / resp_weights.reshape(-1, 1)
 
         for i in range(self.curr_components):
             diff = (feature_vector_array - self.means[i]).T
-            weighted_sum = np.dot(self.resp[:, i] * diff, diff.T)
+            weighted_sum = np.dot(self.resp_array[:, i] * diff, diff.T)
             self.covs_array[i] = weighted_sum / resp_weights[i]
 
         return self
