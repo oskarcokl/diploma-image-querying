@@ -57,6 +57,8 @@ class GMM:
             shape_cov_matrix, np.cov(feature_vector_array, rowvar=False)
         )
 
+        print(self.covs_array[0].shape)
+
         log_likelihood = 0
         self.log_likelihood_trace = []
         self.has_converged = False
@@ -93,9 +95,7 @@ class GMM:
             weight = self.weights[i]
 
             # Getting singular matrix error here. Might just be problem with current data.
-            likelihood = multivariate_normal(
-                mean=self.means[i], cov=self.covs_array[i]
-            ).pdf(feature_vector_array)
+            likelihood = multivariate_normal(cov=self.covs_array[i])
             self.resp[:, i] = weight * likelihood
 
         # Sum all probabilitires of all datapoinst for each cluster
@@ -130,12 +130,7 @@ class GMM:
 if __name__ == "__main__":
     print("Testing GMM class")
 
-    test_list = []
-
-    for i in range(10):
-        test_list.append(np.full(4096, i))
-
-    test_array = np.array(test_list)
+    test_data = np.random.rand(20, 100)
 
     myGmm = GMM()
-    myGmm.gmm_clustering(test_array)
+    myGmm.gmm_clustering(test_data)
