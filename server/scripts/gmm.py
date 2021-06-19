@@ -63,8 +63,11 @@ class GMM:
     # The e step we estimate the probability that a certain feature vector
     # belongs to a specific component/cluster.
     def _e_step(self, feature_vector_array):
-        self._compute_log_likelihood(feature_vector_array)
-        log_likelihood = np.sum(np.log(np.sum(self.resp_array, axis=1)))
+        log_likelihood = self._compute_log_likelihood(feature_vector_array)
+
+        # Normalize resp array over all possible clutser assignments
+        self.resp = self.resp / self.resp.sum(axis=1, keepdims=1)
+        return log_likelihood
 
     def _compute_log_likelihood(self, feature_vector_array):
         for i in range(self.curr_components):
