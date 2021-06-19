@@ -28,15 +28,24 @@ class GMM:
         self.component_range_max = component_range_max
 
     def get_optimal_clusters(self, feature_vector_array):
-        for i in range(self.component_range_min, self.component_range_max + 1):
+        # Current range is for testing only
+        # TODO changed range
+        for i in range(self.component_range_min, self.component_range_min + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
             n_parameters = 3 * i
             n_feature_vectors = feature_vector_array.shape[0]
-            self._compute_mixture_density(gmm_model.weights, gmm_model.resp_array)
+            mixture_density_vector = self._compute_mixture_density(
+                gmm_model.weights, gmm_model.resp_array
+            )
+            self._compute_T(n_parameters, n_feature_vectors, mixture_density_vector)
+
         pass
 
-    def _compute_T(self, n_parameters, n_feature_vectors):
-        pass
+    def _compute_T(self, n_parameters, n_feature_vectors, mixture_density_vector):
+        T = -np.log(np.prod(mixture_density_vector)) + (
+            (n_parameters / 2) * np.log(n_feature_vectors)
+        )
+        return T
 
     def _compute_mixture_density(self, weights, resp_array):
         weights = np.reshape(weights, (weights.shape[0], 1))
@@ -143,7 +152,7 @@ class GMM:
 if __name__ == "__main__":
     print("Testing GMM class")
 
-    test_data = np.random.rand(10, 100)
+    test_data = np.random.rand(20, 40)
 
     myGmm = GMM()
     myGmm.get_optimal_clusters(test_data)
