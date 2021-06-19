@@ -11,7 +11,7 @@ Parameters
 ==========
 
 component_range_min: int
-    Minimum number of clutser you want to have in trained model. Default is 1
+    Minimum number of clutser you want to have in trained model. Default is 2
     Model will train on range (component_range_min to component_range_max)
      of clusters and choose the optimal number.
 
@@ -23,15 +23,25 @@ component_range_max: int
 
 
 class GMM:
-    def __init__(self, component_range_min=1, component_range_max=10):
+    def __init__(self, component_range_min=2, component_range_max=10):
         self.component_range_min = component_range_min
         self.component_range_max = component_range_max
 
     def get_optimal_clusters(self, feature_vector_array):
         for i in range(self.component_range_min, self.component_range_max + 1):
-            gmm_model, ll = self.gmm_clustering(feature_vector_array, i)
-            print(ll)
+            gmm_model = self.gmm_clustering(feature_vector_array, i)
+            n_parameters = 3 * i
+            n_feature_vectors = feature_vector_array.shape[0]
+            self._compute_mixture_density(gmm_model.weights, gmm_model.resp_array)
         pass
+
+    def _compute_T(self, n_parameters, n_feature_vectors):
+        pass
+
+    def _compute_mixture_density(self, weights, resp_array):
+        weights = np.reshape(weights, (weights.shape[0], 1))
+        mixture_density_vector = np.matmul(resp_array, weights)
+        return mixture_density_vector
 
     def gmm_clustering(self, feature_vector_array, n_components):
         self.curr_components = n_components
@@ -62,12 +72,9 @@ class GMM:
             shape_cov_matrix, np.cov(feature_vector_array, rowvar=False)
         )
 
-        print(self.covs_array[0].shape)
-
         log_likelihood = 0
         self.log_likelihood_trace = []
         self.has_converged = False
-
 
         # 1000 iterations is arbitrary here. Can be set by user in future.
         for i in range(1000):
@@ -99,7 +106,6 @@ class GMM:
             weight = self.weights[i]
 
             # Getting singular matrix error here. Might just be problem with current data.
-            # print(self.covs_array[i])
             likelihood = multivariate_normal(
                 mean=self.means[i], cov=self.covs_array[i], allow_singular=True
             ).pdf(feature_vector_array)
@@ -137,7 +143,7 @@ class GMM:
 if __name__ == "__main__":
     print("Testing GMM class")
 
-    test_data = np.random.rand(100, 200)
+    test_data = np.random.rand(10, 100)
 
     myGmm = GMM()
     myGmm.get_optimal_clusters(test_data)
