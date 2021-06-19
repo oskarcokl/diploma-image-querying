@@ -4,6 +4,24 @@ import numpy as np
 from scipy.stats import norm, multivariate_normal
 
 
+"""
+Full covariance Gaussina Mixture Model.
+
+Parameters
+==========
+
+component_range_min: int
+    Minimum number of clutser you want to have in trained model. Default is 1
+    Model will train on range (component_range_min to component_range_max)
+     of clusters and choose the optimal number.
+
+component_range_max: int
+    Maximum number of clutser you want to have in trained model. Default is 10.
+    Model will train on range (component_range_min to component_range_max)
+     of clusters and choose the optimal number.
+"""
+
+
 class GMM:
     def __init__(self, component_range_min=1, component_range_max=10):
         self.component_range_min = component_range_min
