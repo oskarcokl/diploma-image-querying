@@ -162,11 +162,27 @@ class GMM:
         return self
 
 
-def asign_feature_vectors(data, gmm_model):
-    print(data)
-    print(dir(gmm_model))
-    print("Im asigning ahhhhh")
+def asign_feature_vectors(data, gmm_model, layer):
+    new_data = [None] * len(data)
+
+    # for i in range(len(data)):
+    #     feature_vector = item[1]
+
     pass
+
+
+def get_cluster_of_index(resp_array, index):
+    n_clusters = resp_array.shape[1]
+    # Probability (responsibility) can never be smaller than 0.
+    max_resp = -1
+    cluster = -1
+
+    for i in range(n_clusters):
+        if resp_array[index][i] > max_resp:
+            max_resp = resp_array[index][i]
+            cluster = i
+
+    return cluster
 
 
 if __name__ == "__main__":
@@ -188,4 +204,4 @@ if __name__ == "__main__":
 
     myGmm = GMM()
     model = myGmm.get_optimal_clusters(feature_vectors_array)
-    asign_feature_vectors(data_list, model)
+    asign_feature_vectors(data_list, model, 1)
