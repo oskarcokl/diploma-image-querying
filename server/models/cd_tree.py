@@ -1,3 +1,6 @@
+from gmm import GMM
+
+
 class CDTree:
     """
     CDTree object:
@@ -17,6 +20,24 @@ class CDTree:
     def __init__(self, min_node, l_max):
         self.min_node = min_node
         self.l_max = l_max
+
+    """
+    Function that initializes the CDTree and returns it.
+
+    Parameters
+    ==========
+
+    data: [id: int, img_src: string, feature_vector: [int]]
+    """
+
+    def init_cd_tree(data):
+        stack = []
+
+        pass
+
+    def _generate_root_node(data):
+
+        pass
 
 
 class _Node:
@@ -60,3 +81,7 @@ class _Leaf:
     def __init__(self, n_feature_vectors, ids):
         self.n_feature_vectors = n_feature_vectors
         self.ids = ids
+
+
+if __name__ == "__main__":
+    print("Testing CDTree class")
