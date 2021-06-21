@@ -1,6 +1,22 @@
 class CDTree:
-    def __init__(self):
-        pass
+    """
+    CDTree object:
+
+    Parameters
+    ==========
+
+    min_node: int
+        Number used to restrict width of tree. If number of feature vectors
+        in current node is smaller than min_node then the node will not be split.
+
+    l_max: int
+        Number used to restrict depth of tree. If layer of sub node with be greater
+        than l_max the node will not be split
+    """
+
+    def __init__(self, min_node, l_max):
+        self.min_node = min_node
+        self.l_max = l_max
 
 
 class _Node:
