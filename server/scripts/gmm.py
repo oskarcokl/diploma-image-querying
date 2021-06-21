@@ -31,7 +31,8 @@ class GMM:
         # Current range is for testing only
         # TODO changed range
         best_gmm_model = None
-        min_T = 0
+        min_T = float("inf")
+        print(min_T)
 
         for i in range(self.component_range_min, self.component_range_min + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
@@ -47,7 +48,7 @@ class GMM:
                 min_T = T
                 best_gmm_model = gmm_model
 
-        pass
+        return best_gmm_model
 
     # Calculates criterion for estimating how good a given GMM model is.
     def _compute_T(self, n_parameters, n_feature_vectors, mixture_density_vector):
@@ -161,10 +162,30 @@ class GMM:
         return self
 
 
+def asign_feature_vectors(data, gmm_model):
+    print(data)
+    print(dir(gmm_model))
+    print("Im asigning ahhhhh")
+    pass
+
+
 if __name__ == "__main__":
     print("Testing GMM class")
 
-    test_data = np.random.rand(20, 40)
+    data_list = []
+
+    for id in range(1, 21):
+        rand_feature_vector = np.random.rand(40)
+        temp_list = [id, rand_feature_vector]
+        data_list.append(temp_list)
+
+    feature_list = []
+
+    for data in data_list:
+        feature_list.append(data[1])
+
+    feature_vectors_array = np.array(feature_list)
 
     myGmm = GMM()
-    myGmm.get_optimal_clusters(test_data)
+    model = myGmm.get_optimal_clusters(feature_vectors_array)
+    asign_feature_vectors(data_list, model)
