@@ -32,7 +32,6 @@ class GMM:
         # TODO changed range
         best_gmm_model = None
         min_T = float("inf")
-        print(min_T)
 
         for i in range(self.component_range_min, self.component_range_min + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
@@ -162,13 +161,17 @@ class GMM:
         return self
 
 
+# The function gets data, gmm_model and layer and for each data points
+# asignes it to its cluster and marks which layer current clusters are on.
 def asign_feature_vectors(data, gmm_model, layer):
     new_data = [None] * len(data)
 
-    # for i in range(len(data)):
-    #     feature_vector = item[1]
+    for i in range(len(data)):
+        cluster = get_cluster_of_index(gmm_model.resp_array, i)
+        new_data_item = [data[i][0], data[i][1], cluster, layer]
+        new_data[i] = new_data_item
 
-    pass
+    return new_data
 
 
 def get_cluster_of_index(resp_array, index):
@@ -204,4 +207,4 @@ if __name__ == "__main__":
 
     myGmm = GMM()
     model = myGmm.get_optimal_clusters(feature_vectors_array)
-    asign_feature_vectors(data_list, model, 1)
+    new_data = asign_feature_vectors(data_list, model, 1)
