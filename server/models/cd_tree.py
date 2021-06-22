@@ -1,6 +1,7 @@
 from os import kill
 from gmm import GMM
 import numpy as np
+import math
 
 
 class CDTree:
@@ -33,6 +34,7 @@ class CDTree:
     data: [id: int, img_src: string, feature_vector: [int]]
     """
 
+    # TODO add n_iterations and tolerance parameters
     def init_cd_tree(self, data):
         gmm = GMM()
         stack = []
@@ -123,9 +125,6 @@ class CDTree:
 
         return False
 
-    def _generate_sub_node(self):
-        pass
-
     def _generate_root_node(self, data):
         ids = []
         feature_vectors = []
@@ -142,6 +141,24 @@ class CDTree:
             feature_vectors=feature_vectors,
         )
         return root_node
+
+    # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
+    # Function calculates the above function
+    def _calculate_cpd(self, feature_vector, mean, cov_array):
+        d = len(feature_vector)
+        a = (2 * np.pi) ** (d / 2)
+        b = np.linalg.det(cov_array) ** -0.5
+        c = np.exp(
+            -0.5
+            * np.matmul(
+                np.matmul(
+                    np.transpose(feature_vector - mean), np.linalg.inv(cov_array)
+                ),
+                (feature_vector - mean),
+            )
+        )
+        cpd = a * b * c
+        return cpd
 
 
 class _Node:
