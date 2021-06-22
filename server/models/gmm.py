@@ -29,10 +29,10 @@ class GMM:
 
     def get_optimal_clusters(self, feature_vector_array):
         # Current range is for testing only
-        # TODO changed range
         best_gmm_model = None
         min_T = float("inf")
 
+        # TODO changed range
         for i in range(self.component_range_min, self.component_range_min + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
             n_parameters = 3 * i
