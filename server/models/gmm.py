@@ -61,7 +61,9 @@ class GMM:
         mixture_density_vector = np.matmul(resp_array, weights)
         return mixture_density_vector
 
-    def gmm_clustering(self, feature_vector_array, n_components):
+    def gmm_clustering(
+        self, feature_vector_array, n_components, tolerence=0.01, n_iters=1000
+    ):
         self.curr_components = n_components
         n_feature_vectors, n_features_length = feature_vector_array.shape
 
@@ -95,12 +97,12 @@ class GMM:
         self.has_converged = False
 
         # 1000 iterations is arbitrary here. Can be set by user in future.
-        for i in range(1000):
+        for i in range(n_iters):
             new_log_likelihood = self._e_step(feature_vector_array)
             self._m_step(feature_vector_array)
 
             # 0.001 is an arbitrary tolerance which can later be set by the user.
-            if abs(new_log_likelihood - log_likelihood) <= 0.01:
+            if abs(new_log_likelihood - log_likelihood) <= tolerance:
                 print("Passed tolerance")
                 self.has_converged = True
                 break
