@@ -35,6 +35,7 @@ class CDTree:
     def init_cd_tree(self, data):
         stack = []
         root_node = self._generate_root_node(data)
+        print(root_node)
         stack.append(root_node)
         curr_node = stack.pop()
 
@@ -69,7 +70,7 @@ class _Node:
     Parameters
     ==========
 
-    n_sub_clutsers: int
+    n_sub_clusters: int
         Number of sub clusters of this node
 
     gmm_parameters: dict
@@ -97,22 +98,40 @@ class _Node:
         is_leaf=False,
         n_feature_vectors=0,
         ids=[],
-        n_sub_clutsers=0,
+        n_sub_clusters=0,
         gmm_parameters={},
         sub_nodes=[],
         is_root=False,
     ):
-        if is_leaf:
-            self._is_leaf = is_leaf
-            self._n_feature_vectors = n_feature_vectors
-            self._ids = ids
-            self._is_root = is_root
-        else:
-            self._is_leaf = is_leaf
-            self._n_sub_clutsers = n_sub_clutsers
-            self._gmm_parameters = gmm_parameters
-            self._sub_nodes = sub_nodes
-            self._is_root = is_root
+        self._is_leaf = is_leaf
+        self._n_feature_vectors = n_feature_vectors
+        self._ids = ids
+        self._is_root = is_root
+        self._n_sub_clusters = n_sub_clusters
+        self._gmm_parameters = gmm_parameters
+        self._sub_nodes = sub_nodes
+
+    def __str__(self):
+        return """
+    Information about nodes paramteres
+    ==================================
+    is_leaf: {is_leaf}
+    n_feature_vectors: {n_feature_vectors}
+    ids: {ids}
+    n_sub_clutsers: {n_sub_clusters}
+    gmm_parameters: {gmm_parameters}
+    sub_nodes: {sub_nodes}
+    is_root: {is_root}
+    ==================================
+        """.format(
+            is_leaf=self._is_leaf,
+            n_feature_vectors=self._n_feature_vectors,
+            ids=self._ids,
+            is_root=self._is_root,
+            n_sub_clusters=self._n_sub_clusters,
+            gmm_parameters=self._gmm_parameters,
+            sub_nodes=self._sub_nodes,
+        )
 
 
 class _Leaf:
