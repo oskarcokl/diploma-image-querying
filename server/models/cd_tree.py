@@ -74,7 +74,12 @@ class CDTree:
         for item in data:
             ids.append(item[0])
         root_node = _Node(
-            n_feature_vectors=len(data), is_leaf=False, ids=ids, is_root=True, layer=0, data=data
+            n_feature_vectors=len(data),
+            is_leaf=False,
+            ids=ids,
+            is_root=True,
+            layer=0,
+            data=data,
         )
         return root_node
 
@@ -109,9 +114,9 @@ class _Node:
 
     layer: int
         Which layer is the node on.
-    
+
     data: []
-        Same as data that gets based into CDTree.init_cd_tree() 
+        Same as data that gets based into CDTree.init_cd_tree()
         but only keeping the relevant parts for the node.
 
     """
@@ -126,7 +131,7 @@ class _Node:
         sub_nodes=[],
         is_root=False,
         layer=-1,
-        data=[]
+        data=[],
     ):
         self.is_leaf = is_leaf
         self.n_feature_vectors = n_feature_vectors
@@ -163,12 +168,15 @@ class _Node:
         )
 
     # This function assumes that ids are ordered.
-    def _get_node_features(self, node, data):
+    # Return a list[id:int, feature_vector:[]]
+    def _get_node_features(self):
         feature_vectors_with_ids = []
 
-        for item in data
-         
-        pass
+        for item in self.data:
+            vector_with_id = [item[0], item[1]]
+            feature_vectors_with_ids.append(vector_with_id)
+
+        return feature_vectors_with_ids
 
 
 class _Leaf:
