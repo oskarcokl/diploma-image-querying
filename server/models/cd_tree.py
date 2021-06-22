@@ -40,22 +40,51 @@ class CDTree:
         stack.append(root_node)
         curr_node = stack.pop()
 
-        print(curr_node)
-
         while curr_node is not None:
             if self._check_stop_conditions(curr_node):
                 curr_node.is_leaf = True
             else:
-                curr_node_features = curr_node.get_node_features()
-                print(curr_node_features)
-                model = gmm.get_optimal_clusters(curr_node_features)
-                # Save GMM into curr_node
+                curr_node_feature_array = np.array(curr_node.feature_vectors)
+                model = gmm.get_optimal_clusters(curr_node_feature_array, 1, 2)
+                node_gmm_parameters = {
+                    "covs_array": model.covs_array,
+                    "means": model.means,
+                    "weights": model.weights,
+                }
+                # Save GMM parameters into curr_node
+                curr_node.gmm_parameters = node_gmm_parameters
+                self._asign_vectors_to_clusters(
+                    curr_node.ids, curr_node.feature_vectors, model.resp_array
+                )
                 for cluster in model.weights:
+                    print(cluster)
                     # Add sub nodes to stack
                     pass
             curr_node = stack.pop()
 
         return root_node
+
+    def _asign_vectors_to_clusters(self, ids, feature_vectors, resp_array):
+        new_data = []
+        for i in range(len(ids)):
+            cluster = self._get_cluster_of_index(resp_array, i)
+            new_data_item = [ids[i], feature_vectors[i], cluster]
+            new_data[i] = new_data_item
+
+        return new_data
+
+    def _get_cluster_of_index(self, resp_array, index):
+        n_clusters = resp_array.shape[1]
+        # Probability (responsibility) can never be smaller than 0.
+        max_resp = -1
+        cluster = -1
+
+        for i in range(n_clusters):
+            if resp_array[index][i] > max_resp:
+                max_resp = resp_array[index][i]
+                cluster = i
+
+        return cluster
 
     # If stop conditions have been met the functino returns true.
     # Else it retusn false.
@@ -79,7 +108,6 @@ class CDTree:
             ids.append(item[0])
             feature_vectors.append(item[2])
 
-        print(feature_vectors)
         root_node = _Node(
             n_feature_vectors=len(data),
             is_leaf=False,
@@ -213,8 +241,6 @@ if __name__ == "__main__":
         rand_feature_vector = np.random.rand(40)
         temp_list = [id, "img_src", rand_feature_vector]
         data_list.append(temp_list)
-
-    print(data_list)
 
     cd_tree = CDTree(min_node=20, l_max=4)
     cd_tree.init_cd_tree(data_list)
