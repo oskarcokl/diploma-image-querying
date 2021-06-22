@@ -57,16 +57,19 @@ class CDTree:
                     curr_node.ids, curr_node.feature_vectors, model.resp_array
                 )
 
-                print(vectors_with_clusters)
-
                 new_nodes = []
                 node_id = 1
+                # Outer loop loops throught all of the clusters and creates
+                # a new node for each one.
                 for index in range(len(model.weights)):
                     new_node = _Node(layer=curr_node.layer + 1, node_id=node_id)
                     node_id += 1
 
                     feature_vectors = []
                     ids = []
+
+                    # Iterates over feature vectors and pust the ones asigned to current
+                    # cluster into a list which is then added to the new node.
                     for item in vectors_with_clusters:
                         if item[2] == index:
                             feature_vectors.append(item[1])
@@ -74,19 +77,17 @@ class CDTree:
 
                     new_node.ids = ids
                     new_node.feature_vectors = feature_vectors
+                    new_node.n_feature_vectors = len(ids)
                     new_nodes.append(new_node)
+                    stack.append(new_node)
 
-                # For loops populates the ids and feature_vector lists of the node.
-                # Since cluster asigments will always go from 0...n we can use
-                # these numbers as indexes.
+                curr_node.sub_nodes = new_nodes
+                curr_node.n_sub_clusters = len(new_nodes)
 
-                for node in new_nodes:
-                    node.n_feature_vectors = len(node.feature_vectors)
-                    print(node)
-
-            curr_node = stack.pop()
-
-        return root_node
+            if stack:
+                curr_node = stack.pop()
+            else:
+                return root_node
 
     def _asign_vectors_to_clusters(self, ids, feature_vectors, resp_array):
         new_data = []
@@ -271,4 +272,8 @@ if __name__ == "__main__":
         data_list.append(temp_list)
 
     cd_tree = CDTree(min_node=20, l_max=4)
-    cd_tree.init_cd_tree(data_list)
+    root = cd_tree.init_cd_tree(data_list)
+
+    print(root)
+    print(root.sub_nodes[0])
+    print(root.sub_nodes[1])
