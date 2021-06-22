@@ -28,12 +28,12 @@ class GMM:
         self, feature_vector_array, component_range_min=1, component_range_max=10
     ):
         self._clear_self_params()
-    
+
         # Current range is for testing only
         best_gmm_model = None
         min_T = float("inf")
 
-        for i in range(self.component_range_min, self.component_range_max + 1):
+        for i in range(component_range_min, component_range_max + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
             n_parameters = 3 * i
             n_feature_vectors = feature_vector_array.shape[0]
@@ -78,7 +78,7 @@ class GMM:
         return mixture_density_vector
 
     def gmm_clustering(
-        self, feature_vector_array, n_components, tolerence=0.01, n_iters=1000
+        self, feature_vector_array, n_components, tolerance=0.01, n_iters=1000
     ):
         self.curr_components = n_components
         n_feature_vectors, n_features_length = feature_vector_array.shape
@@ -206,7 +206,13 @@ def get_cluster_of_index(resp_array, index):
 if __name__ == "__main__":
     print("Testing GMM class")
 
+    # Test data
     data_list = []
+
+    for id in range(1, 21):
+        rand_feature_vector = np.random.rand(40)
+        temp_list = [id, rand_feature_vector]
+        data_list.append(temp_list)
 
     feature_list = []
 
@@ -216,5 +222,4 @@ if __name__ == "__main__":
     feature_vectors_array = np.array(feature_list)
 
     myGmm = GMM()
-    model = myGmm.get_optimal_clusters(feature_vectors_array)
-    new_data = asign_feature_vectors(data_list, model, 1)
+    model1 = myGmm.get_optimal_clusters(feature_vectors_array, 1, 2)
