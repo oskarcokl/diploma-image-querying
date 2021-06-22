@@ -245,21 +245,6 @@ class _Node:
         return feature_vectors_with_ids
 
 
-class _Leaf:
-    """
-    Leaf node of CDTree:
-
-    Parameters
-    ==========
-
-
-    """
-
-    def __init__(self, n_feature_vectors, ids):
-        self.n_feature_vectors = n_feature_vectors
-        self.ids = ids
-
-
 if __name__ == "__main__":
     print("Testing CDTree class")
 
