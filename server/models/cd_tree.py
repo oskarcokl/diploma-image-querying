@@ -53,13 +53,37 @@ class CDTree:
                 }
                 # Save GMM parameters into curr_node
                 curr_node.gmm_parameters = node_gmm_parameters
-                self._asign_vectors_to_clusters(
+                vectors_with_clusters = self._asign_vectors_to_clusters(
                     curr_node.ids, curr_node.feature_vectors, model.resp_array
                 )
-                for cluster in model.weights:
-                    print(cluster)
-                    # Add sub nodes to stack
-                    pass
+
+                print(vectors_with_clusters)
+
+                new_nodes = []
+                node_id = 1
+                for index in range(len(model.weights)):
+                    new_node = _Node(layer=curr_node.layer + 1, node_id=node_id)
+                    node_id += 1
+
+                    feature_vectors = []
+                    ids = []
+                    for item in vectors_with_clusters:
+                        if item[2] == index:
+                            feature_vectors.append(item[1])
+                            ids.append(item[0])
+
+                    new_node.ids = ids
+                    new_node.feature_vectors = feature_vectors
+                    new_nodes.append(new_node)
+
+                # For loops populates the ids and feature_vector lists of the node.
+                # Since cluster asigments will always go from 0...n we can use
+                # these numbers as indexes.
+
+                for node in new_nodes:
+                    node.n_feature_vectors = len(node.feature_vectors)
+                    print(node)
+
             curr_node = stack.pop()
 
         return root_node
@@ -69,7 +93,7 @@ class CDTree:
         for i in range(len(ids)):
             cluster = self._get_cluster_of_index(resp_array, i)
             new_data_item = [ids[i], feature_vectors[i], cluster]
-            new_data[i] = new_data_item
+            new_data.append(new_data_item)
 
         return new_data
 
@@ -168,6 +192,7 @@ class _Node:
         layer=-1,
         data=[],
         feature_vectors=[],
+        node_id=-1,
     ):
         self.is_leaf = is_leaf
         self.n_feature_vectors = n_feature_vectors
@@ -179,6 +204,7 @@ class _Node:
         self.layer = layer
         self.data = data
         self.feature_vectors = feature_vectors
+        self.node_id = node_id
 
     def __str__(self):
         return """
@@ -192,6 +218,7 @@ class _Node:
     sub_nodes: {sub_nodes}
     is_root: {is_root}
     layer: {layer}
+    node_id: {node_id}
     ==================================
         """.format(
             is_leaf=self.is_leaf,
@@ -202,6 +229,7 @@ class _Node:
             gmm_parameters=self.gmm_parameters,
             sub_nodes=self.sub_nodes,
             layer=self.layer,
+            node_id=self.node_id,
         )
 
     # This function assumes that ids are ordered.
