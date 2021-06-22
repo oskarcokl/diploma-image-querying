@@ -1,3 +1,4 @@
+from os import kill
 from gmm import GMM
 import numpy as np
 
@@ -43,8 +44,9 @@ class CDTree:
 
         while curr_node is not None:
             if self._check_stop_conditions(curr_node):
-                leaf_node = self.make_node_leaf(curr_node)
+                curr_node.is_leaf = True
             else:
+                curr_node_features = self._get_node_features(curr_node, data)
                 model = gmm.get_optimal_clusters(curr_node_features)
                 # Save GMM into curr_node
                 for cluster in model.weights:
@@ -72,7 +74,7 @@ class CDTree:
         for item in data:
             ids.append(item[0])
         root_node = _Node(
-            n_feature_vectors=len(data), is_leaf=False, ids=ids, is_root=True
+            n_feature_vectors=len(data), is_leaf=False, ids=ids, is_root=True, layer=0, data=data
         )
         return root_node
 
@@ -105,17 +107,26 @@ class _Node:
     is_root: bool
         Wheather the node is the rote node of the tree or not.
 
+    layer: int
+        Which layer is the node on.
+    
+    data: []
+        Same as data that gets based into CDTree.init_cd_tree() 
+        but only keeping the relevant parts for the node.
+
     """
 
     def __init__(
         self,
         is_leaf=False,
-        n_feature_vectors=0,
+        n_feature_vectors=-1,
         ids=[],
-        n_sub_clusters=0,
+        n_sub_clusters=-1,
         gmm_parameters={},
         sub_nodes=[],
         is_root=False,
+        layer=-1,
+        data=[]
     ):
         self.is_leaf = is_leaf
         self.n_feature_vectors = n_feature_vectors
@@ -124,6 +135,8 @@ class _Node:
         self.n_sub_clusters = n_sub_clusters
         self.gmm_parameters = gmm_parameters
         self.sub_nodes = sub_nodes
+        self.layer = layer
+        self.data = data
 
     def __str__(self):
         return """
@@ -136,6 +149,7 @@ class _Node:
     gmm_parameters: {gmm_parameters}
     sub_nodes: {sub_nodes}
     is_root: {is_root}
+    layer: {layer}
     ==================================
         """.format(
             is_leaf=self.is_leaf,
@@ -145,7 +159,16 @@ class _Node:
             n_sub_clusters=self.n_sub_clusters,
             gmm_parameters=self.gmm_parameters,
             sub_nodes=self.sub_nodes,
+            layer=self.layer,
         )
+
+    # This function assumes that ids are ordered.
+    def _get_node_features(self, node, data):
+        feature_vectors_with_ids = []
+
+        for item in data
+         
+        pass
 
 
 class _Leaf:
