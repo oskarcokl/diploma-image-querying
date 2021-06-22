@@ -39,8 +39,10 @@ class CDTree:
         stack.append(root_node)
         curr_node = stack.pop()
 
+        print(curr_node)
+
         while curr_node is not None:
-            if self.check_stop_conditions(curr_node):
+            if self._check_stop_conditions(curr_node):
                 leaf_node = self.make_node_leaf(curr_node)
             else:
                 model = gmm.get_optimal_clusters(curr_node_features)
@@ -115,13 +117,13 @@ class _Node:
         sub_nodes=[],
         is_root=False,
     ):
-        self._is_leaf = is_leaf
-        self._n_feature_vectors = n_feature_vectors
-        self._ids = ids
-        self._is_root = is_root
-        self._n_sub_clusters = n_sub_clusters
-        self._gmm_parameters = gmm_parameters
-        self._sub_nodes = sub_nodes
+        self.is_leaf = is_leaf
+        self.n_feature_vectors = n_feature_vectors
+        self.ids = ids
+        self.is_root = is_root
+        self.n_sub_clusters = n_sub_clusters
+        self.gmm_parameters = gmm_parameters
+        self.sub_nodes = sub_nodes
 
     def __str__(self):
         return """
@@ -136,13 +138,13 @@ class _Node:
     is_root: {is_root}
     ==================================
         """.format(
-            is_leaf=self._is_leaf,
-            n_feature_vectors=self._n_feature_vectors,
-            ids=self._ids,
-            is_root=self._is_root,
-            n_sub_clusters=self._n_sub_clusters,
-            gmm_parameters=self._gmm_parameters,
-            sub_nodes=self._sub_nodes,
+            is_leaf=self.is_leaf,
+            n_feature_vectors=self.n_feature_vectors,
+            ids=self.ids,
+            is_root=self.is_root,
+            n_sub_clusters=self.n_sub_clusters,
+            gmm_parameters=self.gmm_parameters,
+            sub_nodes=self.sub_nodes,
         )
 
 
