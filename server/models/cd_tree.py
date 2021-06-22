@@ -74,15 +74,19 @@ class CDTree:
 
     def _generate_root_node(self, data):
         ids = []
+        feature_vectors = []
         for item in data:
             ids.append(item[0])
+            feature_vectors.append(item[2])
+
+        print(feature_vectors)
         root_node = _Node(
             n_feature_vectors=len(data),
             is_leaf=False,
             ids=ids,
             is_root=True,
             layer=0,
-            data=data,
+            feature_vectors=feature_vectors,
         )
         return root_node
 
@@ -135,6 +139,7 @@ class _Node:
         is_root=False,
         layer=-1,
         data=[],
+        feature_vectors=[],
     ):
         self.is_leaf = is_leaf
         self.n_feature_vectors = n_feature_vectors
@@ -145,6 +150,7 @@ class _Node:
         self.sub_nodes = sub_nodes
         self.layer = layer
         self.data = data
+        self.feature_vectors = feature_vectors
 
     def __str__(self):
         return """
@@ -205,8 +211,10 @@ if __name__ == "__main__":
 
     for id in range(1, 21):
         rand_feature_vector = np.random.rand(40)
-        temp_list = [id, rand_feature_vector]
+        temp_list = [id, "img_src", rand_feature_vector]
         data_list.append(temp_list)
+
+    print(data_list)
 
     cd_tree = CDTree(min_node=20, l_max=4)
     cd_tree.init_cd_tree(data_list)
