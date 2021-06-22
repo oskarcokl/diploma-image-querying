@@ -46,7 +46,8 @@ class CDTree:
             if self._check_stop_conditions(curr_node):
                 curr_node.is_leaf = True
             else:
-                curr_node_features = self._get_node_features(curr_node, data)
+                curr_node_features = curr_node.get_node_features()
+                print(curr_node_features)
                 model = gmm.get_optimal_clusters(curr_node_features)
                 # Save GMM into curr_node
                 for cluster in model.weights:
@@ -57,11 +58,11 @@ class CDTree:
         return root_node
 
     def _check_stop_conditions(self, node):
-        if len(node._gmm_parameters["weights"]) == 1:
+        if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
             return False
-        elif node._n_feature_vectors < self.min_node:
+        elif node.n_feature_vectors < self.min_node:
             return False
-        elif node._layer >= self.l_max:
+        elif node.layer >= self.l_max:
             return False
 
         return True
@@ -169,7 +170,7 @@ class _Node:
 
     # This function assumes that ids are ordered.
     # Return a list[id:int, feature_vector:[]]
-    def _get_node_features(self):
+    def get_node_features(self):
         feature_vectors_with_ids = []
 
         for item in self.data:
