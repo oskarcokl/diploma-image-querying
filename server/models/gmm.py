@@ -1,4 +1,5 @@
 # Code written with help from https://github.com/maelfabien/EM_GMM_HMM/blob/master/gmm.py
+import os
 from re import A
 import numpy as np
 from scipy.stats import norm, multivariate_normal
@@ -26,6 +27,8 @@ class GMM:
     def get_optimal_clusters(
         self, feature_vector_array, component_range_min=1, component_range_max=10
     ):
+        self._clear_self_params()
+    
         # Current range is for testing only
         best_gmm_model = None
         min_T = float("inf")
@@ -52,6 +55,19 @@ class GMM:
             (n_parameters / 2) * np.log(n_feature_vectors)
         )
         return T
+
+    # Function clears all parameters which are used in the copmutation
+    # of the gmm. The params should be overriden each opeartion so this
+    # Is more of an preamptive meassure.
+    def _clear_self_params(self):
+        self.curr_components = None
+        self.weights = None
+        self.resp_array = None
+        self.covs_array = None
+        self.has_converged = None
+        self.means = None
+        self.log_likelihood_trace = None
+        pass
 
     # Calculate mixture_density which is then used in calculation the T criterion.
     # mixture_density is basicaly weight*prob data j belongs to cluster k summed for
