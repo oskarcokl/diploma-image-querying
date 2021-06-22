@@ -57,15 +57,17 @@ class CDTree:
 
         return root_node
 
+    # If stop conditions have been met the functino returns true.
+    # Else it retusn false.
     def _check_stop_conditions(self, node):
         if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
-            return False
+            return True
         elif node.n_feature_vectors < self.min_node:
-            return False
+            return True
         elif node.layer >= self.l_max:
-            return False
+            return True
 
-        return True
+        return False
 
     def _generate_sub_node(self):
         pass

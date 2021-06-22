@@ -23,17 +23,14 @@ component_range_max: int
 
 
 class GMM:
-    def __init__(self, component_range_min=2, component_range_max=10):
-        self.component_range_min = component_range_min
-        self.component_range_max = component_range_max
-
-    def get_optimal_clusters(self, feature_vector_array):
+    def get_optimal_clusters(
+        self, feature_vector_array, component_range_min=1, component_range_max=10
+    ):
         # Current range is for testing only
         best_gmm_model = None
         min_T = float("inf")
 
-        # TODO changed range
-        for i in range(self.component_range_min, self.component_range_min + 1):
+        for i in range(self.component_range_min, self.component_range_max + 1):
             gmm_model = self.gmm_clustering(feature_vector_array, i)
             n_parameters = 3 * i
             n_feature_vectors = feature_vector_array.shape[0]
