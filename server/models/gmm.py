@@ -193,11 +193,6 @@ if __name__ == "__main__":
 
     data_list = []
 
-    for id in range(1, 21):
-        rand_feature_vector = np.random.rand(40)
-        temp_list = [id, rand_feature_vector]
-        data_list.append(temp_list)
-
     feature_list = []
 
     for data in data_list:
