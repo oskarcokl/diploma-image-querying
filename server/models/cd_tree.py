@@ -33,24 +33,36 @@ class CDTree:
     """
 
     def init_cd_tree(self, data):
+        gmm = GMM()
         stack = []
         root_node = self._generate_root_node(data)
-        print(root_node)
         stack.append(root_node)
         curr_node = stack.pop()
 
-        # while curr_node is not None:
-        #     if self.check_stop_conditions(curr_node):
-        #         leaf_node = self.make_node_leaf(curr_node)
-        #     else:
-        #         model = gmm_class.get_optimal_clusters(curr_node_features)
-        #         # Save GMM into curr_node
-        #         for cluster in model.weights:
-        #             # Add sub nodes to stack
-        #             pass
-        #     curr_node = stack.pop()
+        while curr_node is not None:
+            if self.check_stop_conditions(curr_node):
+                leaf_node = self.make_node_leaf(curr_node)
+            else:
+                model = gmm.get_optimal_clusters(curr_node_features)
+                # Save GMM into curr_node
+                for cluster in model.weights:
+                    # Add sub nodes to stack
+                    pass
+            curr_node = stack.pop()
 
-        # return root_node
+        return root_node
+
+    def _check_stop_conditions(self, node):
+        if len(node._gmm_parameters["weights"]) == 1:
+            return False
+        elif node._n_feature_vectors < self.min_node:
+            return False
+        elif node._layer >= self.l_max:
+            return False
+
+        return True
+
+    def _generate_sub_node(self):
         pass
 
     def _generate_root_node(self, data):
