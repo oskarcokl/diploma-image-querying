@@ -160,6 +160,64 @@ class CDTree:
         cpd = a * b * c
         return cpd
 
+    # Function calculates the new mean and cov matrix for a node.
+    # These values need to be updated when we want to insert a new,
+    # data point. M is the number of data points in the node we are updating
+    def _calculate_mean_and_cov(self, m, feature_vector, mean, cov_array):
+        new_mean = ((m / (m + 1)) * mean) + ((1 / (m + 1)) * feature_vector)
+        new_cov_array = (((m - 1) / m) * cov_array) + (
+            (1 / (m + 1))
+            * np.matmul((feature_vector - mean), (feature_vector - mean).T)
+        )
+        return new_mean, new_cov_array
+
+    # Algorithm finds leaf node of query_feature_vector. It finds
+    # the leaf by calculation cpd's in for each subnode and choosing
+    # the subnode with the highest cpd.
+    def _find_leaf_node(self, id, query_feature_vector, root_node):
+        path = []
+        curr_node = root_node
+        while not curr_node.is_leaf:
+            max_cpd = -1
+            max_node_index = -1
+            max_node_mean
+            max_node_cov_array
+            for i in range(curr_node.n_sub_clusters):
+                mean = curr_node.gmm_parameters["means"][i]
+                cov_array = curr_node.gmm_parameters["covs_array"][i]
+                cpd = self._calculate_cpd(query_feature_vector, mean, cov_array)
+                if max_cpd < cpd:
+                    max_cpd = cpd
+                    max_node_index = i
+                    max_node_mean = mean
+                    max_node_cov_array = cov_array
+
+            sub_node = curr_node.sub_nodes[max_node_index]
+            # For now I will be adding feature vectors and ids to
+            # all of the nodes in the path but this is generally not
+            # needed.
+            sub_node.ids.append(id)
+            sub_node.feature_vectors.append(query_feature_vector)
+            sub_node.n_feature_vectors += 1
+
+            # Calculate mean and cov and update them for the node
+            # with the max cpd.
+            (
+                curr_node.gmm_parameters["means"][max_node_index],
+                curr_node.gmm_parameters["covs_array"][max_node_index],
+            ) = self._calculate_mean_and_cov(
+                sub_node.n_feature_vectors,
+                query_feature_vector,
+                max_node_mean,
+                max_node_cov_array,
+            )
+
+            curr_node = sub_node
+
+        curr_node.ids.append(id)
+        curr_node.feature_vectors.append(query_feature_vector)
+        curr_node.n_feature_vectors += 1
+
 
 class _Node:
     """
