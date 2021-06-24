@@ -24,6 +24,7 @@ class CDTree:
     def __init__(self, min_node, l_max):
         self.min_node = min_node
         self.l_max = l_max
+        self.node_id = 1
 
     """
     Function that initializes the CDTree and returns it.
@@ -59,32 +60,18 @@ class CDTree:
                     curr_node.ids, curr_node.feature_vectors, model.resp_array
                 )
 
-                new_nodes = []
-                node_id = 1
-                # Outer loop loops throught all of the clusters and creates
-                # a new node for each one.
-                for index in range(len(model.weights)):
-                    new_node = _Node(layer=curr_node.layer + 1, node_id=node_id)
-                    node_id += 1
+                sub_nodes = self._create_sub_nodes(
+                    vectors_with_clusters,
+                    curr_node.ids,
+                    curr_node.layer + 1,
+                    len(model.weights),
+                )
 
-                    feature_vectors = []
-                    ids = []
+                for sub_node in sub_nodes:
+                    stack.append(sub_node)
 
-                    # Iterates over feature vectors and pust the ones asigned to current
-                    # cluster into a list which is then added to the new node.
-                    for item in vectors_with_clusters:
-                        if item[2] == index:
-                            feature_vectors.append(item[1])
-                            ids.append(item[0])
-
-                    new_node.ids = ids
-                    new_node.feature_vectors = feature_vectors
-                    new_node.n_feature_vectors = len(ids)
-                    new_nodes.append(new_node)
-                    stack.append(new_node)
-
-                curr_node.sub_nodes = new_nodes
-                curr_node.n_sub_clusters = len(new_nodes)
+                curr_node.sub_nodes = sub_nodes
+                curr_node.n_sub_clusters = len(sub_nodes)
 
             if stack:
                 curr_node = stack.pop()
@@ -139,6 +126,7 @@ class CDTree:
             is_root=True,
             layer=0,
             feature_vectors=feature_vectors,
+            node_id=self.node_id,
         )
         return root_node
 
@@ -246,39 +234,47 @@ class CDTree:
 
             # Might turned this into a function since the same thing
             # happens in init_cd_tree().
-            feature_vectors_1 = []
-            feature_vectors_2 = []
-            ids_1 = []
-            ids_2 = []
-            sub_node_layer = curr_node.layer + 1
-            for i in range(curr_node.n_feature_vectors):
-                if model.resp_array[i][0] > model.resp_array[i][1]:
-                    feature_vectors_1.append(curr_node.feature_vectors[i])
-                    ids_1.append(curr_node.ids[i])
-                else:
-                    feature_vectors_2.append(curr_node.feature_vectors[i])
-                    ids_2.append(curr_node.ids[i])
 
-            sub_node_1 = _Node(
-                feature_vectors=feature_vectors_1,
-                ids=ids_1,
-                is_leaf=True,
-                layer=sub_node_layer,
-                n_feature_vectors=len(ids_1),
+            vectors_with_clusters = self._asign_vectors_to_clusters(
+                curr_node.ids, curr_node.feature_vectors, model.resp_array
             )
 
-            sub_node_2 = _Node(
-                feature_vectors=feature_vectors_2,
-                ids=ids_2,
-                is_leaf=True,
-                layer=sub_node_layer,
-                n_feature_vectors=len(ids_2),
+            sub_nodes = self._create_sub_nodes(
+                vectors_with_clusters, curr_node.ids, curr_node.layer + 1, 2
             )
 
-            curr_node.sub_nodes = [sub_node_1, sub_node_2]
+            curr_node.sub_nodes = sub_nodes
             curr_node.n_sub_clusters = 2
 
         return root_node
+
+    def _create_sub_nodes(
+        self, feature_vectors_with_clusters, ids, sub_node_layer, n_clusters
+    ):
+        sub_nodes = []
+
+        # Outer loop loops throught all of the clusters and creates
+        # a new node for each one.
+        for index in range(n_clusters):
+            self.node_id += 1
+            sub_node = _Node(layer=sub_node_layer, node_id=self.node_id)
+
+            feature_vectors = []
+            ids = []
+
+            # Iterates over feature vectors and pust the ones asigned to current
+            # cluster into a list which is then added to the new node.
+            for item in feature_vectors_with_clusters:
+                if item[2] == index:
+                    feature_vectors.append(item[1])
+                    ids.append(item[0])
+
+            sub_node.ids = ids
+            sub_node.feature_vectors = feature_vectors
+            sub_node.n_feature_vectors = len(ids)
+            sub_nodes.append(sub_node)
+
+        return sub_nodes
 
 
 class _Node:
