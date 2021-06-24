@@ -2,6 +2,7 @@ from os import kill
 from gmm import GMM
 import numpy as np
 import math
+from opeartor import itemgetter
 
 
 class CDTree:
@@ -160,7 +161,7 @@ class CDTree:
         return new_mean, new_cov_array
 
     # Algorithm finds leaf node of query_feature_vector. It finds
-    # the leaf by calculation cpd's in for each subnode and choosing
+    # the leaf by calculating cpd's for each subnode and choosing
     # the subnode with the highest cpd.
     def _find_leaf_node(self, id, query_feature_vector, root_node):
 
@@ -275,6 +276,44 @@ class CDTree:
             sub_nodes.append(sub_node)
 
         return sub_nodes
+
+    def _calculate_eucledian_distance(self, query_feature_vector, feature_vector):
+        result_array = np.linalg.norm(
+            np.array(query_feature_vector) - np.array(feature_vector)
+        )
+        return result_array.tolist()
+
+    # K: int. Number of similar images to return
+    def find_similar_images(self, root_node, query_feature_vector, q, k):
+        stack = []
+        stack.append(root_node)
+        n_data_points = 0
+        similar_data_points = []
+        while n_data_points < k:
+            curr_node = stack.pop()
+            if not curr_node.is_leaf:
+                cpds = []
+                for i in range(curr_node.n_sub_clusters):
+                    mean = curr_node.gmm_parameters["means"][i]
+                    cov_array = curr_node.gmm_parameters["covs_array"][i]
+                    cpd = self._calculate_cpd(query_feature_vector, mean, cov_array)
+                    # Save index of each sub node alongside the cpd. this is done
+                    # so that sub nodes can be added in decreasing relevance based
+                    # on cpd.
+                    cpds.append([i, cpd])
+
+                sorted_cpds = sorted(cpds, key=lambda x: x[1], reverse=True)
+
+                for item in sorted_cpds:
+                    stack.append(curr_node.sub_nodes[item[0]])
+            else:
+                for i in range(curr_node.n_feature_vectors):
+                    similar_data_points.append(
+                        [curr_node.ids[i], curr_node.feature_vectors[i]]
+                    )
+                n_data_points = len(similar_data_points)
+
+        return
 
 
 class _Node:
