@@ -175,15 +175,10 @@ class CDTree:
     # the leaf by calculation cpd's in for each subnode and choosing
     # the subnode with the highest cpd.
     def _find_leaf_node(self, id, query_feature_vector, root_node):
-        # Used to determine if leaf need to be split with new
-        # data insertion. Could be set by user.
-        gama = 0.1
 
         # TODO update parameters of root node.
         curr_node = root_node
-        n_feature_vectors_parent = 0
         while not curr_node.is_leaf:
-            n_feature_vectors_parent = curr_node.n_feature_vectors
             max_cpd = -1
             max_node_index = -1
             max_node_mean
@@ -224,8 +219,21 @@ class CDTree:
         curr_node.feature_vectors.append(query_feature_vector)
         curr_node.n_feature_vectors += 1
 
+        return curr_node
+
+    def add_feature_vector(self, id, query_feature_vector, root_node):
+        # Used to determine if leaf need to be split with new
+        # data insertion. Could be set by user.
+        gama = 0.1
+
+        curr_node = self._find_leaf_node(id, query_feature_vector, root_node)
+
         # Split the leaf node into to nodes if parent n features * gama is
         # smaller than then feature of the leaf node.
+
+        n_feature_vectors_parent = curr_node.n_feature_vectors
+
+        # TODO Can be refractored to look a lot better.
         if curr_node.n_feature_vectors > gama * n_feature_vectors_parent:
             curr_node.is_leaf = False
             gmm = GMM()
