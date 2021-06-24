@@ -175,9 +175,15 @@ class CDTree:
     # the leaf by calculation cpd's in for each subnode and choosing
     # the subnode with the highest cpd.
     def _find_leaf_node(self, id, query_feature_vector, root_node):
-        path = []
+        # Used to determine if leaf need to be split with new
+        # data insertion. Could be set by user.
+        gama = 0.1
+
+        # TODO update parameters of root node.
         curr_node = root_node
+        n_feature_vectors_parent = 0
         while not curr_node.is_leaf:
+            n_feature_vectors_parent = curr_node.n_feature_vectors
             max_cpd = -1
             max_node_index = -1
             max_node_mean
@@ -217,6 +223,54 @@ class CDTree:
         curr_node.ids.append(id)
         curr_node.feature_vectors.append(query_feature_vector)
         curr_node.n_feature_vectors += 1
+
+        # Split the leaf node into to nodes if parent n features * gama is
+        # smaller than then feature of the leaf node.
+        if curr_node.n_feature_vectors > gama * n_feature_vectors_parent:
+            curr_node.is_leaf = False
+            gmm = GMM()
+            model = gmm.gmm_clustering(np.array(curr_node.feature_vectors), 2)
+            curr_node.gmm_parameters = {
+                "covs_array": model.covs_array,
+                "means": model.means,
+                "weights": model.weights,
+            }
+
+            # Might turned this into a function since the same thing
+            # happens in init_cd_tree().
+            feature_vectors_1 = []
+            feature_vectors_2 = []
+            ids_1 = []
+            ids_2 = []
+            sub_node_layer = curr_node.layer + 1
+            for i in range(curr_node.n_feature_vectors):
+                if model.resp_array[i][0] > model.resp_array[i][1]:
+                    feature_vectors_1.append(curr_node.feature_vectors[i])
+                    ids_1.append(curr_node.ids[i])
+                else:
+                    feature_vectors_2.append(curr_node.feature_vectors[i])
+                    ids_2.append(curr_node.ids[i])
+
+            sub_node_1 = _Node(
+                feature_vectors=feature_vectors_1,
+                ids=ids_1,
+                is_leaf=True,
+                layer=sub_node_layer,
+                n_feature_vectors=len(ids_1),
+            )
+
+            sub_node_2 = _Node(
+                feature_vectors=feature_vectors_2,
+                ids=ids_2,
+                is_leaf=True,
+                layer=sub_node_layer,
+                n_feature_vectors=len(ids_2),
+            )
+
+            curr_node.sub_nodes = [sub_node_1, sub_node_2]
+            curr_node.n_sub_clusters = 2
+
+        return root_node
 
 
 class _Node:
