@@ -283,6 +283,16 @@ class CDTree:
         )
         return result_array.tolist()
 
+    def _rank_images(self, query_feature_vector, similar_images):
+        for i in range(len(similar_images)):
+            d = self._calculate_eucledian_distance(
+                query_feature_vector, similar_images[i][1]
+            )
+            similar_images[i].append(d)
+
+        ranked_similar_images = sorted(similar_images, reverse=True, key=lambda x: x[2])
+        return ranked_similar_images
+
     # K: int. Number of similar images to return
     def find_similar_images(self, root_node, query_feature_vector, q, k):
         stack = []
@@ -313,7 +323,7 @@ class CDTree:
                     )
                 n_data_points = len(similar_data_points)
 
-        return
+        return self._rank_images(query_feature_vector, similar_data_points)
 
 
 class _Node:
