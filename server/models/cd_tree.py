@@ -2,7 +2,6 @@ from os import kill
 from gmm import GMM
 import numpy as np
 import math
-from opeartor import itemgetter
 
 
 class CDTree:
@@ -37,7 +36,12 @@ class CDTree:
     """
 
     # TODO add n_iterations and tolerance parameters
-    def init_cd_tree(self, data):
+    def init_cd_tree(
+        self,
+        data,
+        tolerance=0.001,
+        n_iters=1000,
+    ):
         gmm = GMM()
         stack = []
         root_node = self._generate_root_node(data)
@@ -49,7 +53,9 @@ class CDTree:
                 curr_node.is_leaf = True
             else:
                 curr_node_feature_array = np.array(curr_node.feature_vectors)
-                model = gmm.get_optimal_clusters(curr_node_feature_array, 1, 2)
+                model = gmm.get_optimal_clusters(
+                    curr_node_feature_array, 1, 2, tolerance, n_iters
+                )
                 node_gmm_parameters = {
                     "covs_array": model.covs_array,
                     "means": model.means,

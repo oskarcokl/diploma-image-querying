@@ -25,7 +25,12 @@ component_range_max: int
 
 class GMM:
     def get_optimal_clusters(
-        self, feature_vector_array, component_range_min=1, component_range_max=10
+        self,
+        feature_vector_array,
+        component_range_min=1,
+        component_range_max=10,
+        tolerance=0.001,
+        n_iters=1000,
     ):
         self._clear_self_params()
 
@@ -34,7 +39,7 @@ class GMM:
         min_T = float("inf")
 
         for i in range(component_range_min, component_range_max + 1):
-            gmm_model = self.gmm_clustering(feature_vector_array, i)
+            gmm_model = self.gmm_clustering(feature_vector_array, i, tolerance, n_iters)
             n_parameters = 3 * i
             n_feature_vectors = feature_vector_array.shape[0]
             mixture_density_vector = self._compute_mixture_density(
