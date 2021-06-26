@@ -431,7 +431,24 @@ class _Node(persistent.Persistent):
 
         return feature_vectors_with_ids
 
+    def set_feature_vectors(self, feature_vectors):
+        self.feature_vectors = feature_vectors
+        self._p_changed = True
 
+    def set_ids(self, ids):
+        self.ids = ids
+        self._p_changed = True
+
+    def set_sub_nodes(self, sub_nodes):
+        self.sub_nodes = sub_nodes
+        self._p_changed = True
+
+    def set_gmm_parameters(self, gmm_parameters):
+        self.gmm_parameters = gmm_parameters
+        self._p_changed = True
+
+
+# Used for quick testing during developement.
 if __name__ == "__main__":
     print("Testing CDTree class")
 
