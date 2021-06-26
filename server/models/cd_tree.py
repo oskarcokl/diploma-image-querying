@@ -1,10 +1,10 @@
 from os import kill
 from gmm import GMM
 import numpy as np
-import math
+import persistent
 
 
-class CDTree:
+class CDTree(persistent.Persistent):
     """
     CDTree object:
 
@@ -331,7 +331,7 @@ class CDTree:
         return self._rank_images(query_feature_vector, similar_data_points)
 
 
-class _Node:
+class _Node(persistent.Persistent):
     """
     Inner node of CDTree:
 
