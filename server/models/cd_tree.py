@@ -137,7 +137,7 @@ class CDTree:
         return root_node
 
     # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
-    # Function calculates the above function
+    # Function calculates the above equation
     def _calculate_cpd(self, feature_vector, mean, cov_array):
         d = len(feature_vector)
         a = (2 * np.pi) ** (d / 2)
