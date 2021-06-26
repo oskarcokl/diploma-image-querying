@@ -5,6 +5,7 @@ from create_table import create_table
 import argparse
 import os
 import numpy as np
+import sys
 
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -12,6 +13,11 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
+
+
+# Local application imports
+from ..models.cd_tree import CDTree
+from ..db_connector import DbConnector
 
 
 def insert_image_vector(image_name, image_vector):
@@ -62,6 +68,7 @@ def insert_image_vector_list(tuple_list):
 
 
 def index():
+
     pass
 
 
@@ -113,7 +120,14 @@ def init_index(dataset_src):
     insert_image_vector_list(tuple_list)
 
 
+def init_cd_tree():
+    cd_tree = CDTree(10, 6)
+    root_node = cd_tree.init_cd_tree()
+    pass
+
+
 if __name__ == "__main__":
+
     argParser = argparse.ArgumentParser()
     argParser.add_argument(
         "-d",

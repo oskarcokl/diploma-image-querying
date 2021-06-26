@@ -9,7 +9,7 @@ class CDTree:
     CDTree object:
 
     Parameters
-    ==========
+    ----------
 
     min_node: int
         Number used to restrict width of tree. If number of feature vectors
@@ -30,12 +30,11 @@ class CDTree:
     Function that initializes the CDTree and returns it.
 
     Parameters
-    ==========
+    ----------
 
     data: [id: int, img_src: string, feature_vector: [int]]
     """
 
-    # TODO add n_iterations and tolerance parameters
     def init_cd_tree(
         self,
         data,
@@ -337,7 +336,7 @@ class _Node:
     Inner node of CDTree:
 
     Parameters
-    ==========
+    ----------
 
     n_sub_clusters: int
         Number of sub clusters of this node
