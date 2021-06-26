@@ -344,6 +344,17 @@ class _Node(persistent.Persistent):
     gmm_parameters: dict
         Parameters of the gmm model asosiated with this cluster
 
+        Parameters
+        ----------
+        means: list
+            Mean of each gmm cluster.
+
+        covs_array: nd_array
+            Covariance matrix of each cluster.
+
+        weights: list
+            Weight that each cluster contributes to the gmm.
+
     sub_nodes: list
         List of pointers to sub nodes (clusters)
 
@@ -445,6 +456,22 @@ class _Node(persistent.Persistent):
 
     def set_gmm_parameters(self, gmm_parameters):
         self.gmm_parameters = gmm_parameters
+        self._p_changed = True
+
+    def set_covs_array(self, covs_array):
+        self.gmm_parameters["covs_array"] = covs_array
+        self._p_changed = True
+
+    def set_means(self, means):
+        self.gmm_parameters["means"] = means
+        self._p_changed = True
+
+    def add_id(self, id):
+        self.ids.append(id)
+        self._p_changed = True
+
+    def add_feature_vector(self, feature_vector):
+        self.feature_vectors.append(feature_vector)
         self._p_changed = True
 
 
