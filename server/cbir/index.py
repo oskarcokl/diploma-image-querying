@@ -16,8 +16,7 @@ from tensorflow.keras import backend as K
 
 
 # Local application imports
-from ..models.cd_tree import CDTree
-from ..db_connector import DbConnector
+from ..db_connector import dbconnector
 
 
 def insert_image_vector(image_name, image_vector):
@@ -120,10 +119,20 @@ def init_index(dataset_src):
     insert_image_vector_list(tuple_list)
 
 
-def init_cd_tree():
-    cd_tree = CDTree(10, 6)
-    root_node = cd_tree.init_cd_tree()
+def init_cd_tree(min_node, l_max):
+    cd_tree = CDTree(min_node, l_max)
+
+    root_node = cd_tree.init_cd_tree(data)
     pass
+
+
+def get_data():
+    connector = DbConnector()
+    print(dir(connector))
+    connector.cursor.execute("SELECT * FROM cbir_index")
+    print("Number of indexed images: ", connector.cursor.rowcount)
+    cbir_index_features = connector.cursor.fetchall()
+    print(cbir_index_features)
 
 
 if __name__ == "__main__":
@@ -144,4 +153,4 @@ if __name__ == "__main__":
     if args.get("init"):
         init_index(args.get("dataset"))
     else:
-        index()
+        get_data()
