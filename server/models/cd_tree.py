@@ -61,7 +61,7 @@ class CDTree(persistent.Persistent):
                     "weights": model.weights,
                 }
                 # Save GMM parameters into curr_node
-                curr_node.gmm_parameters = node_gmm_parameters
+                curr_node.set_gmm_parameters(node_gmm_parameters)
                 vectors_with_clusters = self._asign_vectors_to_clusters(
                     curr_node.ids, curr_node.feature_vectors, model.resp_array
                 )
@@ -76,7 +76,7 @@ class CDTree(persistent.Persistent):
                 for sub_node in sub_nodes:
                     stack.append(sub_node)
 
-                curr_node.sub_nodes = sub_nodes
+                curr_node.set_sub_nodes(sub_nodes)
                 curr_node.n_sub_clusters = len(sub_nodes)
 
             if stack:
@@ -87,13 +87,13 @@ class CDTree(persistent.Persistent):
     def _asign_vectors_to_clusters(self, ids, feature_vectors, resp_array):
         new_data = []
         for i in range(len(ids)):
-            cluster = self._get_cluster_of_index(resp_array, i)
+            cluster = self._get_cluster_of_data(resp_array, i)
             new_data_item = [ids[i], feature_vectors[i], cluster]
             new_data.append(new_data_item)
 
         return new_data
 
-    def _get_cluster_of_index(self, resp_array, index):
+    def _get_cluster_of_data(self, resp_array, index):
         n_clusters = resp_array.shape[1]
         # Probability (responsibility) can never be smaller than 0.
         max_resp = -1
@@ -144,13 +144,9 @@ class CDTree(persistent.Persistent):
         b = np.linalg.det(cov_array) ** -0.5
         c = np.exp(
             -0.5
-            * np.matmul(
-                np.matmul(
-                    np.transpose(feature_vector -
-                                 mean), np.linalg.inv(cov_array)
-                ),
-                (feature_vector - mean),
-            )
+            * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array)),
+                        (feature_vector - mean),
+                        )
         )
         cpd = a * b * c
         return cpd
@@ -211,12 +207,13 @@ class CDTree(persistent.Persistent):
 
             curr_node = sub_node
 
-        curr_node.ids.append(id)
-        curr_node.feature_vectors.append(query_feature_vector)
+        curr_node.add_id(id)
+        curr_node.add_feature_vector(query_feature_vector)
         curr_node.n_feature_vectors += 1
 
         return curr_node
 
+    # TODO rename to add_to_cd_tree
     def add_feature_vector(self, id, query_feature_vector, root_node):
         # Used to determine if leaf need to be split with new
         # data insertion. Could be set by user.
@@ -234,11 +231,11 @@ class CDTree(persistent.Persistent):
             curr_node.is_leaf = False
             gmm = GMM()
             model = gmm.gmm_clustering(np.array(curr_node.feature_vectors), 2)
-            curr_node.gmm_parameters = {
+            curr_node.set_gmm_parameters({
                 "covs_array": model.covs_array,
                 "means": model.means,
                 "weights": model.weights,
-            }
+            })
 
             # Might turned this into a function since the same thing
             # happens in init_cd_tree().
@@ -251,8 +248,8 @@ class CDTree(persistent.Persistent):
                 vectors_with_clusters, curr_node.ids, curr_node.layer + 1, 2
             )
 
-            curr_node.sub_nodes = sub_nodes
-            curr_node.n_sub_clusters = 2
+            curr_node.set_sub_nodes(sub_nodes)
+            curr_node.n_sub_clusters = len(sub_nodes)
 
         return root_node
 
@@ -277,8 +274,8 @@ class CDTree(persistent.Persistent):
                     feature_vectors.append(item[1])
                     ids.append(item[0])
 
-            sub_node.ids = ids
-            sub_node.feature_vectors = feature_vectors
+            sub_node.set_ids(ids)
+            sub_node.set_feature_vectors(feature_vectors)
             sub_node.n_feature_vectors = len(ids)
             sub_nodes.append(sub_node)
 
@@ -468,6 +465,10 @@ class _Node(persistent.Persistent):
 
     def set_means(self, means):
         self.gmm_parameters["means"] = means
+        self._p_changed = True
+
+    def set_is_leaft(self, is_leaf):
+        self.is_leaf = is_leaf
         self._p_changed = True
 
     def add_id(self, id):
