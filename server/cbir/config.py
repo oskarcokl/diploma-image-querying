@@ -3,7 +3,7 @@ import os
 
 
 def config(filename="database.ini", section="postgresql"):
-    print(os.listdir("./"))
+    # print(os.listdir("./"))
     parser = ConfigParser()
     parser.read(filename)
     db = {}

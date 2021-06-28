@@ -131,7 +131,6 @@ def init_cd_tree(min_node, l_max):
 
 def get_data():
     connector = DbConnector()
-    print(dir(connector))
     connector.cursor.execute("SELECT * FROM cbir_index")
     print("Number of indexed images: ", connector.cursor.rowcount)
     cbir_index_features = connector.cursor.fetchall()
