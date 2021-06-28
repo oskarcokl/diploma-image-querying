@@ -146,7 +146,8 @@ class CDTree(persistent.Persistent):
             -0.5
             * np.matmul(
                 np.matmul(
-                    np.transpose(feature_vector - mean), np.linalg.inv(cov_array)
+                    np.transpose(feature_vector -
+                                 mean), np.linalg.inv(cov_array)
                 ),
                 (feature_vector - mean),
             )
@@ -180,7 +181,8 @@ class CDTree(persistent.Persistent):
             for i in range(curr_node.n_sub_clusters):
                 mean = curr_node.gmm_parameters["means"][i]
                 cov_array = curr_node.gmm_parameters["covs_array"][i]
-                cpd = self._calculate_cpd(query_feature_vector, mean, cov_array)
+                cpd = self._calculate_cpd(
+                    query_feature_vector, mean, cov_array)
                 if max_cpd < cpd:
                     max_cpd = cpd
                     max_node_index = i
@@ -295,7 +297,8 @@ class CDTree(persistent.Persistent):
             )
             similar_images[i].append(d)
 
-        ranked_similar_images = sorted(similar_images, reverse=True, key=lambda x: x[2])
+        ranked_similar_images = sorted(
+            similar_images, reverse=True, key=lambda x: x[2])
         return ranked_similar_images
 
     # K: int. Number of similar images to return
@@ -311,7 +314,8 @@ class CDTree(persistent.Persistent):
                 for i in range(curr_node.n_sub_clusters):
                     mean = curr_node.gmm_parameters["means"][i]
                     cov_array = curr_node.gmm_parameters["covs_array"][i]
-                    cpd = self._calculate_cpd(query_feature_vector, mean, cov_array)
+                    cpd = self._calculate_cpd(
+                        query_feature_vector, mean, cov_array)
                     # Save index of each sub node alongside the cpd. this is done
                     # so that sub nodes can be added in decreasing relevance based
                     # on cpd.
