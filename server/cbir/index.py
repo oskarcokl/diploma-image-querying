@@ -1,3 +1,4 @@
+from re import A
 import psycopg2
 from tensorflow.python.ops.gen_array_ops import shape
 from config import config
@@ -16,7 +17,9 @@ from tensorflow.keras import backend as K
 
 
 # Local application imports
-from ..db_connector import dbconnector
+sys.path.insert(0, "../")
+from db_connector import DbConnector
+from models.cd_tree import CDTree
 
 
 def insert_image_vector(image_name, image_vector):
@@ -132,7 +135,7 @@ def get_data():
     connector.cursor.execute("SELECT * FROM cbir_index")
     print("Number of indexed images: ", connector.cursor.rowcount)
     cbir_index_features = connector.cursor.fetchall()
-    print(cbir_index_features)
+    return data
 
 
 if __name__ == "__main__":
@@ -144,13 +147,20 @@ if __name__ == "__main__":
         help="Path to directory that contains the images to be indexed",
     )
     argParser.add_argument(
-        "-I",
-        "--init",
+        "-IDB",
+        "--init-db",
         help="Set if initializing the db for the first time. Will add all pictures in dataset path",
         action="store_true",
     )
+    argParser.add_argument(
+        "-IT",
+        "--init-cd-tree",
+        help="Set if initializing the cd tree for the first time. Will create a cd tree and store it with ZODB.",
+        action="store_true",
+    )
     args = vars(argParser.parse_args())
-    if args.get("init"):
+    if args.get("init-db"):
         init_index(args.get("dataset"))
-    else:
-        get_data()
+    elif args.get("init_cd_tree"):
+        data = get_data()
+        init_cd_tree

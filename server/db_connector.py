@@ -1,10 +1,8 @@
 import psycopg2
 import sys
 
-sys.path.append("./cbir")
-sys.path.append("./scripts/cbir")
-
-from config import config
+sys.path.insert(0, "./cbir/")
+from cbir.config import config
 
 
 class DbConnector:

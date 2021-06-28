@@ -2,7 +2,7 @@ from configparser import ConfigParser
 import os
 
 
-def config(filename="./scripts/cbir/database.ini", section="postgresql"):
+def config(filename="database.ini", section="postgresql"):
     print(os.listdir("./"))
     parser = ConfigParser()
     parser.read(filename)

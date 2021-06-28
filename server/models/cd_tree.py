@@ -1,5 +1,4 @@
-from os import kill
-from gmm import GMM
+from .gmm import GMM
 import numpy as np
 import persistent
 
