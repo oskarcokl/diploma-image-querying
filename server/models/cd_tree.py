@@ -128,6 +128,7 @@ class CDTree(persistent.Persistent):
     # If stop conditions have been met the functino returns true.
     # Else it retusn false.
     def _check_stop_conditions(self, node):
+        print(node.n_feature_vectors)
         if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
             return True
         elif node.n_feature_vectors < self.min_node:

@@ -9,15 +9,16 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
-
-from config import config
-from create_table import create_table
-
+import ZODB
+import ZODB.FileStorage
+import BTrees
 
 # Local application imports
 sys.path.insert(0, "../")
 from db_connector import DbConnector
 from models.cd_tree import CDTree
+from config import config
+from create_table import create_table
 
 
 def insert_image_vector(image_name, image_vector):
@@ -128,6 +129,15 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     pass
 
 
+def save_cd_tree(root_node):
+    storage = ZODB.FileStorage.FileStorage("cd_tree.fs")
+    db = ZODB.DB(storage)
+    connection = db.open()
+    root = connection.root
+    root.cd_tree = BTrees.OOBTree.BTree()
+    root.cd_tree["root_node"] = root_node
+
+
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
@@ -136,12 +146,16 @@ def get_data():
     data_array = np.array(data, dtype=object)
 
     rand_indexes = np.random.choice(
-        1909, 10, replace=False
+        1909, 50, replace=False
     )
     print(rand_indexes)
     rand_data = data_array[rand_indexes]
     print(f"Lenght of subset of data {len(rand_data)}")
     return rand_data
+
+
+def get_cd_tree_from_storage():
+    pass
 
 
 if __name__ == "__main__":
@@ -169,4 +183,7 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        init_cd_tree(data, 2, 4, 15, 5)
+        root_node = init_cd_tree(data, 2, 4, 15, 5)
+        save_cd_tree(root_node)
+    else:
+        get_cd_tree_from_storage()
