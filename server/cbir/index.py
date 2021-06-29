@@ -23,7 +23,7 @@ from models.cd_tree import CDTree
 
 
 def insert_image_vector(image_name, image_vector):
-    sql = """INSERT INTO cbir_index(image_name, image_vector) 
+    sql = """INSERT INTO cbir_index(image_name, image_vector)
              VALUES(%s, %s) RETURNING id;"""
 
     connection = None
@@ -46,7 +46,7 @@ def insert_image_vector(image_name, image_vector):
 
 
 def insert_image_vector_list(tuple_list):
-    sql = """INSERT INTO cbir_index(image_name, image_vector) 
+    sql = """INSERT INTO cbir_index(image_name, image_vector)
              VALUES(%s, %s) RETURNING id;"""
 
     connection = None
@@ -122,10 +122,11 @@ def init_index(dataset_src):
     insert_image_vector_list(tuple_list)
 
 
-def init_cd_tree(data, min_node, l_max):
+def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
+
     cd_tree = CDTree(min_node, l_max)
 
-    root_node = cd_tree.init_cd_tree(data)
+    root_node = cd_tree.init_cd_tree(data, min_clusters, max_clusters)
     print(root_node)
     pass
 
@@ -163,4 +164,4 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        init_cd_tree(data, 20, 5)
+        init_cd_tree(data, 2, 15, 20, 5)

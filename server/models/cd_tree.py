@@ -38,10 +38,11 @@ class CDTree(persistent.Persistent):
     def init_cd_tree(
         self,
         data,
+        min_clusters,
+        max_clusters,
         tolerance=0.001,
         n_iters=1000,
     ):
-        gmm = GMM()
         stack = []
         root_node = self._generate_root_node(data)
         stack.append(root_node)
@@ -53,47 +54,56 @@ class CDTree(persistent.Persistent):
             else:
                 curr_node_feature_array = np.array(curr_node.feature_vectors)
 
-                sk_gmm = mixture.GaussianMixture(
-                    n_components=3).fit(curr_node_feature_array)
-                print(sk_gmm.predict(curr_node_feature_array))
+                best_model = None
+                min_bic = -1
+                n_clusters = -1
 
-                # model = gmm.get_optimal_clusters(
-                #     curr_node_feature_array, 2, 10, tolerance, n_iters
-                # )
+                for i in range(min_clusters, max_clusters):
+                    gmm = mixture.GaussianMixture(
+                        n_components=i).fit(curr_node_feature_array)
+
+                    curr_bic = gmm.bic(curr_node_feature_array)
+                    if (curr_bic < min_bic):
+                        best_model = gmm
+                        min_bic = curr_bic
+                        n_clusters = i
+
                 node_gmm_parameters = {
-                    "covs_array": model.covs_array,
-                    "means": model.means,
-                    "weights": model.weights,
+                    "covs_array": best_model.covariances_,
+                    "means": best_model.means,
+                    "weights": best_model.weights,
                 }
+
+                cluster_asigments = best_model.predict(curr_node_feature_array)
+
                 # Save GMM parameters into curr_node
                 curr_node.set_gmm_parameters(node_gmm_parameters)
                 vectors_with_clusters = self._asign_vectors_to_clusters(
-                    curr_node.ids, curr_node.feature_vectors, model.resp_array
+                    curr_node.ids, curr_node.feature_vectors, cluster_asigments
                 )
 
                 sub_nodes = self._create_sub_nodes(
                     vectors_with_clusters,
                     curr_node.ids,
                     curr_node.layer + 1,
-                    len(model.weights),
+                    n_clusters,
                 )
 
                 for sub_node in sub_nodes:
                     stack.append(sub_node)
 
                 curr_node.set_sub_nodes(sub_nodes)
-                curr_node.n_sub_clusters = len(sub_nodes)
+                curr_node.n_sub_clusters = n_clusters
 
             if stack:
                 curr_node = stack.pop()
             else:
                 return root_node
 
-    def _asign_vectors_to_clusters(self, ids, feature_vectors, resp_array):
+    def _asign_vectors_to_clusters(self, ids, feature_vectors, cluster_asigments):
         new_data = []
         for i in range(len(ids)):
-            cluster = self._get_cluster_of_data(resp_array, i)
-            new_data_item = [ids[i], feature_vectors[i], cluster]
+            new_data_item = (ids[i], feature_vectors[i], cluster_asigments[i])
             new_data.append(new_data_item)
 
         return new_data
@@ -258,6 +268,7 @@ class CDTree(persistent.Persistent):
 
         return root_node
 
+    # n_clusters created from current cluster.
     def _create_sub_nodes(
         self, feature_vectors_with_clusters, ids, sub_node_layer, n_clusters
     ):
@@ -272,7 +283,7 @@ class CDTree(persistent.Persistent):
             feature_vectors = []
             ids = []
 
-            # Iterates over feature vectors and pust the ones asigned to current
+            # Iterates over feature vectors and puts the ones asigned to current
             # cluster into a list which is then added to the new node.
             for item in feature_vectors_with_clusters:
                 if item[2] == index:
