@@ -12,6 +12,7 @@ from tensorflow.keras import backend as K
 import ZODB
 import ZODB.FileStorage
 import BTrees
+import transaction
 
 # Local application imports
 sys.path.insert(0, "../")
@@ -126,7 +127,7 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     cd_tree = CDTree(min_node, l_max)
 
     root_node = cd_tree.init_cd_tree(data, min_clusters, max_clusters)
-    pass
+    return root_node
 
 
 def save_cd_tree(root_node):
@@ -136,6 +137,7 @@ def save_cd_tree(root_node):
     root = connection.root
     root.cd_tree = BTrees.OOBTree.BTree()
     root.cd_tree["root_node"] = root_node
+    transaction.commit()
 
 
 def get_data():
@@ -155,7 +157,12 @@ def get_data():
 
 
 def get_cd_tree_from_storage():
-    pass
+    storage = ZODB.FileStorage.FileStorage("cd_tree.fs")
+    db = ZODB.DB(storage)
+    connection = db.open()
+    root = connection.root
+
+    print(root.cd_tree["root_node"].sub_nodes[0])
 
 
 if __name__ == "__main__":

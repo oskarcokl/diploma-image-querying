@@ -120,3 +120,9 @@ vgg16
 
 # Ignore dataset images still need to figure out a good way of storing them.
 dataset
+
+# Ignore files for cd_tree data structure being saved on disk.
+cd_tree.fs
+cd_tree.fs.lock
+cd_tree.fs.index
+cd_tree.fs.tmp
