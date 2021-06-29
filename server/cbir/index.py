@@ -151,7 +151,7 @@ def get_data():
     data_array = np.array(data, dtype=object)
 
     rand_indexes = np.random.choice(
-        1909, 25, replace=False
+        1909, 1000, replace=False
     )
     print(rand_indexes)
     rand_data = data_array[rand_indexes]
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 2, 4, 15, 5)
+        root_node = init_cd_tree(data, 2, 4, 30, 5)
         save_cd_tree(root_node)
     else:
         get_cd_tree_from_storage()

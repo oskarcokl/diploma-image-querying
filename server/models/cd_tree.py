@@ -1,5 +1,6 @@
 from .gmm import GMM
 import numpy as np
+import ZODB
 import persistent
 from sklearn import mixture
 
