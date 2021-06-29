@@ -69,11 +69,6 @@ def insert_image_vector_list(tuple_list):
     return image_id
 
 
-def index():
-
-    pass
-
-
 # This function is intented to be run only when setting up the initial db.
 def init_index(dataset_src):
     commands = (
@@ -123,37 +118,20 @@ def init_index(dataset_src):
 
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
-
     cd_tree = CDTree(min_node, l_max)
-
     root_node = cd_tree.init_cd_tree(data, min_clusters, max_clusters)
     return root_node
 
 
 def save_cd_tree(root_node):
-    storage = ZODB.FileStorage.FileStorage("cd_tree.fs")
+    storage = ZODB.FileStorage.FileStorage(
+        "cd_tree.fs", blob_dir="cd_tree_blob")
     db = ZODB.DB(storage)
     connection = db.open()
     root = connection.root
     root.cd_tree = BTrees.OOBTree.BTree()
     root.cd_tree["root_node"] = root_node
     transaction.commit()
-
-
-def get_data():
-    connector = DbConnector()
-    connector.cursor.execute("SELECT * FROM cbir_index")
-    print("Number of indexed images: ", connector.cursor.rowcount)
-    data = connector.cursor.fetchall()
-    data_array = np.array(data, dtype=object)
-
-    rand_indexes = np.random.choice(
-        1909, 50, replace=False
-    )
-    print(rand_indexes)
-    rand_data = data_array[rand_indexes]
-    print(f"Lenght of subset of data {len(rand_data)}")
-    return rand_data
 
 
 def get_cd_tree_from_storage():
@@ -165,8 +143,23 @@ def get_cd_tree_from_storage():
     print(root.cd_tree["root_node"].sub_nodes[0])
 
 
-if __name__ == "__main__":
+def get_data():
+    connector = DbConnector()
+    connector.cursor.execute("SELECT * FROM cbir_index")
+    print("Number of indexed images: ", connector.cursor.rowcount)
+    data = connector.cursor.fetchall()
+    data_array = np.array(data, dtype=object)
 
+    rand_indexes = np.random.choice(
+        1909, 25, replace=False
+    )
+    print(rand_indexes)
+    rand_data = data_array[rand_indexes]
+    print(f"Lenght of subset of data {len(rand_data)}")
+    return rand_data
+
+
+if __name__ == "__main__":
     argParser = argparse.ArgumentParser()
     argParser.add_argument(
         "-d",
