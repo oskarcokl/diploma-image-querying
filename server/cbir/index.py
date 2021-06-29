@@ -127,7 +127,6 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     cd_tree = CDTree(min_node, l_max)
 
     root_node = cd_tree.init_cd_tree(data, min_clusters, max_clusters)
-    print(root_node)
     pass
 
 
@@ -136,7 +135,15 @@ def get_data():
     connector.cursor.execute("SELECT * FROM cbir_index")
     print("Number of indexed images: ", connector.cursor.rowcount)
     data = connector.cursor.fetchall()
-    return data
+    data_array = np.array(data, dtype=object)
+
+    rand_indexes = np.random.choice(
+        1909, 10, replace=False
+    )
+    print(rand_indexes)
+    rand_data = data_array[rand_indexes]
+    print(f"Lenght of subset of data {len(rand_data)}")
+    return rand_data
 
 
 if __name__ == "__main__":
@@ -164,4 +171,4 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        init_cd_tree(data, 2, 15, 20, 5)
+        init_cd_tree(data, 2, 4, 15, 5)

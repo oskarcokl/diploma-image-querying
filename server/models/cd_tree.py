@@ -55,23 +55,27 @@ class CDTree(persistent.Persistent):
                 curr_node_feature_array = np.array(curr_node.feature_vectors)
 
                 best_model = None
-                min_bic = -1
+                min_bic = np.inf
                 n_clusters = -1
 
-                for i in range(min_clusters, max_clusters):
+                print(f"Current layer: {curr_node.layer}")
+                for i in range(min_clusters, max_clusters + 1):
                     gmm = mixture.GaussianMixture(
                         n_components=i).fit(curr_node_feature_array)
 
                     curr_bic = gmm.bic(curr_node_feature_array)
+                    print(f"Trying with {i} clusters, bic: {curr_bic}")
                     if (curr_bic < min_bic):
                         best_model = gmm
                         min_bic = curr_bic
                         n_clusters = i
 
+                print(f"Choosing {n_clusters} clusters")
+
                 node_gmm_parameters = {
                     "covs_array": best_model.covariances_,
-                    "means": best_model.means,
-                    "weights": best_model.weights,
+                    "means": best_model.means_,
+                    "weights": best_model.weights_,
                 }
 
                 cluster_asigments = best_model.predict(curr_node_feature_array)
