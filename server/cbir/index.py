@@ -1,19 +1,17 @@
-from re import A
-import psycopg2
-from tensorflow.python.ops.gen_array_ops import shape
-from config import config
-from create_table import create_table
 import argparse
 import os
-import numpy as np
 import sys
 
+import psycopg2
+import numpy as np
 from tensorflow import keras
-from tensorflow.keras import layers
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
+
+from config import config
+from create_table import create_table
 
 
 # Local application imports
