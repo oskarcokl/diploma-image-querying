@@ -2,7 +2,7 @@
 import os
 from re import A
 import numpy as np
-from scipy.stats import norm, multivariate_normal
+from scipy import stats
 
 
 """
@@ -37,15 +37,19 @@ class GMM:
         # Current range is for testing only
         best_gmm_model = None
         min_T = float("inf")
+        print("Calculating optimal clusters")
 
         for i in range(component_range_min, component_range_max + 1):
-            gmm_model = self.gmm_clustering(feature_vector_array, i, tolerance, n_iters)
+            print(f"Trying with {i} clusters")
+            gmm_model = self.gmm_clustering(
+                feature_vector_array, i, tolerance, n_iters)
             n_parameters = 3 * i
             n_feature_vectors = feature_vector_array.shape[0]
             mixture_density_vector = self._compute_mixture_density(
                 gmm_model.weights, gmm_model.resp_array
             )
-            T = self._compute_T(n_parameters, n_feature_vectors, mixture_density_vector)
+            T = self._compute_T(
+                n_parameters, n_feature_vectors, mixture_density_vector)
 
             # Update the best gmm model if criteraion T is smaller then current smallest.
             if T < min_T:
@@ -113,6 +117,9 @@ class GMM:
             shape_cov_matrix, np.cov(feature_vector_array, rowvar=False)
         )
 
+        print(self.covs_array.shape)
+        print(self.means)
+
         log_likelihood = 0
         self.log_likelihood_trace = []
         self.has_converged = False
@@ -139,7 +146,12 @@ class GMM:
         log_likelihood = self._compute_log_likelihood(feature_vector_array)
 
         # Normalize resp array over all possible clutser assignments
-        self.resp_array = self.resp_array / self.resp_array.sum(axis=1, keepdims=1)
+        sum_resp_array = self.resp_array.sum(axis=1, keepdims=True)
+
+        if not (sum_resp_array.all(0)[0]):
+
+            self.resp_array = self.resp_array / \
+                self.resp_array.sum(axis=1, keepdims=True)
         return log_likelihood
 
     def _compute_log_likelihood(self, feature_vector_array):
@@ -147,9 +159,10 @@ class GMM:
             weight = self.weights[i]
 
             # Getting singular matrix error here. Might just be problem with current data.
-            likelihood = multivariate_normal(
+            likelihood = stats.multivariate_normal(
                 mean=self.means[i], cov=self.covs_array[i], allow_singular=True
             ).pdf(feature_vector_array)
+            print("Printing likelihood", likelihood)
             self.resp_array[:, i] = weight * likelihood
 
         # Sum all probabilitires of all datapoinst for each cluster

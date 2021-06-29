@@ -122,10 +122,11 @@ def init_index(dataset_src):
     insert_image_vector_list(tuple_list)
 
 
-def init_cd_tree(min_node, l_max):
+def init_cd_tree(data, min_node, l_max):
     cd_tree = CDTree(min_node, l_max)
 
     root_node = cd_tree.init_cd_tree(data)
+    print(root_node)
     pass
 
 
@@ -133,7 +134,7 @@ def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
     print("Number of indexed images: ", connector.cursor.rowcount)
-    cbir_index_features = connector.cursor.fetchall()
+    data = connector.cursor.fetchall()
     return data
 
 
@@ -162,4 +163,4 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        init_cd_tree
+        init_cd_tree(data, 20, 5)

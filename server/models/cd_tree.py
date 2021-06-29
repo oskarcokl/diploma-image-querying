@@ -1,6 +1,7 @@
 from .gmm import GMM
 import numpy as np
 import persistent
+from sklearn import mixture
 
 
 class CDTree(persistent.Persistent):
@@ -51,9 +52,14 @@ class CDTree(persistent.Persistent):
                 curr_node.is_leaf = True
             else:
                 curr_node_feature_array = np.array(curr_node.feature_vectors)
-                model = gmm.get_optimal_clusters(
-                    curr_node_feature_array, 1, 2, tolerance, n_iters
-                )
+
+                sk_gmm = mixture.GaussianMixture(
+                    n_components=3).fit(curr_node_feature_array)
+                print(sk_gmm.predict(curr_node_feature_array))
+
+                # model = gmm.get_optimal_clusters(
+                #     curr_node_feature_array, 2, 10, tolerance, n_iters
+                # )
                 node_gmm_parameters = {
                     "covs_array": model.covs_array,
                     "means": model.means,
