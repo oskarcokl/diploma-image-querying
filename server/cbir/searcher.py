@@ -1,12 +1,14 @@
+from logging import root
 import sys
 from sklearn.neighbors import NearestNeighbors
 import ZODB
 import ZODB.FileStorage
 
 
-sys.path.append("../")
+sys.path.insert(0, "../")
 sys.path.append("./scripts/")
 from db_connector import DbConnector
+from models.cd_tree import CDTree
 
 # Testing vars
 
@@ -22,8 +24,14 @@ class Searcher:
 
     def search(self, query_features, n_similar_images):
         root_node = self._get_root_node()
-        print(root_node.sub_nodes[1])
-        pass
+        cd_tree = CDTree(30, 5)
+        result_images = cd_tree.find_similar_images(
+            root_node=root_node,
+            query_feature_vector=query_features,
+            n_similar_images=n_similar_images)
+
+        print(result_images)
+        return result_images
 
 
 if __name__ == "__main__":

@@ -104,7 +104,7 @@ def init_index(dataset_src):
         img_array = preprocess_input(img_array)
 
         get_fc2_layer_output = K.function(
-            [model.layers[0].input], model.layers[21].output
+            [model.layers[0].input], model.layers[22].output
         )
         features = get_fc2_layer_output([img_array])[0]
         features_to_list = features.tolist()
@@ -143,6 +143,10 @@ def get_cd_tree_from_storage():
     print(root.cd_tree["root_node"].sub_nodes[0])
 
 
+def make_test_query_feature():
+    pass
+
+
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
@@ -179,7 +183,10 @@ if __name__ == "__main__":
         action="store_true",
     )
     args = vars(argParser.parse_args())
-    if args.get("init-db"):
+
+    print(args)
+
+    if args.get("init_db"):
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
