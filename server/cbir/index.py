@@ -144,7 +144,28 @@ def get_cd_tree_from_storage():
 
 
 def make_test_query_feature():
-    pass
+
+    processed_img_array = preprocess_input(img_array)
+    get_fc2_layer_output = K.function(
+        [model.layers[0].input], model.layers[22].output)
+    features_query = get_fc2_layer_output([processed_img_array])[0]
+    return ":)"
+
+
+def load_model():
+    model = None
+    if os.path.isdir("./vgg16"):
+        print("Model already downloaded loading from disk.")
+        model = keras.models.load_model("./vgg16")
+    else:
+        print("Downloading model.")
+        model = VGG16(
+            weights="imagenet",
+        )
+        print("Saving model to disk.")
+        model.save("./vgg16")
+
+    return model
 
 
 def get_data():
