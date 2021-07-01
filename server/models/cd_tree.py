@@ -321,12 +321,12 @@ class CDTree(persistent.Persistent):
         return ranked_similar_images
 
     # K: int. Number of similar images to return
-    def find_similar_images(self, root_node, query_feature_vector, q, k):
+    def find_similar_images(self, root_node, query_feature_vector, n_similar_images):
         stack = []
         stack.append(root_node)
         n_data_points = 0
         similar_data_points = []
-        while n_data_points < k:
+        while n_data_points < n_similar_images:
             curr_node = stack.pop()
             if not curr_node.is_leaf:
                 cpds = []

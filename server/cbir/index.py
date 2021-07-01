@@ -151,7 +151,7 @@ def get_data():
     data_array = np.array(data, dtype=object)
 
     rand_indexes = np.random.choice(
-        1909, 1000, replace=False
+        1909, 50, replace=False
     )
     print(rand_indexes)
     rand_data = data_array[rand_indexes]
