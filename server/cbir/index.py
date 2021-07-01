@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import pickle
 
 import psycopg2
 import numpy as np
@@ -143,12 +144,22 @@ def get_cd_tree_from_storage():
     print(root.cd_tree["root_node"].sub_nodes[0])
 
 
-def make_test_query_feature():
+def make_test_query_feature(query_img_path):
+    model = load_model()
+
+    print(query_img_path)
+
+    img = image.load_img(query_img_path, target_size=(224, 224))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
 
     processed_img_array = preprocess_input(img_array)
     get_fc2_layer_output = K.function(
         [model.layers[0].input], model.layers[22].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
+
+    with open("query_features", "wb") as f:
+        pickle.dump(features_query, f)
     return ":)"
 
 
@@ -203,6 +214,18 @@ if __name__ == "__main__":
         help="Set if initializing the cd tree for the first time. Will create a cd tree and store it with ZODB.",
         action="store_true",
     )
+    argParser.add_argument(
+        "-IQ",
+        "--init-query",
+        help="Create a query and save it to a file to load it later.",
+        action="store_true",
+    )
+    argParser.add_argument(
+        "-q",
+        "--query",
+        help="Path to query image.",
+    )
+
     args = vars(argParser.parse_args())
 
     print(args)
@@ -213,5 +236,7 @@ if __name__ == "__main__":
         data = get_data()
         root_node = init_cd_tree(data, 2, 4, 30, 5)
         save_cd_tree(root_node)
+    elif args.get("init_query"):
+        make_test_query_feature(args.get("query"))
     else:
         get_cd_tree_from_storage()
