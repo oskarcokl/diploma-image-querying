@@ -1,45 +1,27 @@
-from re import A
 import sys
+from sklearn.neighbors import NearestNeighbors
+import ZODB
+import ZODB.FileStorage
+
 
 sys.path.append("../")
 sys.path.append("./scripts/")
-
-import numpy as np
-from sklearn.neighbors import NearestNeighbors
 from db_connector import DbConnector
 
 
 class Searcher:
-    def search(self, query_features, n_neigbhours):
-        results = {}
+    def _get_root_node(self):
+        storage = ZODB.FileStorage.FileStorage("cd_tree.fs")
+        db = ZODB.DB(storage)
+        connection = db.open()
+        root = connection.root
 
-        connector = DbConnector()
-        print(dir(connector))
-        connector.cursor.execute("SELECT * FROM cbir_index")
-        print("Number of indexed images: ", connector.cursor.rowcount)
-        cbir_index_features = connector.cursor.fetchall()
-        cbir_index_img_paths = []
-        features_array_list = []
+        return root.cd_tree["root_node"]
 
-        for cbir_index_feature_list in cbir_index_features:
-            cbir_index_img_paths.append(cbir_index_feature_list[1])
-            feature_array = np.array(cbir_index_feature_list[2])
-            features_array_list.append(feature_array)
-
-        features_array = np.array(features_array_list)
-
-        neighbor_model = NearestNeighbors(n_neighbors=n_neigbhours)
-        neighbor_model.fit(features_array)
-
-        dist, results = neighbor_model.kneighbors(query_features)
-
-        connector.close()
-        img_paths = []
-
-        for result in results[0]:
-            img_paths.append(cbir_index_img_paths[result])
-
-        return dist[0], img_paths
+    def search(self, query_features, n_similar_images):
+        root_node = self._get_root_node()
+        print(root_node.sub_nodes[1])
+        pass
 
 
 if __name__ == "__main__":
