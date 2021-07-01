@@ -23,7 +23,8 @@ def search(query_img_path=None, query_img_list=None, cli=False):
         print("Saving model to disk.")
         model.save("./vgg16")
 
-    searcher = Searcher()
+    #searcher = Searcher()
+    searcher = None
 
     if cli:
         try:
@@ -61,7 +62,8 @@ def show_results(query_img_path, img_paths):
 
 def find_similar_imgs(img_array, model, searcher):
     processed_img_array = preprocess_input(img_array)
-    get_fc2_layer_output = K.function([model.layers[0].input], model.layers[21].output)
+    get_fc2_layer_output = K.function(
+        [model.layers[0].input], model.layers[21].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
     (dist, img_paths) = searcher.search(features_query.reshape(1, -1), 10)
@@ -81,4 +83,6 @@ if __name__ == "__main__":
     )
     args = vars(argParser.parse_args())
 
-    search(args["query"], args["terminal"])
+    print(args["terminal"])
+
+    search(query_img_path=args["query"], cli=args["terminal"])
