@@ -58,7 +58,8 @@ class CDTree(persistent.Persistent):
             if self._check_stop_conditions(curr_node):
                 curr_node.is_leaf = True
             else:
-                curr_node_feature_array = np.array(curr_node.feature_vectors)
+                curr_node_feature_array = np.array(
+                    curr_node.get_feature_vectors(data))
 
                 best_model = None
                 min_bic = np.inf

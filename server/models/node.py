@@ -116,6 +116,13 @@ class Node(persistent.Persistent):
 
         return feature_vectors_with_ids
 
+    def get_feature_vectors_by_id(self, data):
+        indexes = [id - 1 for id in self.ids]
+
+        features = [data[index] for index in indexes]
+
+        return features
+
     def set_feature_vectors(self, feature_vectors):
         self.feature_vectors = feature_vectors
         self._p_changed = True
