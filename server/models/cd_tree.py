@@ -136,15 +136,15 @@ class CDTree(persistent.Persistent):
 
         return cluster
 
-    def _get_feature_vectors_by_id(self, data):
-        indexes = [id - 1 for id in self.ids]
+    def _get_feature_vectors_by_id(self, data, ids):
+        indexes = [id - 1 for id in ids]
 
         features = [data[index][2] for index in indexes]
 
         return features
 
-    def _get_img_names_by_id(self, data):
-        indexes = [id - 1 for id in self.ids]
+    def _get_img_names_by_id(self, data, ids):
+        indexes = [id - 1 for id in ids]
 
         features = [data[index] for index in indexes]
 
