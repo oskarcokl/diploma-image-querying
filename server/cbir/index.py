@@ -77,7 +77,7 @@ def init_index(dataset_src):
         print("Saving model to disk.")
         model.save("./vgg16")
 
-    img_path_list = []
+    img_name_list = []
     feature_list = []
 
     for img_name in os.listdir(dataset_src):
@@ -93,12 +93,12 @@ def init_index(dataset_src):
         features = get_fc2_layer_output([img_array])[0]
         features_to_list = features.tolist()
 
-        img_path_list.append(img_path)
+        img_name_list.append(img_name)
         feature_list.append(features_to_list)
 
     # reduced_feature_list = reduce_features(feature_list, 100)
 
-    tuple_list = list(zip(img_path_list, feature_list))
+    tuple_list = list(zip(img_name_list, feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
 
