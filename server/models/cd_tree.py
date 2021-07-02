@@ -346,20 +346,23 @@ class CDTree(persistent.Persistent):
         while n_data_points < n_similar_images:
             curr_node = stack.pop()
             if not curr_node.is_leaf:
-                cpds = []
+                resps = []
                 for i in range(curr_node.n_sub_clusters):
                     mean = curr_node.gmm_parameters["means"][i]
                     cov_array = curr_node.gmm_parameters["covs_array"][i]
-                    cpd = self._calculate_cpd(
-                        query_feature_vector, mean, cov_array)
+                    weight = curr_node.gmm_parameters["weights"][i]
+                    resp = self._calculate_likelihood(
+                        query_feature_vector, mean, cov_array, weight)
                     # Save index of each sub node alongside the cpd. this is done
                     # so that sub nodes can be added in decreasing relevance based
                     # on cpd.
-                    cpds.append([i, cpd])
+                    resps.append([i, resp])
 
-                sorted_cpds = sorted(cpds, key=lambda x: x[1], reverse=True)
+                print(self._test_resps(resps))
 
-                for item in sorted_cpds:
+                sorted_resps = sorted(resps, key=lambda x: x[1], reverse=True)
+
+                for item in sorted_resps:
                     stack.append(curr_node.sub_nodes[item[0]])
             else:
                 for i in range(curr_node.n_feature_vectors):
@@ -370,9 +373,16 @@ class CDTree(persistent.Persistent):
 
         return self._rank_images(query_feature_vector, similar_data_points)
 
+    def _test_resps(resps):
+        sum = 0
+        for resp in resps:
+            sum += resp[1]
 
-# TODO seperate into own file.
+        return sum
+
+
 class _Node(persistent.Persistent):
+    # TODO seperate into own file.
     """
     Inner node of CDTree:
 
