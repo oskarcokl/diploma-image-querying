@@ -14,6 +14,7 @@ import ZODB
 import ZODB.FileStorage
 import BTrees
 import transaction
+from sklearn.decomposition import TruncatedSVD
 
 # Local application imports
 sys.path.insert(0, "../")
@@ -81,6 +82,7 @@ def init_index(dataset_src):
         )
         """,
     )
+    # TODO add checking if table already exsits and if it exists droping it.
     create_table(commands)
 
     if os.path.isdir("./vgg16"):
@@ -113,9 +115,19 @@ def init_index(dataset_src):
         img_path_list.append(img_path)
         feature_list.append(features_to_list)
 
+    reduced_feature_list = reduce_features(feature_list)
+
     tuple_list = list(zip(img_path_list, feature_list))
 
     insert_image_vector_list(tuple_list)
+
+
+def reduce_features(feature_list):
+    feature_array = np.array(feature_list)
+    svd = TruncatedSVD(n_components=100)
+    svd.fit(feature_array)
+    result = svd.transform(feature_array)
+    return result.tolist()
 
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
@@ -184,11 +196,11 @@ def get_data():
     data = connector.cursor.fetchall()
     data_array = np.array(data, dtype=object)
 
-    rand_indexes = np.random.choice(
-        1909, 1909, replace=False
-    )
-    print(rand_indexes)
-    rand_data = data_array[rand_indexes]
+    # rand_indexes = np.random.choice(
+    #     1909, 1909, replace=False
+    # )
+    # print(rand_indexes)
+    # rand_data = data_array[rand_indexes]
     print(f"Lenght of subset of data {len(rand_data)}")
     return data_array
 
