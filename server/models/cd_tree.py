@@ -56,7 +56,10 @@ class CDTree(persistent.Persistent):
 
         while curr_node is not None:
             if self._check_stop_conditions(curr_node):
-                curr_node.make_leaf(data)
+                leaf_feature_vectors = self._get_feature_vectors_by_id(
+                    data, curr_node.ids)
+                leaf_img_names = self._get_img_names_by_id(data, curr_node.ids)
+                curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
             else:
                 curr_node_feature_array = np.array(
                     curr_node.get_feature_vectors(data))
