@@ -196,7 +196,7 @@ if __name__ == "__main__":
     argParser.add_argument(
         "-IDB",
         "--init-db",
-        help="Set if initializing the db for the first time. Will add all pictures in dataset path",
+        help="Set if initializing the db for the first time. Will add all pictures in dataset path. Will drop table that was previously initialized.",
         action="store_true",
     )
     argParser.add_argument(
