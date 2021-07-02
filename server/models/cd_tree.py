@@ -193,18 +193,26 @@ class CDTree(persistent.Persistent):
     # Function calculates the new mean and cov matrix for a node.
     # These values need to be updated when we want to insert a new,
     # data point. M is the number of data points in the node we are updating
-    # TODO break up into 2 functions for clarity.
     def _calculate_mean_and_cov(self, m, feature_vector, mean, cov_array):
+        new_mean = self._compute_mean(m, mean, feature_vector)
+        new_cov_array = self._compute_mean(m, feature_vector, mean, cov_array)
+        return new_mean, new_cov_array
+
+    def _compute_mean(self, m, mean, feature_vector):
         new_mean = ((m / (m + 1)) * mean) + ((1 / (m + 1)) * feature_vector)
+        return new_mean
+
+    def _compute_cov(self, m, feature_vector, mean, cov_array):
         new_cov_array = (((m - 1) / m) * cov_array) + (
             (1 / (m + 1))
             * np.matmul((feature_vector - mean), (feature_vector - mean).T)
         )
-        return new_mean, new_cov_array
+        return new_cov_array
 
     # Algorithm finds leaf node of query_feature_vector. It finds
     # the leaf by calculating cpd's for each subnode and choosing
     # the subnode with the highest cpd.
+
     def _find_leaf_node_for_adding(self, id, query_feature_vector, root_node):
 
         # TODO update parameters of root node.
@@ -255,8 +263,7 @@ class CDTree(persistent.Persistent):
 
         return curr_node
 
-    # TODO rename to add_to_cd_tree
-    def add_to_cs_tree(self, id, query_feature_vector, root_node):
+    def add_to_cd_tree(self, id, query_feature_vector, root_node):
         # Used to determine if leaf need to be split with new
         # data insertion. Could be set by user.
         gama = 0.1
