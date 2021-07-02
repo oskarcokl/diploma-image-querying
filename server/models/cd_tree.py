@@ -1,5 +1,4 @@
 import numpy as np
-import ZODB
 from numpy.core.numeric import Inf
 import persistent
 from sklearn import mixture
@@ -256,7 +255,7 @@ class CDTree(persistent.Persistent):
         return curr_node
 
     # TODO rename to add_to_cd_tree
-    def add_feature_vector(self, id, query_feature_vector, root_node):
+    def add_to_cs_tree(self, id, query_feature_vector, root_node):
         # Used to determine if leaf need to be split with new
         # data insertion. Could be set by user.
         gama = 0.1
