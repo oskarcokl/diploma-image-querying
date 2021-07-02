@@ -57,6 +57,10 @@ class CDTree(persistent.Persistent):
         while curr_node is not None:
             if self._check_stop_conditions(curr_node):
                 curr_node.is_leaf = True
+                # Only the leaf nodes should explicitly hold feature vectors,
+                # all other nodes should get feature vectors from they're ids.
+                curr_node.set_feature_vectors(
+                    curr_node.get_feature_vectors_by_id(data))
             else:
                 curr_node_feature_array = np.array(
                     curr_node.get_feature_vectors(data))
