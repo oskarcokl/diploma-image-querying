@@ -1,11 +1,14 @@
-from .gmm import GMM
 import numpy as np
 import ZODB
 import persistent
 from sklearn import mixture
+from scipy import stats
 
+from .gmm import GMM
 
 # TODO refactor to not be a class and rather a module.
+
+
 class CDTree(persistent.Persistent):
     """
     CDTree object:
@@ -173,6 +176,14 @@ class CDTree(persistent.Persistent):
         )
         cpd = a * b * c
         return cpd
+
+    # This is basically CPD but with added multiplication with weight
+    # (I'm pretty sure, haven't really found any good information on what cpd is.)
+    def _calculate_likelihood(self, feature_vector, mean, cov_array, weight):
+        likelihood = stats.multivariate_normal(
+            mean=mean, cov=cov_array, allow_singular=True).pdf(feature_vector)
+
+        return weight * likelihood
 
     # Function calculates the new mean and cov matrix for a node.
     # These values need to be updated when we want to insert a new,
