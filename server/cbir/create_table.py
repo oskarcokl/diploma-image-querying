@@ -12,7 +12,7 @@ def create_table(commands):
     dbConnector.cursor.execute(commands)
 
 
-def check_table(table):
+def table_exists(table):
     dbConnector = DbConnector()
     sql = """SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)"""
     dbConnector.cursor.execute(sql, (table,))
@@ -20,4 +20,4 @@ def check_table(table):
 
 
 if __name__ == "__main__":
-    print(check_table("cbir_index"))
+    print(table_exists("cbir_index"))
