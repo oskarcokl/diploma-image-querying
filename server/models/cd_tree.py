@@ -188,6 +188,7 @@ class CDTree(persistent.Persistent):
     # Function calculates the new mean and cov matrix for a node.
     # These values need to be updated when we want to insert a new,
     # data point. M is the number of data points in the node we are updating
+    # TODO break up into 2 functions for clarity.
     def _calculate_mean_and_cov(self, m, feature_vector, mean, cov_array):
         new_mean = ((m / (m + 1)) * mean) + ((1 / (m + 1)) * feature_vector)
         new_cov_array = (((m - 1) / m) * cov_array) + (
@@ -199,11 +200,12 @@ class CDTree(persistent.Persistent):
     # Algorithm finds leaf node of query_feature_vector. It finds
     # the leaf by calculating cpd's for each subnode and choosing
     # the subnode with the highest cpd.
-    def _find_leaf_node(self, id, query_feature_vector, root_node):
+    def _find_leaf_node_for_adding(self, id, query_feature_vector, root_node):
 
         # TODO update parameters of root node.
         curr_node = root_node
         while not curr_node.is_leaf:
+            # TODO use other fucntion than likelihood
             max_cpd = -1
             max_node_index = -1
             max_node_mean
@@ -229,6 +231,7 @@ class CDTree(persistent.Persistent):
 
             # Calculate mean and cov and update them for the node
             # with the max cpd.
+            # TODO use setters instead of direct asigment.
             (
                 curr_node.gmm_parameters["means"][max_node_index],
                 curr_node.gmm_parameters["covs_array"][max_node_index],
@@ -253,7 +256,8 @@ class CDTree(persistent.Persistent):
         # data insertion. Could be set by user.
         gama = 0.1
 
-        curr_node = self._find_leaf_node(id, query_feature_vector, root_node)
+        curr_node = self._find_leaf_node_for_adding(
+            id, query_feature_vector, root_node)
 
         # Split the leaf node into to nodes if parent n features * gama is
         # smaller than then feature of the leaf node.
