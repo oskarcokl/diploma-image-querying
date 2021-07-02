@@ -10,6 +10,18 @@ from db_connector import DbConnector
 def create_table(commands):
     dbConnector = DbConnector()
     dbConnector.cursor.execute(commands)
+    dbConnector.connection.commit()
+
+
+def drop_table(table):
+    dbConnector = DbConnector()
+    sql = f"DROP TABLE {table}"
+    print(sql)
+    try:
+        dbConnector.cursor.execute(sql)
+        dbConnector.connection.commit()
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
 
 
 def table_exists(table):
@@ -20,4 +32,4 @@ def table_exists(table):
 
 
 if __name__ == "__main__":
-    print(table_exists("cbir_index"))
+    drop_table("cbir_index")
