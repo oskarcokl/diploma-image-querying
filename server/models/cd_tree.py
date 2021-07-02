@@ -5,7 +5,7 @@ from sklearn import mixture
 from scipy import stats
 
 from .gmm import GMM
-from node import Node
+from .node import Node
 
 # TODO refactor to not be a class and rather a module.
 

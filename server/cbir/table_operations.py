@@ -34,17 +34,16 @@ def table_exists(table):
 
 def insert_tuple_list(tuple_list):
     db_connector = DbConnector()
-    sql = """INSERT INTO (image_name, image_vector)
+    sql = """INSERT INTO cbir_index (image_name, image_vector)
              VALUES(%s, %s) RETURNING id;"""
 
     try:
         print("Writing image vectors to database.")
         id = db_connector.cursor.executemany(sql, tuple_list)
         db_connector.connection.commit()
+        return id
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
-
-    return id
 
 
 if __name__ == "__main__":
