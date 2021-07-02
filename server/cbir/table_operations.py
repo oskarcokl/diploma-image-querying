@@ -6,11 +6,12 @@ sys.path.insert(0, "../")
 from db_connector import DbConnector
 
 
-def create_table(commands):
-    dbConnector = DbConnector()
+def create_table(command):
+    db_connector = DbConnector()
     try:
-        dbConnector.cursor.execute(commands)
-        dbConnector.connection.commit()
+        db_connector.cursor.execute(command)
+        db_connector.cursor.close()
+        db_connector.connection.commit()
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
 
@@ -20,6 +21,7 @@ def drop_table(table):
     sql = f"DROP TABLE {table}"
     try:
         db_connector.cursor.execute(sql)
+        db_connector.cursor.close()
         db_connector.connection.commit()
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)

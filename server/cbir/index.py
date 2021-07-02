@@ -50,21 +50,20 @@ def insert_image_vector(image_name, image_vector):
 # This function is intented to be run only when setting up the initial db.
 # WARNING! The function will drop cbir_index table if it already exists!
 def init_index(dataset_src):
-    commands = (
-        """
+    command = """
         CREATE TABLE cbir_index (
             id SERIAL PRIMARY KEY,
             image_name VARCHAR(255) NOT NULL,
             image_vector DOUBLE PRECISION[4096]
         )
-        """,
-    )
+        """
 
     if table_operations.table_exists("cbir_index"):
+        print("Deleting previous table")
         table_operations.drop_table("cbir_index")
 
-    # TODO add checking if table already exsits and if it exists droping it.
-    table_operations.create_table(commands)
+    print("Creating cbir_index table")
+    table_operations.create_table(command)
 
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
