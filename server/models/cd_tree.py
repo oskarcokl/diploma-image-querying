@@ -359,7 +359,8 @@ class CDTree(persistent.Persistent):
             similar_images[i].append(d)
 
         ranked_similar_images = sorted(
-            similar_images, reverse=True, key=lambda x: x[2])
+            similar_images, reverse=True, key=lambda x: x[3])
+
         return ranked_similar_images
 
     # K: int. Number of similar images to return
@@ -393,11 +394,15 @@ class CDTree(persistent.Persistent):
             else:
                 for i in range(curr_node.n_feature_vectors):
                     similar_data_points.append(
-                        [curr_node.ids[i], curr_node.feature_vectors[i]]
+                        [curr_node.ids[i],
+                         curr_node.feature_vectors[i],
+                         curr_node.img_names[i]]
                     )
                 n_data_points = len(similar_data_points)
 
-        return self._rank_images(query_feature_vector, similar_data_points)
+        ranked_images = self._rank_images(
+            query_feature_vector, similar_data_points)
+        return ranked_images
 
     def _test_resps(self, resps):
         print(resps)

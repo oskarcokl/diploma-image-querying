@@ -1,3 +1,4 @@
+from re import S
 import sys
 import pickle
 
@@ -31,9 +32,13 @@ class Searcher:
             query_feature_vector=query_features,
             n_similar_images=n_similar_images)
 
-        for result in result_images:
-            print(result[0])
-        return result_images
+        img_names = []
+
+        for i in range(n_similar_images):
+            img_names.append(result_images[i][2])
+
+        print(img_names)
+        return img_names
 
 
 if __name__ == "__main__":
