@@ -2,7 +2,6 @@ import persistent
 
 
 class Node(persistent.Persistent):
-    # TODO seperate into own file.
     """
     Inner node of CDTree:
 
@@ -35,6 +34,13 @@ class Node(persistent.Persistent):
     ids: list
         List of ids in this leaf.
 
+    feature_vectors: list
+        List of feature vectors.
+
+    img_names: list
+        List of img_names. This is only the name of the image. The relative path to where
+        it is stored should be added when you wish to retrieve it.
+
     is_leaf: bool
         Boolean which determines if the node is a leaf or not.
 
@@ -43,11 +49,6 @@ class Node(persistent.Persistent):
 
     layer: int
         Which layer is the node on.
-
-    data: []
-        Same as data that gets based into CDTree.init_cd_tree()
-        but only keeping the relevant parts for the node.
-
     """
 
     def __init__(
@@ -62,6 +63,7 @@ class Node(persistent.Persistent):
         layer=-1,
         data=[],
         feature_vectors=[],
+        img_names=[],
         node_id=-1,
     ):
         self.is_leaf = is_leaf
@@ -75,6 +77,7 @@ class Node(persistent.Persistent):
         self.data = data
         self.feature_vectors = feature_vectors
         self.node_id = node_id
+        self.img_names = img_names
 
     def __str__(self):
         return """
@@ -119,6 +122,10 @@ class Node(persistent.Persistent):
 
     def set_ids(self, ids):
         self.ids = ids
+        self._p_changed = True
+
+    def set_img_names(self, img_names):
+        self.img_names = img_names
         self._p_changed = True
 
     def set_sub_nodes(self, sub_nodes):
