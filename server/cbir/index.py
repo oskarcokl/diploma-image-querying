@@ -201,7 +201,7 @@ def get_data():
     # )
     # print(rand_indexes)
     # rand_data = data_array[rand_indexes]
-    print(f"Lenght of subset of data {len(rand_data)}")
+    # print(f"Lenght of subset of data {len(rand_data)}")
     return data_array
 
 
