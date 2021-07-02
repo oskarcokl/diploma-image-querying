@@ -21,7 +21,7 @@ sys.path.insert(0, "../")
 from db_connector import DbConnector
 from models.cd_tree import CDTree
 from config import config
-from create_table import create_table
+import table_operations
 
 
 def insert_image_vector(image_name, image_vector):
@@ -47,31 +47,8 @@ def insert_image_vector(image_name, image_vector):
     return image_id
 
 
-def insert_image_vector_list(tuple_list):
-    sql = """INSERT INTO cbir_index(image_name, image_vector)
-             VALUES(%s, %s) RETURNING id;"""
-
-    connection = None
-    image_id = None
-    try:
-        print("Writing image vectors to database.")
-        params = config()
-        connection = psycopg2.connect(**params)
-        cursor = connection.cursor()
-        cursor.executemany(sql, tuple_list)
-        connection.commit()
-        cursor.close()
-    except (Exception, psycopg2.DatabaseError) as e:
-        print(e)
-    finally:
-        if connection is not None:
-            connection.close()
-            print("Finished writing image vectors to database.")
-
-    return image_id
-
-
 # This function is intented to be run only when setting up the initial db.
+# WARNING! The function will drop cbir_index table if it already exists!
 def init_index(dataset_src):
     commands = (
         """
@@ -82,8 +59,12 @@ def init_index(dataset_src):
         )
         """,
     )
+
+    if table_operations.table_exists("cbir_index"):
+        table_operations.drop_table("cbir_index")
+
     # TODO add checking if table already exsits and if it exists droping it.
-    create_table(commands)
+    table_operations.create_table(commands)
 
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
@@ -119,7 +100,7 @@ def init_index(dataset_src):
 
     tuple_list = list(zip(img_path_list, reduced_feature_list))
 
-    insert_image_vector_list(tuple_list)
+    table_operations.insert_tuple_list(tuple_list)
 
 
 def reduce_features(feature_list, n_components=100):
