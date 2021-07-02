@@ -41,6 +41,4 @@ if __name__ == "__main__":
     with open("query_features", "rb") as f:
         query_feature_vector = pickle.load(f)
 
-    print(query_feature_vector)
-
     Searcher().search(n_similar_images=10, query_features=query_feature_vector)
