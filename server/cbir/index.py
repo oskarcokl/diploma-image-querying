@@ -147,8 +147,6 @@ def get_cd_tree_from_storage():
 def make_test_query_feature(query_img_path):
     model = load_model()
 
-    print(query_img_path)
-
     img = image.load_img(query_img_path, target_size=(224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)

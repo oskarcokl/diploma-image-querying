@@ -162,7 +162,7 @@ class CDTree(persistent.Persistent):
     def _calculate_cpd(self, feature_vector, mean, cov_array):
         d = len(feature_vector)
         print(d)
-        a = (2 * np.pi) ** (d / 2)
+        a = np.power(2 * 3.14, d / 2)
         b = np.linalg.det(cov_array) ** -0.5
         c = np.exp(
             -0.5
