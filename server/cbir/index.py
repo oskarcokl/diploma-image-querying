@@ -115,16 +115,16 @@ def init_index(dataset_src):
         img_path_list.append(img_path)
         feature_list.append(features_to_list)
 
-    reduced_feature_list = reduce_features(feature_list)
+    reduced_feature_list = reduce_features(feature_list, 100)
 
-    tuple_list = list(zip(img_path_list, feature_list))
+    tuple_list = list(zip(img_path_list, reduced_feature_list))
 
     insert_image_vector_list(tuple_list)
 
 
-def reduce_features(feature_list):
+def reduce_features(feature_list, n_components=100):
     feature_array = np.array(feature_list)
-    svd = TruncatedSVD(n_components=100)
+    svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_array)
     result = svd.transform(feature_array)
     return result.tolist()

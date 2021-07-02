@@ -1,25 +1,23 @@
+import sys
+
 import psycopg2
 from config import config
 
+sys.path.insert(0, "../")
+from db_connector import DbConnector
+
 
 def create_table(commands):
-    connection = None
-    try:
-        params = config()
-        connection = psycopg2.connect(**params)
-        cursor = connection.cursor()
+    dbConnector = DbConnector()
+    dbConnector.cursor.execute(commands)
 
-        for command in commands:
-            cursor.execute(command)
 
-        cursor.close()
-        connection.commit()
-    except (Exception, psycopg2.DatabaseError) as e:
-        print(e)
-    finally:
-        if connection is not None:
-            connection.close()
+def check_table(table):
+    dbConnector = DbConnector()
+    sql = """SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)"""
+    dbConnector.cursor.execute(sql, (table,))
+    return dbConnector.cursor.fetchone()[0]
 
 
 if __name__ == "__main__":
-    create_table()
+    print(check_table("cbir_index"))
