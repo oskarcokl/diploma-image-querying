@@ -56,12 +56,7 @@ class CDTree(persistent.Persistent):
 
         while curr_node is not None:
             if self._check_stop_conditions(curr_node):
-                curr_node.make_leaf()
-                curr_node.is_leaf = True
-                # Only the leaf nodes should explicitly hold feature vectors,
-                # all other nodes should get feature vectors from they're ids.
-                curr_node.set_feature_vectors(
-                    curr_node.get_feature_vectors_by_id(data))
+                curr_node.make_leaf(data)
             else:
                 curr_node_feature_array = np.array(
                     curr_node.get_feature_vectors(data))
@@ -96,13 +91,12 @@ class CDTree(persistent.Persistent):
 
                 # Save GMM parameters into curr_node
                 curr_node.set_gmm_parameters(node_gmm_parameters)
-                vectors_with_clusters = self._asign_vectors_to_clusters(
+                ids_with_clusters = self._asign_ids_to_clusters(
                     curr_node.ids, curr_node.feature_vectors, cluster_asigments
                 )
 
                 sub_nodes = self._create_sub_nodes(
-                    vectors_with_clusters,
-                    curr_node.ids,
+                    ids_with_clusters,
                     curr_node.layer + 1,
                     n_clusters,
                 )
@@ -118,10 +112,10 @@ class CDTree(persistent.Persistent):
             else:
                 return root_node
 
-    def _asign_vectors_to_clusters(self, ids, feature_vectors, cluster_asigments):
+    def _asign_ids_to_clusters(self, ids, cluster_asigments):
         new_data = []
         for i in range(len(ids)):
-            new_data_item = (ids[i], feature_vectors[i], cluster_asigments[i])
+            new_data_item = (ids[i], cluster_asigments[i])
             new_data.append(new_data_item)
 
         return new_data
@@ -138,6 +132,20 @@ class CDTree(persistent.Persistent):
                 cluster = i
 
         return cluster
+
+    def _get_feature_vectors_by_id(self, data):
+        indexes = [id - 1 for id in self.ids]
+
+        features = [data[index][2] for index in indexes]
+
+        return features
+
+    def _get_img_names_by_id(self, data):
+        indexes = [id - 1 for id in self.ids]
+
+        features = [data[index] for index in indexes]
+
+        return features
 
     # If stop conditions have been met the functino returns true.
     # Else it retusn false.
@@ -311,7 +319,7 @@ class CDTree(persistent.Persistent):
 
     # n_clusters created from current cluster.
     def _create_sub_nodes(
-        self, feature_vectors_with_clusters, ids, sub_node_layer, n_clusters
+        self, ids_with_clusters, sub_node_layer, n_clusters
     ):
         sub_nodes = []
 
@@ -321,18 +329,15 @@ class CDTree(persistent.Persistent):
             self.node_id += 1
             sub_node = Node(layer=sub_node_layer, node_id=self.node_id)
 
-            feature_vectors = []
             ids = []
 
             # Iterates over feature vectors and puts the ones asigned to current
             # cluster into a list which is then added to the new node.
-            for item in feature_vectors_with_clusters:
-                if item[2] == index:
-                    feature_vectors.append(item[1])
+            for item in ids_with_clusters:
+                if item[1] == index:
                     ids.append(item[0])
 
             sub_node.set_ids(ids)
-            sub_node.set_feature_vectors(feature_vectors)
             sub_node.n_feature_vectors = len(ids)
             sub_nodes.append(sub_node)
 

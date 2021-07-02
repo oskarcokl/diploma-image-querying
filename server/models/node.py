@@ -116,13 +116,6 @@ class Node(persistent.Persistent):
 
         return feature_vectors_with_ids
 
-    def get_feature_vectors_by_id(self, data):
-        indexes = [id - 1 for id in self.ids]
-
-        features = [data[index] for index in indexes]
-
-        return features
-
     def set_feature_vectors(self, feature_vectors):
         self.feature_vectors = feature_vectors
         self._p_changed = True
@@ -163,9 +156,9 @@ class Node(persistent.Persistent):
         self.feature_vectors.append(feature_vector)
         self._p_changed = True
 
-    def make_leaf(self, data):
+    def make_leaf(self, feature_vectors, img_names):
         self.is_leaf = True
         # Only the leaf nodes should explicitly hold feature vectors,
         # all other nodes should get feature vectors from they're ids.
-        self.set_feature_vectors(
-            self.get_feature_vectors_by_id(data))
+        self.set_feature_vectors(feature_vectors)
+        self.set_img_names(img_names)
