@@ -141,7 +141,7 @@ def get_cd_tree_from_storage():
     connection = db.open()
     root = connection.root
 
-    print(root.cd_tree["root_node"].sub_nodes[0])
+    print(root.cd_tree["root_node"].ids)
 
 
 def make_test_query_feature(query_img_path):

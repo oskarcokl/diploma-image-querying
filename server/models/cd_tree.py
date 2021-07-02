@@ -1,5 +1,6 @@
 import numpy as np
 import ZODB
+from numpy.core.numeric import Inf
 import persistent
 from sklearn import mixture
 from scipy import stats
@@ -179,10 +180,12 @@ class CDTree(persistent.Persistent):
 
     # This is basically CPD but with added multiplication with weight
     # (I'm pretty sure, haven't really found any good information on what cpd is.)
+    # TODO figure out what multivariate_normal is actully doing with pdf()
     def _calculate_likelihood(self, feature_vector, mean, cov_array, weight):
         likelihood = stats.multivariate_normal(
             mean=mean, cov=cov_array, allow_singular=True).pdf(feature_vector)
-
+        if likelihood == float("inf"):
+            likelihood = 1
         return weight * likelihood
 
     # Function calculates the new mean and cov matrix for a node.
@@ -348,6 +351,7 @@ class CDTree(persistent.Persistent):
             if not curr_node.is_leaf:
                 resps = []
                 for i in range(curr_node.n_sub_clusters):
+                    print(i)
                     mean = curr_node.gmm_parameters["means"][i]
                     cov_array = curr_node.gmm_parameters["covs_array"][i]
                     weight = curr_node.gmm_parameters["weights"][i]
@@ -373,7 +377,8 @@ class CDTree(persistent.Persistent):
 
         return self._rank_images(query_feature_vector, similar_data_points)
 
-    def _test_resps(resps):
+    def _test_resps(self, resps):
+        print(resps)
         sum = 0
         for resp in resps:
             sum += resp[1]

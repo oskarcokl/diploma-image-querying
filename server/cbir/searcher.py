@@ -31,7 +31,7 @@ class Searcher:
             query_feature_vector=query_features,
             n_similar_images=n_similar_images)
 
-        print(result_images)
+        # print(result_images)
         return result_images
 
 
