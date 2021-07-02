@@ -162,3 +162,10 @@ class Node(persistent.Persistent):
     def add_feature_vector(self, feature_vector):
         self.feature_vectors.append(feature_vector)
         self._p_changed = True
+
+    def make_leaf(self, data):
+        self.is_leaf = True
+        # Only the leaf nodes should explicitly hold feature vectors,
+        # all other nodes should get feature vectors from they're ids.
+        self.set_feature_vectors(
+            self.get_feature_vectors_by_id(data))
