@@ -92,6 +92,8 @@ class Node(persistent.Persistent):
     is_root: {is_root}
     layer: {layer}
     node_id: {node_id}
+    feature_vectors: {feature_vectors}
+    img_names: {img_names}
     ==================================
         """.format(
             is_leaf=self.is_leaf,
@@ -103,6 +105,8 @@ class Node(persistent.Persistent):
             sub_nodes=self.sub_nodes,
             layer=self.layer,
             node_id=self.node_id,
+            feature_vectors=self.feature_vectors,
+            img_names=self.img_names
         )
 
     # This function assumes that ids are ordered.

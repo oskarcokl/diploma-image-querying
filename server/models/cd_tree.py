@@ -62,7 +62,7 @@ class CDTree(persistent.Persistent):
                 curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
             else:
                 curr_node_feature_array = np.array(
-                    curr_node.get_feature_vectors(data))
+                    self._get_feature_vectors_by_id(data, curr_node.ids))
 
                 best_model = None
                 min_bic = np.inf
@@ -95,8 +95,7 @@ class CDTree(persistent.Persistent):
                 # Save GMM parameters into curr_node
                 curr_node.set_gmm_parameters(node_gmm_parameters)
                 ids_with_clusters = self._asign_ids_to_clusters(
-                    curr_node.ids, curr_node.feature_vectors, cluster_asigments
-                )
+                    curr_node.ids, cluster_asigments)
 
                 sub_nodes = self._create_sub_nodes(
                     ids_with_clusters,
@@ -146,7 +145,7 @@ class CDTree(persistent.Persistent):
     def _get_img_names_by_id(self, data, ids):
         indexes = [id - 1 for id in ids]
 
-        features = [data[index] for index in indexes]
+        features = [data[index][1] for index in indexes]
 
         return features
 

@@ -133,7 +133,7 @@ def get_cd_tree_from_storage():
     connection = db.open()
     root = connection.root
 
-    print(root.cd_tree["root_node"].ids)
+    print(root.cd_tree["root_node"].sub_nodes[0])
 
 
 def make_test_query_feature(query_img_path):
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 30, 30, 15)
+        root_node = init_cd_tree(data, 1, 10, 30, 2)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))
