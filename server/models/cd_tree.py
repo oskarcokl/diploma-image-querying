@@ -5,6 +5,7 @@ import persistent
 from sklearn import mixture
 
 
+# TODO refactor to not be a class and rather a module.
 class CDTree(persistent.Persistent):
     """
     CDTree object:
@@ -355,6 +356,7 @@ class CDTree(persistent.Persistent):
         return self._rank_images(query_feature_vector, similar_data_points)
 
 
+# TODO seperate into own file.
 class _Node(persistent.Persistent):
     """
     Inner node of CDTree:
