@@ -95,7 +95,7 @@ def init_index(dataset_src):
         img_name_list.append(img_name)
         feature_list.append(features_to_list)
 
-    # reduced_feature_list = reduce_features(feature_list, 100)
+    reduced_feature_list = reduce_features(feature_list, 100)
 
     tuple_list = list(zip(img_name_list, feature_list))
 
