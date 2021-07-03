@@ -94,6 +94,8 @@ class CDTree(persistent.Persistent):
                 cluster_asigments = self._predict(
                     curr_node_feature_array, best_model.means_, best_model.covariances_)
 
+                print(f"Cluster asigments: {cluster_asigments}")
+
                 # Save GMM parameters into curr_node
                 curr_node.set_gmm_parameters(node_gmm_parameters)
                 ids_with_clusters = self._asign_ids_to_clusters(
@@ -126,15 +128,14 @@ class CDTree(persistent.Persistent):
 
     # Func returns asigmnets of feature vector to clusters.
     def _predict(self, feature_vectors, means, covs_array):
-
         assigments = []
 
         for feature_vector in feature_vectors:
             cpds = self._compute_cpds(feature_vector, means, covs_array)
-            max_cpd_cluster = self._get_max_cpd(cpds)
+            max_cpd_cluster = self._get_max_cpd_index(cpds)
             assigments.append(max_cpd_cluster)
 
-        return max_cpd_cluster
+        return assigments
 
     def _compute_cpds(self, feature_vector, means, covs_array):
         cpds = []
@@ -144,7 +145,7 @@ class CDTree(persistent.Persistent):
 
         return cpds
 
-    def _get_max_cpd(self, cpds):
+    def _get_max_cpd_index(self, cpds):
         return cpds.index(max(cpds))
 
     def _get_cluster_of_data(self, resp_array, index):
@@ -207,18 +208,25 @@ class CDTree(persistent.Persistent):
 
     # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
     # Function calculates the above equation
+    # All the bad var names are made on a saturday ad 20:55 pls forgive me.
     def _compute_cpd(self, feature_vector, mean, cov_array):
+        cov_array_dig = np.diag(cov_array)
         d = len(feature_vector)
-        print(d)
-        a = np.power(2 * 3.14, d / 2)
-        b = np.linalg.det(cov_array) ** -0.5
+        half_d = d / 2
+        # print(cov_array_dig)
+        two_pi = 2 * np.pi
+        a = np.power(two_pi, half_d)
+        b = np.linalg.det(cov_array_dig)
+        # print(b)
+        b_power = b ** -0.5
         c = np.exp(
             -0.5
-            * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array)),
+            * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array_dig)),
                         (feature_vector - mean),
                         )
         )
-        cpd = a * b * c
+        first_part = a * b
+        cpd = first_part * c
         return cpd
 
     # This is basically CPD but with added multiplication with weight

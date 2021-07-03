@@ -80,7 +80,7 @@ def find_similar_imgs(img_array, model, searcher):
 
     print(feature_query_2d.shape)
 
-    reduced_feature_query = reduce_features(feature_query_2d)
+    reduced_feature_query = reduce_features(feature_query_2d, 10)
     print(reduced_feature_query)
 
     #img_names = searcher.search(features_query.reshape(1, -1), 10)
