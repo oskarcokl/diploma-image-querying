@@ -37,7 +37,6 @@ class Searcher:
         for i in range(n_similar_images):
             img_names.append(result_images[i][2])
 
-        print(img_names)
         return img_names
 
 

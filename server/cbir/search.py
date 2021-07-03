@@ -11,7 +11,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 
 
-def search(query_img_path=None, query_img_list=None, cli=False):
+def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
@@ -23,8 +23,7 @@ def search(query_img_path=None, query_img_list=None, cli=False):
         print("Saving model to disk.")
         model.save("./vgg16")
 
-    #searcher = Searcher()
-    searcher = None
+    searcher = Searcher()
 
     if cli:
         try:
@@ -32,9 +31,16 @@ def search(query_img_path=None, query_img_list=None, cli=False):
             img_array = image.img_to_array(img)
             img_array = np.expand_dims(img_array, axis=0)
 
-            img_paths = find_similar_imgs(
+            img_names = find_similar_imgs(
                 img_array=img_array, model=model, searcher=searcher
             )
+
+            print(img_names)
+
+            img_paths = [os.path.join(dataset, img_name)
+                         for img_name in img_names]
+            print(img_paths)
+
             show_results(query_img_path, img_paths)
         except Exception as e:
             print(e)
@@ -66,8 +72,8 @@ def find_similar_imgs(img_array, model, searcher):
         [model.layers[0].input], model.layers[22].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
-    (dist, img_paths) = searcher.search(features_query.reshape(1, -1), 10)
-    return img_paths
+    img_names = searcher.search(features_query.reshape(1, -1), 10)
+    return img_names
 
 
 if __name__ == "__main__":
@@ -81,8 +87,14 @@ if __name__ == "__main__":
         help="Use if you want to call the script from a CLI.",
         action="store_true",
     )
+    argParser.add_argument(
+        "-d",
+        "--dataset",
+        help="Path to where images are being stored"
+    )
     args = vars(argParser.parse_args())
 
     print(args["terminal"])
 
-    search(query_img_path=args["query"], cli=args["terminal"])
+    search(query_img_path=args["query"],
+           cli=args["terminal"], dataset=args["dataset"])
