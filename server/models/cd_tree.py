@@ -124,6 +124,7 @@ class CDTree(persistent.Persistent):
 
         return new_data
 
+    # Func returns asigmnets of feature vector to clusters.
     def _predict(self, feature_vectors, means, covs_array):
 
         assigments = []
@@ -134,6 +135,14 @@ class CDTree(persistent.Persistent):
             assigments.append(max_cpd_cluster)
 
         return max_cpd_cluster
+
+    def _compute_cpds(self, feature_vector, means, covs_array):
+        cpds = []
+        for i in range(len(means)):
+            cpd = self._compute_cpd(feature_vector, means[i], covs_array[i])
+            cpds.append(cpd)
+
+        return cpds
 
     def _get_cluster_of_data(self, resp_array, index):
         n_clusters = resp_array.shape[1]
@@ -195,7 +204,7 @@ class CDTree(persistent.Persistent):
 
     # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
     # Function calculates the above equation
-    def _calculate_cpd(self, feature_vector, mean, cov_array):
+    def _compute_cpd(self, feature_vector, mean, cov_array):
         d = len(feature_vector)
         print(d)
         a = np.power(2 * 3.14, d / 2)
