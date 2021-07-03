@@ -91,7 +91,8 @@ class CDTree(persistent.Persistent):
                     "weights": best_model.weights_,
                 }
 
-                cluster_asigments = best_model.predict(curr_node_feature_array)
+                cluster_asigments = self._predict(
+                    curr_node_feature_array, best_model.means_, best_model.covariances_)
 
                 # Save GMM parameters into curr_node
                 curr_node.set_gmm_parameters(node_gmm_parameters)
@@ -122,6 +123,17 @@ class CDTree(persistent.Persistent):
             new_data.append(new_data_item)
 
         return new_data
+
+    def _predict(self, feature_vectors, means, covs_array):
+
+        assigments = []
+
+        for feature_vector in feature_vectors:
+            cpds = self._compute_cpds(feature_vector, means, covs_array)
+            max_cpd_cluster = self._get_max_cpd(cpds)
+            assigments.append(max_cpd_cluster)
+
+        return max_cpd_cluster
 
     def _get_cluster_of_data(self, resp_array, index):
         n_clusters = resp_array.shape[1]
