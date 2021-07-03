@@ -144,6 +144,9 @@ class CDTree(persistent.Persistent):
 
         return cpds
 
+    def _get_max_cpd(self, cpds):
+        return cpds.index(max(cpds))
+
     def _get_cluster_of_data(self, resp_array, index):
         n_clusters = resp_array.shape[1]
         # Probability (responsibility) can never be smaller than 0.
