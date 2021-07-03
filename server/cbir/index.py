@@ -224,7 +224,7 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 10, 30, 2)
+        root_node = init_cd_tree(data, 1, 15, 30, 20)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))

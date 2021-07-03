@@ -1,3 +1,4 @@
+import enum
 import numpy as np
 from numpy.core.numeric import Inf
 import persistent
@@ -200,15 +201,43 @@ class CDTree(persistent.Persistent):
     # (I'm pretty sure, haven't really found any good information on what cpd is.)
     # TODO figure out what multivariate_normal is actully doing with pdf()
     def _calculate_likelihood(self, feature_vector, mean, cov_array, weight):
+
         likelihood = stats.multivariate_normal(
-            mean=mean, cov=cov_array, allow_singular=True).pdf(feature_vector)
+            mean=mean, cov=cov_array).pdf(feature_vector)
         if likelihood == float("inf"):
             likelihood = 1
         return weight * likelihood
 
+    def _compute_resps(self, feature_vector, means, cov_arrays, weights):
+        params = {
+            "weights_": weights,
+            "means_": means,
+            "covariances_": cov_arrays
+        }
+
+        gmm = mixture.GaussianMixture(
+            covariance_type="diag", max_iter=1)
+        gmm.weights_ = weights
+        gmm.means_ = means
+        gmm.covariances_ = cov_arrays
+        precision_cholesky = self._compute_precision_cholesky(cov_arrays)
+        gmm.precisions_cholesky_ = precision_cholesky
+
+        resps = gmm.predict_proba(feature_vector)
+        print(resps)
+        result = [[i, resp] for i, resp in enumerate(resps)]
+        return result
+
+    def _compute_precision_cholesky(self, cov_arrays):
+        if np.any(np.less_equal(cov_arrays, 0.0)):
+            raise ValueError("Cant estimate precision")
+        precisions_chol = 1. / np.sqrt(cov_arrays)
+        return precisions_chol
+
     # Function calculates the new mean and cov matrix for a node.
     # These values need to be updated when we want to insert a new,
     # data point. M is the number of data points in the node we are updating
+
     def _calculate_mean_and_cov(self, m, feature_vector, mean, cov_array):
         new_mean = self._compute_mean(m, mean, feature_vector)
         new_cov_array = self._compute_mean(m, feature_vector, mean, cov_array)
@@ -373,17 +402,26 @@ class CDTree(persistent.Persistent):
             curr_node = stack.pop()
             if not curr_node.is_leaf:
                 resps = []
-                for i in range(curr_node.n_sub_clusters):
-                    print(i)
-                    mean = curr_node.gmm_parameters["means"][i]
-                    cov_array = curr_node.gmm_parameters["covs_array"][i]
-                    weight = curr_node.gmm_parameters["weights"][i]
-                    resp = self._calculate_likelihood(
-                        query_feature_vector, mean, cov_array, weight)
-                    # Save index of each sub node alongside the cpd. this is done
-                    # so that sub nodes can be added in decreasing relevance based
-                    # on cpd.
-                    resps.append([i, resp])
+                # for i in range(curr_node.n_sub_clusters):
+                #     print(i)
+                #     mean = curr_node.gmm_parameters["means"][i]
+                #     cov_array = curr_node.gmm_parameters["covs_array"][i]
+                #     weight = curr_node.gmm_parameters["weights"][i]
+                #     # resp = self._calculate_likelihood(
+                #     #     query_feature_vector, mean, cov_array, weight)
+                #     # Save index of each sub node alongside the cpd. this is done
+                #     # so that sub nodes can be added in decreasing relevance based
+                #     # on cpd.
+                #     resps.append([i, resp])
+
+                means = curr_node.gmm_parameters["means"]
+                cov_array = curr_node.gmm_parameters["covs_array"]
+                weights = curr_node.gmm_parameters["weights"]
+
+                resps = self._compute_resps(
+                    query_feature_vector, means, cov_array, weights)
+
+                print(resps)
 
                 print(self._test_resps(resps))
 
