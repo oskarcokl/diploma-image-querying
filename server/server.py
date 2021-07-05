@@ -2,12 +2,10 @@ import tornado.ioloop
 import tornado.web
 import json
 import logging
-import queries
 import cv2
 import numpy as np
 from celery_app.tasks import add
 from celery_app.cbir_tasks import cbir_query
-from tornado.httpclient import AsyncHTTPClient
 
 from tornado.options import define, options, parse_command_line
 
@@ -48,7 +46,8 @@ class FileUploadHandler(BaseHandler):
                 filename, content_type = info["filename"], info["content_type"]
                 body = info["body"]
                 logging.info(
-                    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
+                    'POST "%s" "%s" %d bytes', filename, content_type, len(
+                        body)
                 )
 
         self.write("OK")
@@ -110,7 +109,8 @@ def server_startup_message():
 
 def decode_uploaded_img(file):
     img_bytes = file[0].body
-    img_array = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
+    img_array = cv2.imdecode(np.frombuffer(
+        img_bytes, np.uint8), cv2.IMREAD_COLOR)
     img_array = cv2.resize(img_array, (224, 224))
     img_array = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
     # Think image should be RGB after this but couldn't test.
