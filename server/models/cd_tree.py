@@ -11,10 +11,12 @@ from .node import Node
 
 def init_cd_tree(
     data,
-    min_clusters,
-    max_clusters,
-    tolerance=0.001,
-    n_iters=1000,
+    min_clusters=1,
+    max_clusters=10,
+    min_node=20,
+    l_max=5,
+    # tolerance=0.001,
+    # n_iters=1000,
 ):
     """
     Function that initializes the CDTree and returns it.
@@ -30,7 +32,7 @@ def init_cd_tree(
     curr_node = stack.pop()
 
     while curr_node is not None:
-        if _check_stop_conditions(curr_node):
+        if _check_stop_conditions(curr_node, min_node, l_max):
             leaf_feature_vectors = _get_feature_vectors_by_id(
                 data, curr_node.ids)
             leaf_img_names = _get_img_names_by_id(
@@ -163,7 +165,7 @@ def _get_img_names_by_id(data, ids):
 # Else it retusn false.
 
 
-def _check_stop_conditions(node):
+def _check_stop_conditions(node, min_node, l_max):
     print(node.n_feature_vectors)
     if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
         return True
@@ -175,7 +177,7 @@ def _check_stop_conditions(node):
     return False
 
 
-def _generate_root_node(data):
+def _generate_root_node(data, node_id):
     ids = []
     feature_vectors = []
     for item in data:
@@ -261,7 +263,7 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
         for i in range(curr_node.n_sub_clusters):
             mean = curr_node.gmm_parameters["means"][i]
             cov_array = curr_node.gmm_parameters["covs_array"][i]
-            cpd = _calculate_cpd(
+            cpd = _compute_cpd(
                 query_feature_vector, mean, cov_array)
             if max_cpd < cpd:
                 max_cpd = cpd
@@ -327,7 +329,7 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
         # Might turned this into a function since the same thing
         # happens in init_cd_tree().
 
-        vectors_with_clusters = _asign_vectors_to_clusters(
+        vectors_with_clusters = _asign_ids_to_clusters(
             curr_node.ids, curr_node.feature_vectors, model.resp_array
         )
 
@@ -344,7 +346,7 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
 
 
 def _create_sub_nodes(
-    ids_with_clusters, sub_node_layer, n_clusters
+    ids_with_clusters, sub_node_layer, n_clusters, node_id
 ):
     sub_nodes = []
 
@@ -452,8 +454,7 @@ if __name__ == "__main__":
         temp_list = [id, "img_src", rand_feature_vector]
         data_list.append(temp_list)
 
-    cd_tree = CDTree(min_node=20, l_max=4)
-    root = cd_tree.init_cd_tree(data_list)
+    root = init_cd_tree(data_list)
 
     print(root)
     print(root.sub_nodes[0])
