@@ -13,6 +13,7 @@ from tensorflow.keras import backend as K
 import ZODB
 import ZODB.FileStorage
 import BTrees
+from tensorflow.python.ops.gen_math_ops import squared_difference_eager_fallback
 import transaction
 from sklearn.decomposition import TruncatedSVD
 
@@ -94,7 +95,9 @@ def init_index(dataset_src):
         img_name_list.append(img_name)
         feature_list.append(features)
 
-    normalized_feature_list = residuals(feature_list)
+    print(feature_list[0])
+    normalized_feature_list = min_max_normalization(feature_list)
+    print(normalized_feature_list[0])
 
     tuple_list = list(zip(img_name_list, normalized_feature_list))
 
@@ -110,6 +113,19 @@ def residuals(feature_list):
         normalized_feature_list.append(normalized_feature_vector)
 
     return normalized_feature_list
+
+
+def min_max_normalization(feature_list):
+    scaled_feature_list = []
+
+    for feature_vector in feature_list:
+        max = np.max(feature_vector)
+        min = np.min(feature_vector)
+        scaled_feature_vector = np.array(
+            [(x - min) / (max - min) for x in feature_vector])
+        scaled_feature_list.append(scaled_feature_vector)
+
+    return scaled_feature_list
 
 
 def normalize_features(feature_list):
