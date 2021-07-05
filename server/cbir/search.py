@@ -1,6 +1,5 @@
 import argparse
 import os
-from absl.logging import get_absl_handler
 import cv2
 import numpy as np
 from searcher import Searcher
@@ -16,7 +15,7 @@ import sys
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 
-from db_connector import DbConnector
+from db_utils.db_connector import DbConnector
 
 
 def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
@@ -63,6 +62,7 @@ def show_results(query_img_path, img_paths):
     query_img = cv2.imread(query_img_path)
     query_resized = cv2.resize(query_img, (720, 480))
     cv2.imshow("Query", query_resized)
+    # TODO maybe remove first wait key.
     cv2.waitKey(0)
 
     for img_path in img_paths:

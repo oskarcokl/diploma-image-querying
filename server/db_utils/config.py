@@ -1,9 +1,10 @@
-from configparser import ConfigParser
 import os
 
+from configparser import ConfigParser
 
-def config(filename="database.ini", section="postgresql"):
-    # print(os.listdir("./"))
+
+def config(filename="./db_utils/database.ini", section="postgresql"):
+    print(os.listdir("./"))
     parser = ConfigParser()
     parser.read(filename)
     db = {}

@@ -9,7 +9,6 @@ import ZODB.FileStorage
 
 sys.path.insert(0, "../")
 sys.path.append("./scripts/")
-from db_connector import DbConnector
 from models import cd_tree
 
 # Testing vars
