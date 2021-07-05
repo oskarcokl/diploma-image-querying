@@ -166,7 +166,6 @@ def _get_img_names_by_id(data, ids):
 
 
 def _check_stop_conditions(node, min_node, l_max):
-    print(node.n_feature_vectors)
     if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
         return True
     elif node.n_feature_vectors < min_node:
@@ -408,7 +407,6 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
     similar_data_points = []
     while n_data_points < n_similar_images:
         curr_node = stack.pop()
-        print(curr_node.is_leaf)
         if not curr_node.is_leaf:
             means = curr_node.gmm_parameters["means"]
             cov_array = curr_node.gmm_parameters["covs_array"]
@@ -423,8 +421,6 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
 
             sorted_cvds = sorted(
                 cvds_index, key=lambda x: x[1], reverse=True)
-
-            print("Sorted cvds")
 
             for item in sorted_cvds:
                 stack.append(curr_node.sub_nodes[item[0]])
