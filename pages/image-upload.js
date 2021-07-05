@@ -44,11 +44,14 @@ export default function UploadImage(params) {
         console.log(e);
       })
       .then((res) => {
-        const imgPaths = res.data.result_imgs;
+        const imgNames = res.data.result_imgs;
         let returnedImages = [];
-        for (let imgPath of imgPaths) {
-          returnedImages.push("/dataset/" + imgPath.split("/")[5]);
+        for (let imgName of imgNames) {
+          returnedImages.push("/dataset/" + imgName);
         }
+
+        console.log(returnedImages);
+
         setResultImages(returnedImages);
       });
   };

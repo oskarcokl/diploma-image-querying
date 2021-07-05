@@ -52,10 +52,11 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
     else:
         query_img_array = np.array(query_img_list)
         img_array = np.expand_dims(query_img_array, axis=0)
-        img_paths = find_similar_imgs(
+
+        img_names = find_similar_imgs(
             img_array=img_array, model=model, searcher=searcher
         )
-        return img_paths
+        return img_names
 
 
 def show_results(query_img_path, img_paths):
