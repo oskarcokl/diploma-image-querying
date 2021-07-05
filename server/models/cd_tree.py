@@ -43,7 +43,6 @@ def init_cd_tree(
 
             best_model = None
             min_bic = np.inf
-            # min_T = np.inf
             n_clusters = -1
 
             print(f"Current layer: {curr_node.layer}")
@@ -104,10 +103,9 @@ def _asign_ids_to_clusters(ids, cluster_asigments):
 
     return new_data
 
-# Func returns asigmnets of feature vector to clusters.
-
 
 def _predict(feature_vectors, means, covs_array):
+    # Func returns asigmnets of feature vectors to clusters.
     assigments = []
 
     for feature_vector in feature_vectors:
@@ -161,11 +159,10 @@ def _get_img_names_by_id(data, ids):
 
     return features
 
-# If stop conditions have been met the functino returns true.
-# Else it retusn false.
-
 
 def _check_stop_conditions(node, min_node, l_max):
+    # If stop conditions have been met the functino returns true.
+    # Else it retusn false.
     if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
         return True
     elif node.n_feature_vectors < min_node:
@@ -194,12 +191,11 @@ def _generate_root_node(data, node_id):
     )
     return root_node
 
-# (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
-# Function calculates the above equation
-# All the bad var names are made on a saturday ad 20:55 pls forgive me.
-
 
 def _compute_cpd(feature_vector, mean, cov_array):
+    # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
+    # Function calculates the above equation
+    # All the bad var names are made on a saturday ad 20:55 pls forgive me.
     cov_array_dig = np.diag(cov_array)
     d = len(feature_vector)
     half_d = d / 2
@@ -217,12 +213,12 @@ def _compute_cpd(feature_vector, mean, cov_array):
     cpd = first_part * c
     return cpd
 
-# Function calculates the new mean and cov matrix for a node.
-# These values need to be updated when we want to insert a new,
-# data point. M is the number of data points in the node we are updating
-
 
 def _calculate_mean_and_cov(m, feature_vector, mean, cov_array):
+    # Function calculates the new mean and cov matrix for a node.
+    # These values need to be updated when we want to insert a new,
+    # data point. M is the number of data points in the node we are updating
+
     new_mean = _compute_mean(m, mean, feature_vector)
     new_cov_array = _compute_cov(
         m, feature_vector, mean, cov_array)
@@ -242,12 +238,11 @@ def _compute_cov(m, feature_vector, mean, cov_array):
     )
     return new_cov_array
 
-# Algorithm finds leaf node of query_feature_vector. It finds
-# the leaf by calculating cpd's for each subnode and choosing
-# the subnode with the highest cpd.
-
 
 def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
+    # Algorithm finds leaf node of query_feature_vector. It finds
+    # the leaf by calculating cpd's for each subnode and choosing
+    # the subnode with the highest cpd.
 
     # TODO update parameters of root node.
     curr_node = root_node
@@ -311,7 +306,6 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
 
     n_feature_vectors_parent = curr_node.n_feature_vectors
 
-    # TODO Can be refractored to look a lot better.
     if curr_node.n_feature_vectors > gama * n_feature_vectors_parent:
         curr_node.is_leaf = False
         gmm = GMM()
@@ -408,7 +402,6 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
         if not curr_node.is_leaf:
             means = curr_node.gmm_parameters["means"]
             cov_array = curr_node.gmm_parameters["covs_array"]
-            weights = curr_node.gmm_parameters["weights"]
 
             cvds = _compute_cpds(
                 query_feature_vector, means, cov_array)
