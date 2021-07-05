@@ -247,50 +247,42 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
     # TODO update parameters of root node.
     curr_node = root_node
     while not curr_node.is_leaf:
-        # TODO use other fucntion than likelihood
-        max_cpd = -1
-        max_node_index = -1
-        max_node_mean
-        max_node_cov_array
-        for i in range(curr_node.n_sub_clusters):
-            mean = curr_node.gmm_parameters["means"][i]
-            cov_array = curr_node.gmm_parameters["covs_array"][i]
-            cpd = _compute_cpd(
-                query_feature_vector, mean, cov_array)
-            if max_cpd < cpd:
-                max_cpd = cpd
-                max_node_index = i
-                max_node_mean = mean
-                max_node_cov_array = cov_array
+        means = curr_node.gmm_parameters["means"]
+        cov_arrays = curr_node.gmm_parameters["covs_array"]
 
-        sub_node = curr_node.sub_nodes[max_node_index]
-        # For now I will be adding feature vectors and ids to
-        # all of the nodes in the path but this is generally not
-        # needed.
+        cpds = _compute_cpds(query_feature_vector, means, cov_arrays)
+
+        max_cpd_index = _get_max_cpd_index(cpds)
+
+        sub_node = curr_node.sub_nodes[max_cpd_index]
         sub_node.ids.append(id)
-        sub_node.feature_vectors.append(query_feature_vector)
         sub_node.n_feature_vectors += 1
 
-        # Calculate mean and cov and update them for the node
-        # with the max cpd.
-        # TODO use setters instead of direct asigment.
-        (
-            curr_node.gmm_parameters["means"][max_node_index],
-            curr_node.gmm_parameters["covs_array"][max_node_index],
-        ) = _calculate_mean_and_cov(
-            sub_node.n_feature_vectors,
-            query_feature_vector,
-            max_node_mean,
-            max_node_cov_array,
-        )
+        _update_gmm_params(sub_node, curr_node,
+                           max_cpd_index, query_feature_vector)
 
         curr_node = sub_node
 
     curr_node.add_id(id)
-    curr_node.add_feature_vector(query_feature_vector)
     curr_node.n_feature_vectors += 1
 
     return curr_node
+
+
+def _update_gmm_params(sub_node, node, index, query_feature_vector):
+    n_feature_vectors = sub_node.n_feature_vectors
+    old_means = node.gmm_parameters["means"][index]
+    old_covs_array = node.gmm_parameters["means"][index]
+
+    # Calculate mean and cov and update them for the node
+    # with the max cpd.
+    new_means = _compute_mean(
+        n_feature_vectors, old_means, query_feature_vector)
+    new_covs_array = _compute_cov(
+        n_feature_vectors, old_covs_array, query_feature_vector)
+
+    sub_node.set_means(new_means)
+    sub_node.set_covs_array(new_covs_array)
 
 
 def add_to_cd_tree(id, query_feature_vector, root_node):
