@@ -78,13 +78,10 @@ def find_similar_imgs(img_array, model, searcher):
 
     feature_query_2d = np.array([features_query])
 
-    print(feature_query_2d.shape)
-
     reduced_feature_query = reduce_features(feature_query_2d, 10)
-    print(reduced_feature_query)
 
-    #img_names = searcher.search(features_query.reshape(1, -1), 10)
-    # return img_names
+    img_names = searcher.search(reduced_feature_query, 10)
+    return img_names
 
 
 def reduce_features(query_features, n_components=100):
@@ -107,12 +104,6 @@ def get_data():
     data = connector.cursor.fetchall()
     data_array = np.array(data, dtype=object)
 
-    # rand_indexes = np.random.choice(
-    #     1909, 1909, replace=False
-    # )
-    # print(rand_indexes)
-    # rand_data = data_array[rand_indexes]
-    # print(f"Lenght of subset of data {len(rand_data)}")
     feature_vectors = data_array[:, 2]
     result = [np.array(feature_vector) for feature_vector in feature_vectors]
     return np.array(result)

@@ -406,15 +406,22 @@ class CDTree(persistent.Persistent):
 
         return sub_nodes
 
-    def _calculate_eucledian_distance(self, query_feature_vector, feature_vector):
+    def _compute_eucledian_distance(self, query_feature_vector, feature_vector):
         result_array = np.linalg.norm(
             np.array(query_feature_vector) - np.array(feature_vector)
         )
         return result_array.tolist()
 
+    def _compute_cosine_similarity(self, query_feature_vector, feature_vector):
+        dot_product = np.dot(query_feature_vector, feature_vector)
+        magnitude_q = np.linalg.norm(query_feature_vector)
+        magnitude_f = np.linalg.norm(feature_vector)
+        result = dot_product / (magnitude_f * magnitude_q)
+        return result
+
     def _rank_images(self, query_feature_vector, similar_images):
         for i in range(len(similar_images)):
-            d = self._calculate_eucledian_distance(
+            d = self._compute_cosine_similarity(
                 query_feature_vector, similar_images[i][1]
             )
             similar_images[i].append(d)
@@ -432,34 +439,25 @@ class CDTree(persistent.Persistent):
         similar_data_points = []
         while n_data_points < n_similar_images:
             curr_node = stack.pop()
+            print(curr_node.is_leaf)
             if not curr_node.is_leaf:
-                resps = []
-                # for i in range(curr_node.n_sub_clusters):
-                #     print(i)
-                #     mean = curr_node.gmm_parameters["means"][i]
-                #     cov_array = curr_node.gmm_parameters["covs_array"][i]
-                #     weight = curr_node.gmm_parameters["weights"][i]
-                #     # resp = self._calculate_likelihood(
-                #     #     query_feature_vector, mean, cov_array, weight)
-                #     # Save index of each sub node alongside the cpd. this is done
-                #     # so that sub nodes can be added in decreasing relevance based
-                #     # on cpd.
-                #     resps.append([i, resp])
-
                 means = curr_node.gmm_parameters["means"]
                 cov_array = curr_node.gmm_parameters["covs_array"]
                 weights = curr_node.gmm_parameters["weights"]
 
-                resps = self._compute_resps(
-                    query_feature_vector, means, cov_array, weights)
+                cvds = self._compute_cpds(
+                    query_feature_vector, means, cov_array)
 
-                print(resps)
+                print(cvds)
 
-                print(self._test_resps(resps))
+                cvds_index = [(i, cvd) for i, cvd in enumerate(cvds)]
 
-                sorted_resps = sorted(resps, key=lambda x: x[1], reverse=True)
+                sorted_cvds = sorted(
+                    cvds_index, key=lambda x: x[1], reverse=True)
 
-                for item in sorted_resps:
+                print("Sorted cvds")
+
+                for item in sorted_cvds:
                     stack.append(curr_node.sub_nodes[item[0]])
             else:
                 for i in range(curr_node.n_feature_vectors):
