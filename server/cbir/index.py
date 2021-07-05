@@ -114,7 +114,7 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     new_data = []
     for i, item in enumerate(data):
         # Appending tuples here.
-        new_data.append((data[0], data[1], reduced_feature_vectors[i]))
+        new_data.append((item[0], item[1], reduced_feature_vectors[i]))
 
     cd_tree = CDTree(min_node, l_max)
     root_node = cd_tree.init_cd_tree(new_data, min_clusters, max_clusters)
