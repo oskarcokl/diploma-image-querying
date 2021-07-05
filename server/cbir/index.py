@@ -94,11 +94,22 @@ def init_index(dataset_src):
         img_name_list.append(img_name)
         feature_list.append(features)
 
-    normalized_feature_list = normalize_features(feature_list)
+    normalized_feature_list = residuals(feature_list)
 
     tuple_list = list(zip(img_name_list, normalized_feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
+
+
+def residuals(feature_list):
+    normalized_feature_list = []
+
+    for feature_vector in feature_list:
+        normalized_feature_vector = feature_vector - \
+            int(np.mean(feature_vector))
+        normalized_feature_list.append(normalized_feature_vector)
+
+    return normalized_feature_list
 
 
 def normalize_features(feature_list):
@@ -106,6 +117,7 @@ def normalize_features(feature_list):
     normalized_feature_list = []
     for feature_vector in feature_list:
         normalizd_feature_vector = feature_vector / np.sum(feature_vector)
+
         normalized_feature_list.append(normalizd_feature_vector.tolist())
 
     return normalized_feature_list
@@ -227,8 +239,6 @@ if __name__ == "__main__":
     )
 
     args = vars(argParser.parse_args())
-
-    print(args)
 
     if args.get("init_db"):
         init_index(args.get("dataset"))
