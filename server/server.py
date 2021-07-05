@@ -6,7 +6,6 @@ import cv2
 import numpy as np
 from celery_app.tasks import add
 from celery_app.cbir_tasks import cbir_query
-
 from tornado.options import define, options, parse_command_line
 
 define("port", default=8888, help="run on the given port", type=int)

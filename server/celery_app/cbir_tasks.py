@@ -1,7 +1,7 @@
 from .celery import app
 import sys
 
-sys.path.append("./scripts/cbir/")
+sys.path.insert(0, "./cbir/")
 from search import search
 
 
