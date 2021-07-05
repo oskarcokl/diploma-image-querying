@@ -95,9 +95,7 @@ def init_index(dataset_src):
         img_name_list.append(img_name)
         feature_list.append(features_to_list)
 
-    reduced_feature_list = reduce_features(feature_list, 10)
-
-    tuple_list = list(zip(img_name_list, reduced_feature_list))
+    tuple_list = list(zip(img_name_list, feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
 
@@ -111,8 +109,15 @@ def reduce_features(feature_list, n_components=100):
 
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
+    feature_vectors = [item[2] for item in data]
+    reduced_feature_vectors = reduce_features(feature_vectors, 10)
+    new_data = []
+    for i, item in enumerate(data):
+        # Appending tuples here.
+        new_data.append((data[0], data[1], reduced_feature_vectors[i]))
+
     cd_tree = CDTree(min_node, l_max)
-    root_node = cd_tree.init_cd_tree(data, min_clusters, max_clusters)
+    root_node = cd_tree.init_cd_tree(new_data, min_clusters, max_clusters)
     return root_node
 
 
