@@ -224,7 +224,7 @@ def _compute_cpd(feature_vector, mean, cov_array):
 
 def _calculate_mean_and_cov(m, feature_vector, mean, cov_array):
     new_mean = _compute_mean(m, mean, feature_vector)
-    new_cov_array = _compute_mean(
+    new_cov_array = _compute_cov(
         m, feature_vector, mean, cov_array)
     return new_mean, new_cov_array
 
@@ -391,7 +391,7 @@ def _rank_images(query_feature_vector, similar_images):
         similar_images[i].append(d)
 
     ranked_similar_images = sorted(
-        similar_images, reverse=True, key=lambda x: x[3])
+        similar_images, reverse=False, key=lambda x: x[3])
 
     return ranked_similar_images
 
@@ -413,12 +413,12 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
             cvds = _compute_cpds(
                 query_feature_vector, means, cov_array)
 
-            print(cvds)
-
             cvds_index = [(i, cvd) for i, cvd in enumerate(cvds)]
 
             sorted_cvds = sorted(
-                cvds_index, key=lambda x: x[1], reverse=True)
+                cvds_index, key=lambda x: x[1], reverse=False)
+
+            print(sorted_cvds)
 
             for item in sorted_cvds:
                 stack.append(curr_node.sub_nodes[item[0]])
