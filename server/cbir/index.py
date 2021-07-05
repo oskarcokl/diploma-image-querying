@@ -19,7 +19,7 @@ from sklearn.decomposition import TruncatedSVD
 # Local application imports
 sys.path.insert(0, "../")
 from db_connector import DbConnector
-from models.cd_tree import CDTree
+from models import cd_tree
 from config import config
 import table_operations
 
@@ -116,8 +116,8 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
         # Appending tuples here.
         new_data.append((item[0], item[1], reduced_feature_vectors[i]))
 
-    cd_tree = CDTree(min_node, l_max)
-    root_node = cd_tree.init_cd_tree(new_data, min_clusters, max_clusters)
+    root_node = cd_tree.init_cd_tree(
+        new_data, min_clusters, max_clusters, min_node=min_node, l_max=l_max)
     return root_node
 
 
