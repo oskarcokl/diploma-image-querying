@@ -203,11 +203,9 @@ def _compute_cpd(feature_vector, mean, cov_array):
     cov_array_dig = np.diag(cov_array)
     d = len(feature_vector)
     half_d = d / 2
-    # print(cov_array_dig)
     two_pi = 2 * np.pi
     a = np.power(two_pi, half_d)
     b = np.linalg.det(cov_array_dig)
-    # print(b)
     b_power = b ** -0.5
     c = np.exp(
         -0.5
@@ -215,7 +213,7 @@ def _compute_cpd(feature_vector, mean, cov_array):
                     (feature_vector - mean),
                     )
     )
-    first_part = a * b
+    first_part = a * b_power
     cpd = first_part * c
     return cpd
 
