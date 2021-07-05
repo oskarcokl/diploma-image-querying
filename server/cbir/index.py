@@ -16,6 +16,7 @@ import BTrees
 from tensorflow.python.ops.gen_math_ops import squared_difference_eager_fallback
 import transaction
 from sklearn.decomposition import TruncatedSVD
+from sklearn import preprocessing
 
 # Local application imports
 sys.path.insert(0, "../")
@@ -96,12 +97,22 @@ def init_index(dataset_src):
         feature_list.append(features)
 
     print(feature_list[0])
-    normalized_feature_list = min_max_normalization(feature_list)
+
+    normalized_feature_list = normalize_sk_learn(feature_list)
     print(normalized_feature_list[0])
 
     tuple_list = list(zip(img_name_list, normalized_feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
+
+
+def normalize_sk_learn(feature_list):
+    feature_array = np.array(feature_list)
+    normalized_feature_array = preprocessing.normalize(
+        feature_array, norm="max")
+    normalized_feature_list = normalized_feature_array.tolist()
+
+    return normalized_feature_list
 
 
 def residuals(feature_list):
@@ -110,7 +121,7 @@ def residuals(feature_list):
     for feature_vector in feature_list:
         normalized_feature_vector = feature_vector - \
             int(np.mean(feature_vector))
-        normalized_feature_list.append(normalized_feature_vector)
+        normalized_feature_list.append(normalized_feature_vector.tolist())
 
     return normalized_feature_list
 
@@ -119,10 +130,10 @@ def min_max_normalization(feature_list):
     scaled_feature_list = []
 
     for feature_vector in feature_list:
-        max = np.max(feature_vector)
-        min = np.min(feature_vector)
-        scaled_feature_vector = np.array(
-            [(x - min) / (max - min) for x in feature_vector])
+        max = feature_vector.max()
+        min = feature_vector.min()
+        scaled_feature_vector = [float((x - min) / (max - min)
+                                 for x in feature_vector)]
         scaled_feature_list.append(scaled_feature_vector)
 
     return scaled_feature_list
