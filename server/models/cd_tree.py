@@ -69,8 +69,6 @@ def init_cd_tree(
             cluster_asigments = _predict(
                 curr_node_feature_array, best_model.means_, best_model.covariances_)
 
-            print(f"Cluster asigments: {cluster_asigments}")
-
             # Save GMM parameters into curr_node
             curr_node.set_gmm_parameters(node_gmm_parameters)
             ids_with_clusters = _asign_ids_to_clusters(
@@ -295,39 +293,41 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
     # data insertion. Could be set by user.
     gama = 0.1
 
-    curr_node, n_feature_vectors_parent = _find_leaf_node_for_adding(
+    node, n_feature_vectors_parent = _find_leaf_node_for_adding(
         id, query_feature_vector, root_node)
 
     # Split the leaf node into two nodes if parent n features * gama is
     # smaller than then feature of the leaf node.
-    if curr_node.n_feature_vectors > gama * n_feature_vectors_parent:
-        curr_node.is_leaf = False
-        gmm = GMM()
-        model = gmm.gmm_clustering(
-            np.array(curr_node.feature_vectors), 2)
-        curr_node.set_gmm_parameters({
-            "covs_array": model.covs_array,
-            "means": model.means,
-            "weights": model.weights,
+    if node.n_feature_vectors > gama * n_feature_vectors_parent:
+        feature_vectors_array = np.array(node.feature_vectors)
+        gmm = mixture.GaussianMixture(
+            n_components=2, covariance_type="diag").fit(feature_vectors_array)
+
+        node.set_gmm_parameters({
+            "covs_array": gmm.covariances_,
+            "means": gmm.means_,
+            "weights": gmm.weights_,
         })
 
-        # Might turned this into a function since the same thing
-        # happens in init_cd_tree().
+        cluster_asigments = _predict(
+            feature_vectors_array, gmm.means_, gmm.covariances_)
 
-        vectors_with_clusters = _asign_ids_to_clusters(
-            curr_node.ids, curr_node.feature_vectors, model.resp_array
-        )
+        ids_with_clusters = _asign_ids_to_clusters(node.ids, cluster_asigments)
 
+        # Node ID could be removed, or I have to somehow presistently store the curr
+        # counter.
         sub_nodes = _create_sub_nodes(
-            vectors_with_clusters, curr_node.ids, curr_node.layer + 1, 2
+            ids_with_clusters,
+            node.layer + 1,
+            2,
+            0
         )
 
-        curr_node.set_sub_nodes(sub_nodes)
-        curr_node.n_sub_clusters = len(sub_nodes)
+        node.set_sub_nodes(sub_nodes)
+        node.n_sub_clusters = 2
+        node.make_inner_node()
 
     return root_node
-
-# n_clusters created from current cluster.
 
 
 def _create_sub_nodes(
