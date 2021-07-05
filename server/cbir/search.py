@@ -10,6 +10,7 @@ from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 from sklearn.decomposition import TruncatedSVD
+from sklearn import preprocessing
 
 import sys
 sys.path.insert(0, "../")
@@ -76,9 +77,10 @@ def find_similar_imgs(img_array, model, searcher):
         [model.layers[0].input], model.layers[22].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
-    feature_query_2d = np.array([features_query])
+    normalized_feature_query = preprocessing.normalize(
+        features_query.reshape(1, -1), norm="max")
 
-    reduced_feature_query = reduce_features(feature_query_2d, 10)
+    reduced_feature_query = reduce_features(normalized_feature_query, 10)
 
     img_names = searcher.search(reduced_feature_query, 10)
     return img_names
