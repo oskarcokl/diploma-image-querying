@@ -166,3 +166,11 @@ class Node(persistent.Persistent):
         # all other nodes should get feature vectors from they're ids.
         self.set_feature_vectors(feature_vectors)
         self.set_img_names(img_names)
+
+    def make_inner_node(self):
+        self.is_leaf = False
+
+        # Make features and names empty lists so it doesn't
+        # take up space.
+        self.set_feature_vectors([])
+        self.set_img_names([])

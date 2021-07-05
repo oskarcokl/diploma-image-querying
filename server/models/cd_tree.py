@@ -248,7 +248,10 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
     # results in the long run. Maybe tree need to be rebuilt once
     # in a while.
     curr_node = root_node
+    n_feature_vectors_parent = 0
     while not curr_node.is_leaf:
+        n_feature_vectors_parent = curr_node.n_feature_vectors
+
         means = curr_node.gmm_parameters["means"]
         cov_arrays = curr_node.gmm_parameters["covs_array"]
 
@@ -268,7 +271,7 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
     curr_node.add_id(id)
     curr_node.n_feature_vectors += 1
 
-    return curr_node
+    return (curr_node, n_feature_vectors_parent)
 
 
 def _update_gmm_params(sub_node, node, index, query_feature_vector):
@@ -292,14 +295,11 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
     # data insertion. Could be set by user.
     gama = 0.1
 
-    curr_node = _find_leaf_node_for_adding(
+    curr_node, n_feature_vectors_parent = _find_leaf_node_for_adding(
         id, query_feature_vector, root_node)
 
-    # Split the leaf node into to nodes if parent n features * gama is
+    # Split the leaf node into two nodes if parent n features * gama is
     # smaller than then feature of the leaf node.
-
-    n_feature_vectors_parent = curr_node.n_feature_vectors
-
     if curr_node.n_feature_vectors > gama * n_feature_vectors_parent:
         curr_node.is_leaf = False
         gmm = GMM()
