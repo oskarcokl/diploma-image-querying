@@ -1,9 +1,6 @@
-import enum
 import numpy as np
 from numpy.core.numeric import Inf
-import persistent
 from sklearn import mixture
-from scipy import stats
 
 from .gmm import GMM
 from .node import Node
