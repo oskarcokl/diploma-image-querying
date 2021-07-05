@@ -26,8 +26,10 @@ def init_cd_tree(
 
     data: [id: int, img_src: string, feature_vector: [int]]
     """
+
+    node_id = 0
     stack = []
-    root_node = _generate_root_node(data)
+    root_node = _generate_root_node(data, node_id)
     stack.append(root_node)
     curr_node = stack.pop()
 
@@ -82,6 +84,7 @@ def init_cd_tree(
                 ids_with_clusters,
                 curr_node.layer + 1,
                 n_clusters,
+                node_id
             )
 
             for sub_node in sub_nodes:
