@@ -90,14 +90,25 @@ def init_index(dataset_src):
             [model.layers[0].input], model.layers[22].output
         )
         features = get_fc2_layer_output([img_array])[0]
-        features_to_list = features.tolist()
 
         img_name_list.append(img_name)
-        feature_list.append(features_to_list)
+        feature_list.append(features)
 
-    tuple_list = list(zip(img_name_list, feature_list))
+    normalized_feature_list = normalize_features(feature_list)
+
+    tuple_list = list(zip(img_name_list, normalized_feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
+
+
+def normalize_features(feature_list):
+    # Feature_list is a list of nd_arrays
+    normalized_feature_list = []
+    for feature_vector in feature_list:
+        normalizd_feature_vector = feature_vector / np.sum(feature_vector)
+        normalized_feature_list.append(normalizd_feature_vector.tolist())
+
+    return normalized_feature_list
 
 
 def reduce_features(feature_list, n_components=100):
@@ -181,12 +192,6 @@ def get_data():
     data = connector.cursor.fetchall()
     data_array = np.array(data, dtype=object)
 
-    # rand_indexes = np.random.choice(
-    #     1909, 1909, replace=False
-    # )
-    # print(rand_indexes)
-    # rand_data = data_array[rand_indexes]
-    # print(f"Lenght of subset of data {len(rand_data)}")
     return data_array
 
 
@@ -229,9 +234,10 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 10, 30, 10)
+        root_node = init_cd_tree(data, 1, 10, 20, 6)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))
     else:
-        get_cd_tree_from_storage()
+        # get_cd_tree_from_storage()
+        print(get_data())
