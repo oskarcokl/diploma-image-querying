@@ -10,7 +10,7 @@ import ZODB.FileStorage
 sys.path.insert(0, "../")
 sys.path.append("./scripts/")
 from db_connector import DbConnector
-from models.cd_tree import CDTree
+from models import cd_tree
 
 # Testing vars
 
@@ -26,7 +26,6 @@ class Searcher:
 
     def search(self, query_features, n_similar_images):
         root_node = self._get_root_node()
-        cd_tree = CDTree(30, 5)
         result_images = cd_tree.find_similar_images(
             root_node=root_node,
             query_feature_vector=query_features,
