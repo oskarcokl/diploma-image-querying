@@ -244,7 +244,9 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
     # the leaf by calculating cpd's for each subnode and choosing
     # the subnode with the highest cpd.
 
-    # TODO update parameters of root node.
+    # Means and covs of root do not get update. This might hurt
+    # results in the long run. Maybe tree need to be rebuilt once
+    # in a while.
     curr_node = root_node
     while not curr_node.is_leaf:
         means = curr_node.gmm_parameters["means"]
