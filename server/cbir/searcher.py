@@ -11,12 +11,11 @@ sys.path.insert(0, "../")
 sys.path.append("./scripts/")
 from models import cd_tree
 
-# Testing vars
-
 
 class Searcher:
     def _get_root_node(self):
-        storage = ZODB.FileStorage.FileStorage("cd_tree.fs")
+        print(f"searcher {self.__class__}")
+        storage = ZODB.FileStorage.FileStorage("./cbir/cd_tree.fs")
         db = ZODB.DB(storage)
         connection = db.open()
         root = connection.root

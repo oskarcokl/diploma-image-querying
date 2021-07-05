@@ -4,6 +4,8 @@ from configparser import ConfigParser
 
 
 def config(filename="./db_utils/database.ini", section="postgresql"):
+    print(__name__)
+
     print(os.listdir("./"))
     parser = ConfigParser()
     parser.read(filename)
