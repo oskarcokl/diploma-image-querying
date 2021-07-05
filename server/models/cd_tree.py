@@ -10,7 +10,6 @@ from .node import Node
 
 
 def init_cd_tree(
-    self,
     data,
     min_clusters,
     max_clusters,
@@ -26,20 +25,20 @@ def init_cd_tree(
     data: [id: int, img_src: string, feature_vector: [int]]
     """
     stack = []
-    root_node = self._generate_root_node(data)
+    root_node = _generate_root_node(data)
     stack.append(root_node)
     curr_node = stack.pop()
 
     while curr_node is not None:
-        if self._check_stop_conditions(curr_node):
-            leaf_feature_vectors = self._get_feature_vectors_by_id(
+        if _check_stop_conditions(curr_node):
+            leaf_feature_vectors = _get_feature_vectors_by_id(
                 data, curr_node.ids)
-            leaf_img_names = self._get_img_names_by_id(
+            leaf_img_names = _get_img_names_by_id(
                 data, curr_node.ids)
             curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
         else:
             curr_node_feature_array = np.array(
-                self._get_feature_vectors_by_id(data, curr_node.ids))
+                _get_feature_vectors_by_id(data, curr_node.ids))
 
             best_model = None
             min_bic = np.inf
@@ -67,17 +66,17 @@ def init_cd_tree(
                 "weights": best_model.weights_,
             }
 
-            cluster_asigments = self._predict(
+            cluster_asigments = _predict(
                 curr_node_feature_array, best_model.means_, best_model.covariances_)
 
             print(f"Cluster asigments: {cluster_asigments}")
 
             # Save GMM parameters into curr_node
             curr_node.set_gmm_parameters(node_gmm_parameters)
-            ids_with_clusters = self._asign_ids_to_clusters(
+            ids_with_clusters = _asign_ids_to_clusters(
                 curr_node.ids, cluster_asigments)
 
-            sub_nodes = self._create_sub_nodes(
+            sub_nodes = _create_sub_nodes(
                 ids_with_clusters,
                 curr_node.layer + 1,
                 n_clusters,
@@ -95,7 +94,7 @@ def init_cd_tree(
             return root_node
 
 
-def _asign_ids_to_clusters(self, ids, cluster_asigments):
+def _asign_ids_to_clusters(ids, cluster_asigments):
     new_data = []
     for i in range(len(ids)):
         new_data_item = (ids[i], cluster_asigments[i])
@@ -106,32 +105,32 @@ def _asign_ids_to_clusters(self, ids, cluster_asigments):
 # Func returns asigmnets of feature vector to clusters.
 
 
-def _predict(self, feature_vectors, means, covs_array):
+def _predict(feature_vectors, means, covs_array):
     assigments = []
 
     for feature_vector in feature_vectors:
-        cpds = self._compute_cpds(feature_vector, means, covs_array)
-        max_cpd_cluster = self._get_max_cpd_index(cpds)
+        cpds = _compute_cpds(feature_vector, means, covs_array)
+        max_cpd_cluster = _get_max_cpd_index(cpds)
         assigments.append(max_cpd_cluster)
 
     return assigments
 
 
-def _compute_cpds(self, feature_vector, means, covs_array):
+def _compute_cpds(feature_vector, means, covs_array):
     cpds = []
     for i in range(len(means)):
-        cpd = self._compute_cpd(
+        cpd = _compute_cpd(
             feature_vector, means[i], covs_array[i])
         cpds.append(cpd)
 
     return cpds
 
 
-def _get_max_cpd_index(self, cpds):
+def _get_max_cpd_index(cpds):
     return cpds.index(max(cpds))
 
 
-def _get_cluster_of_data(self, resp_array, index):
+def _get_cluster_of_data(resp_array, index):
     n_clusters = resp_array.shape[1]
     # Probability (responsibility) can never be smaller than 0.
     max_resp = -1
@@ -145,7 +144,7 @@ def _get_cluster_of_data(self, resp_array, index):
     return cluster
 
 
-def _get_feature_vectors_by_id(self, data, ids):
+def _get_feature_vectors_by_id(data, ids):
     indexes = [id - 1 for id in ids]
 
     features = [data[index][2] for index in indexes]
@@ -153,7 +152,7 @@ def _get_feature_vectors_by_id(self, data, ids):
     return features
 
 
-def _get_img_names_by_id(self, data, ids):
+def _get_img_names_by_id(data, ids):
     indexes = [id - 1 for id in ids]
 
     features = [data[index][1] for index in indexes]
@@ -164,19 +163,19 @@ def _get_img_names_by_id(self, data, ids):
 # Else it retusn false.
 
 
-def _check_stop_conditions(self, node):
+def _check_stop_conditions(node):
     print(node.n_feature_vectors)
     if node.gmm_parameters and len(node.gmm_parameters["weights"]) == 1:
         return True
-    elif node.n_feature_vectors < self.min_node:
+    elif node.n_feature_vectors < min_node:
         return True
-    elif node.layer >= self.l_max:
+    elif node.layer >= l_max:
         return True
 
     return False
 
 
-def _generate_root_node(self, data):
+def _generate_root_node(data):
     ids = []
     feature_vectors = []
     for item in data:
@@ -190,7 +189,7 @@ def _generate_root_node(self, data):
         is_root=True,
         layer=0,
         feature_vectors=feature_vectors,
-        node_id=self.node_id,
+        node_id=node_id,
     )
     return root_node
 
@@ -199,7 +198,7 @@ def _generate_root_node(self, data):
 # All the bad var names are made on a saturday ad 20:55 pls forgive me.
 
 
-def _compute_cpd(self, feature_vector, mean, cov_array):
+def _compute_cpd(feature_vector, mean, cov_array):
     cov_array_dig = np.diag(cov_array)
     d = len(feature_vector)
     half_d = d / 2
@@ -224,20 +223,20 @@ def _compute_cpd(self, feature_vector, mean, cov_array):
 # data point. M is the number of data points in the node we are updating
 
 
-def _calculate_mean_and_cov(self, m, feature_vector, mean, cov_array):
-    new_mean = self._compute_mean(m, mean, feature_vector)
-    new_cov_array = self._compute_mean(
+def _calculate_mean_and_cov(m, feature_vector, mean, cov_array):
+    new_mean = _compute_mean(m, mean, feature_vector)
+    new_cov_array = _compute_mean(
         m, feature_vector, mean, cov_array)
     return new_mean, new_cov_array
 
 
-def _compute_mean(self, m, mean, feature_vector):
+def _compute_mean(m, mean, feature_vector):
     new_mean = ((m / (m + 1)) * mean) + \
         ((1 / (m + 1)) * feature_vector)
     return new_mean
 
 
-def _compute_cov(self, m, feature_vector, mean, cov_array):
+def _compute_cov(m, feature_vector, mean, cov_array):
     new_cov_array = (((m - 1) / m) * cov_array) + (
         (1 / (m + 1))
         * np.matmul((feature_vector - mean), (feature_vector - mean).T)
@@ -249,7 +248,7 @@ def _compute_cov(self, m, feature_vector, mean, cov_array):
 # the subnode with the highest cpd.
 
 
-def _find_leaf_node_for_adding(self, id, query_feature_vector, root_node):
+def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
 
     # TODO update parameters of root node.
     curr_node = root_node
@@ -262,7 +261,7 @@ def _find_leaf_node_for_adding(self, id, query_feature_vector, root_node):
         for i in range(curr_node.n_sub_clusters):
             mean = curr_node.gmm_parameters["means"][i]
             cov_array = curr_node.gmm_parameters["covs_array"][i]
-            cpd = self._calculate_cpd(
+            cpd = _calculate_cpd(
                 query_feature_vector, mean, cov_array)
             if max_cpd < cpd:
                 max_cpd = cpd
@@ -284,7 +283,7 @@ def _find_leaf_node_for_adding(self, id, query_feature_vector, root_node):
         (
             curr_node.gmm_parameters["means"][max_node_index],
             curr_node.gmm_parameters["covs_array"][max_node_index],
-        ) = self._calculate_mean_and_cov(
+        ) = _calculate_mean_and_cov(
             sub_node.n_feature_vectors,
             query_feature_vector,
             max_node_mean,
@@ -300,12 +299,12 @@ def _find_leaf_node_for_adding(self, id, query_feature_vector, root_node):
     return curr_node
 
 
-def add_to_cd_tree(self, id, query_feature_vector, root_node):
+def add_to_cd_tree(id, query_feature_vector, root_node):
     # Used to determine if leaf need to be split with new
     # data insertion. Could be set by user.
     gama = 0.1
 
-    curr_node = self._find_leaf_node_for_adding(
+    curr_node = _find_leaf_node_for_adding(
         id, query_feature_vector, root_node)
 
     # Split the leaf node into to nodes if parent n features * gama is
@@ -328,11 +327,11 @@ def add_to_cd_tree(self, id, query_feature_vector, root_node):
         # Might turned this into a function since the same thing
         # happens in init_cd_tree().
 
-        vectors_with_clusters = self._asign_vectors_to_clusters(
+        vectors_with_clusters = _asign_vectors_to_clusters(
             curr_node.ids, curr_node.feature_vectors, model.resp_array
         )
 
-        sub_nodes = self._create_sub_nodes(
+        sub_nodes = _create_sub_nodes(
             vectors_with_clusters, curr_node.ids, curr_node.layer + 1, 2
         )
 
@@ -345,15 +344,15 @@ def add_to_cd_tree(self, id, query_feature_vector, root_node):
 
 
 def _create_sub_nodes(
-    self, ids_with_clusters, sub_node_layer, n_clusters
+    ids_with_clusters, sub_node_layer, n_clusters
 ):
     sub_nodes = []
 
     # Outer loop loops throught all of the clusters and creates
     # a new node for each one.
     for index in range(n_clusters):
-        self.node_id += 1
-        sub_node = Node(layer=sub_node_layer, node_id=self.node_id)
+        node_id += 1
+        sub_node = Node(layer=sub_node_layer, node_id=node_id)
 
         ids = []
 
@@ -370,14 +369,14 @@ def _create_sub_nodes(
     return sub_nodes
 
 
-def _compute_eucledian_distance(self, query_feature_vector, feature_vector):
+def _compute_eucledian_distance(query_feature_vector, feature_vector):
     result_array = np.linalg.norm(
         np.array(query_feature_vector) - np.array(feature_vector)
     )
     return result_array.tolist()
 
 
-def _compute_cosine_similarity(self, query_feature_vector, feature_vector):
+def _compute_cosine_similarity(query_feature_vector, feature_vector):
     dot_product = np.dot(query_feature_vector, feature_vector)
     magnitude_q = np.linalg.norm(query_feature_vector)
     magnitude_f = np.linalg.norm(feature_vector)
@@ -385,9 +384,9 @@ def _compute_cosine_similarity(self, query_feature_vector, feature_vector):
     return result
 
 
-def _rank_images(self, query_feature_vector, similar_images):
+def _rank_images(query_feature_vector, similar_images):
     for i in range(len(similar_images)):
-        d = self._compute_cosine_similarity(
+        d = _compute_cosine_similarity(
             query_feature_vector, similar_images[i][1]
         )
         similar_images[i].append(d)
@@ -400,7 +399,7 @@ def _rank_images(self, query_feature_vector, similar_images):
 # K: int. Number of similar images to return
 
 
-def find_similar_images(self, root_node, query_feature_vector, n_similar_images):
+def find_similar_images(root_node, query_feature_vector, n_similar_images):
     stack = []
     stack.append(root_node)
     n_data_points = 0
@@ -413,7 +412,7 @@ def find_similar_images(self, root_node, query_feature_vector, n_similar_images)
             cov_array = curr_node.gmm_parameters["covs_array"]
             weights = curr_node.gmm_parameters["weights"]
 
-            cvds = self._compute_cpds(
+            cvds = _compute_cpds(
                 query_feature_vector, means, cov_array)
 
             print(cvds)
@@ -436,7 +435,7 @@ def find_similar_images(self, root_node, query_feature_vector, n_similar_images)
                 )
             n_data_points = len(similar_data_points)
 
-    ranked_images = self._rank_images(
+    ranked_images = _rank_images(
         query_feature_vector, similar_data_points)
     return ranked_images
 
