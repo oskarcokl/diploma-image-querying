@@ -48,5 +48,19 @@ def insert_tuple_list(tuple_list):
         print(e)
 
 
+def inser_tuple(tuple):
+    db_connector = DbConnector()
+    sql = """INSERT INTO cbir_index (image_name, image_vector)
+             VALUES(%s, %s) RETURNING id;"""
+
+    try:
+        print("Writing image vector to database.")
+        id = db_connector.cursor.execute(sql, tuple)
+        db_connector.connection.commit()
+        return id
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+
+
 if __name__ == "__main__":
     drop_table("cbir_index")
