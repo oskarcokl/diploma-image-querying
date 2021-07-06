@@ -1,5 +1,6 @@
 import argparse
 import os
+
 import cv2
 import numpy as np
 from searcher import Searcher
