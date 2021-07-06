@@ -1,5 +1,6 @@
 .uploaded-image {
   width: 400px;
-  height: auto;
+  height: 400px;
+  object-fit: cover;
   border-radius: 0.5rem;
 }
