@@ -191,9 +191,11 @@ def _generate_root_node(data, node_id):
 
 
 def _compute_cpd(feature_vector, mean, cov_array):
-    # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−12(X−μi)TΣ−1i(X−μi)).
+    # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−1/2(X−μi)TΣ−1i(X−μi)).
     # Function calculates the above equation
     # All the bad var names are made on a saturday ad 20:55 pls forgive me.
+    # TODO first component is probably not useful. Calculate determinante in
+    # a better way since it's diagonal
     cov_array_dig = np.diag(cov_array)
     d = len(feature_vector)
     half_d = d / 2
