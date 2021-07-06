@@ -12,7 +12,7 @@ import SectionTitle from "../components/sectionTitle";
 
 const API = "http://localhost:8888/";
 
-export default function UploadImage(params) {
+export default function QueryByExample(params) {
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
