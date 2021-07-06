@@ -30,7 +30,7 @@ export default function AddToIndex(params) {
             ></FileUpload>
             <Button
               additionalClasses="flex-none"
-              name="Upload image"
+              name="Add to index"
               //clickHandler={onClickHandler}
             ></Button>
           </form>
