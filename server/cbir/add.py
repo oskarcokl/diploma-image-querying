@@ -14,6 +14,9 @@ sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 
 
+from adder import Adder
+
+
 def add_cli(img_list):
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
@@ -44,13 +47,22 @@ def add_cli(img_list):
         img_name_list.append(img_name)
         feature_list.append(features)
 
+    adder = Adder()
+
+    ids = []
+    for i in range(len(img_name_list)):
+        id = adder.add_img_to_db(feature_list[i], img_name_list[i])
+        ids.append(id)
+
+    print(ids)
+
 
 if __name__ == "__main__":
+
     argParser = argparse.ArgumentParser()
     argParser.add_argument("-i", "--images", nargs="+", required=True,
                            help="Pass paths to images you want to add to index.")
 
     args = vars(argParser.parse_args())
-    print(args)
 
     add_cli(args["images"])
