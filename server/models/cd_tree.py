@@ -327,7 +327,7 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
         node.n_sub_clusters = 2
         node.make_inner_node()
 
-    return root_node
+    return node
 
 
 def _create_sub_nodes(

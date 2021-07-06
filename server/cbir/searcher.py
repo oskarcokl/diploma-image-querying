@@ -1,7 +1,6 @@
 import sys
 import pickle
 
-from sklearn.neighbors import NearestNeighbors
 import ZODB
 import ZODB.FileStorage
 
