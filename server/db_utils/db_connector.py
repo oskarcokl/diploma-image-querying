@@ -3,8 +3,7 @@ import sys
 import psycopg2
 
 
-sys.path.insert(0, "./")
-from db_utils.config import config
+sys.path.insert(0, ".")
 from .config import config
 
 

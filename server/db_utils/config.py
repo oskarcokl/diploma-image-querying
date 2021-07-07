@@ -3,10 +3,11 @@ import os
 from configparser import ConfigParser
 
 
-def config(filename="./db_utils/database.ini", section="postgresql"):
-    print(__name__)
+cli = "../db_utils/database.ini"
+server = "./db_utils/database.ini"
 
-    print(os.listdir("./"))
+
+def config(filename=cli, section="postgresql"):
     parser = ConfigParser()
     parser.read(filename)
     db = {}

@@ -1,4 +1,5 @@
 import argparse
+from functools import reduce
 import os
 
 
@@ -57,18 +58,30 @@ def add_cli(img_list):
         id = adder.add_img_to_db(normalized_features[i], img_name_list[i])
         ids.append(id)
 
+    reduced_features = reduce_features(normalized_features, 10)
 
-def reduce_features(query_features, n_components=100):
+
+def reduce_features(add_features, n_components=100):
     feature_vectors = get_data()
-    feature_vectors_plus = np.append(
-        feature_vectors, np.array(query_features), axis=0)
+
+    print(feature_vectors.shape)
+
+    feature_vectors_plus = None
+
+    for add_feature in add_features:
+        add_feature_array = np.array(add_feature)
+
+        feature_vectors_plus = np.append(
+            feature_vectors, add_feature_array, axis=0)
+
+    print(feature_vectors_plus.shape)
 
     feature_array = np.array(feature_vectors_plus)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_array)
     result = svd.transform(feature_array)
-    query_reduced = result[len(result) - 1]
-    return query_reduced
+    add_reduced = result[len(result) - 1]
+    return add_reduced
 
 
 def get_data():
@@ -78,7 +91,9 @@ def get_data():
     data = connector.cursor.fetchall()
     data_array = np.array(data, dtype=object)
 
-    return data_array
+    feature_vectors = data_array[:, 2]
+    result = [np.array(feature_vector) for feature_vector in feature_vectors]
+    return np.array(result)
 
 
 def normalize_sk_learn(feature_list):
