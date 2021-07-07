@@ -215,7 +215,7 @@ def _compute_cpd(feature_vector, mean, cov_array):
     return cpd
 
 
-def _calculate_mean_and_cov(m, feature_vector, mean, cov_array):
+def _compute_means_and_covs(m, feature_vector, mean, cov_array):
     # Function calculates the new mean and cov matrix for a node.
     # These values need to be updated when we want to insert a new,
     # data point. M is the number of data points in the node we are updating
@@ -241,6 +241,22 @@ def _compute_cov(m, feature_vector, mean, cov_array):
 
     diag_values = np.diag(new_cov_array)
     return diag_values
+
+
+def _compute_covs(m, feature_vector, means, covs_array):
+    n_clusters = len(means)
+    n_features = len(feature_vector)
+
+    covs = np.zeros((n_clusters, n_features))
+
+    for i in range(n_clusters):
+        covs[i] = _compute_cov(m, feature_vector, means[i], covs_array[i])
+
+    return covs
+
+
+def _compute_means():
+    pass
 
 
 def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
