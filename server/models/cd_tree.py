@@ -304,8 +304,11 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
 
 def _update_gmm_params(sub_node, node, index, query_feature_vector):
     n_feature_vectors = sub_node.n_feature_vectors
-    old_means = node.gmm_parameters["means"][index]
-    old_covs_array = node.gmm_parameters["means"][index]
+    old_means = node.gmm_parameters["means"]
+    old_covs_array = node.gmm_parameters["means"]
+
+    print(f"Shape means {old_means.shape}")
+    print(f"Shape covs {old_covs_array.shape}")
 
     # Calculate mean and cov and update them for the node
     # with the max cpd.
