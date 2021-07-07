@@ -2,7 +2,7 @@ import sys
 import os
 
 import ZODB
-import ZODB.FileStorage.FileStorage
+import ZODB.FileStorage
 
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
@@ -14,7 +14,7 @@ from db_utils import table_operations
 
 class Adder:
     def _get_root_node(self):
-        storage = ZODB.FileStorage("./cbir/cd_tree.fs")
+        storage = ZODB.FileStorage.FileStorage("./cd_tree.fs")
         db = ZODB.DB(storage)
         connection = db.open()
         root = connection.root

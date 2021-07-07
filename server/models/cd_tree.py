@@ -196,6 +196,7 @@ def _compute_cpd(feature_vector, mean, cov_array):
     # All the bad var names are made on a saturday ad 20:55 pls forgive me.
     # TODO first component is probably not useful. Calculate determinante in
     # a better way since it's diagonal
+
     cov_array_dig = np.diag(cov_array)
     d = len(feature_vector)
     half_d = d / 2
@@ -232,11 +233,14 @@ def _compute_mean(m, mean, feature_vector):
 
 
 def _compute_cov(m, feature_vector, mean, cov_array):
-    new_cov_array = (((m - 1) / m) * cov_array) + (
+    cov_mat = np.diag(cov_array)
+    new_cov_array = (((m - 1) / m) * cov_mat) + (
         (1 / (m + 1))
         * np.matmul((feature_vector - mean), (feature_vector - mean).T)
     )
-    return new_cov_array
+
+    diag_values = np.diag(new_cov_array)
+    return diag_values
 
 
 def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
@@ -284,7 +288,7 @@ def _update_gmm_params(sub_node, node, index, query_feature_vector):
     new_means = _compute_mean(
         n_feature_vectors, old_means, query_feature_vector)
     new_covs_array = _compute_cov(
-        n_feature_vectors, old_covs_array, query_feature_vector)
+        n_feature_vectors, query_feature_vector, old_covs_array, old_means)
 
     sub_node.set_means(new_means)
     sub_node.set_covs_array(new_covs_array)

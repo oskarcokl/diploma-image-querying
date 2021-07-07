@@ -60,27 +60,25 @@ def add_cli(img_list):
 
     reduced_features = reduce_features(normalized_features, 10)
 
+    add_to_cd_tree(ids, reduced_features, adder)
+
+
+def add_to_cd_tree(ids, feature_vectors, adder):
+    for i in range(len(feature_vectors)):
+        node = adder.add_to_cd_tree(ids[i], feature_vectors[i])
+        print(node)
+
 
 def reduce_features(add_features, n_components=100):
     feature_vectors = get_data()
-
-    print(feature_vectors.shape)
-
-    feature_vectors_plus = None
-
-    for add_feature in add_features:
-        add_feature_array = np.array(add_feature)
-
-        feature_vectors_plus = np.append(
-            feature_vectors, add_feature_array, axis=0)
-
-    print(feature_vectors_plus.shape)
+    feature_vectors_plus = np.append(
+        feature_vectors, np.array(add_features), axis=0)
 
     feature_array = np.array(feature_vectors_plus)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_array)
     result = svd.transform(feature_array)
-    add_reduced = result[len(result) - 1]
+    add_reduced = result[len(result) - len(add_features):]
     return add_reduced
 
 
