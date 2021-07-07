@@ -255,8 +255,16 @@ def _compute_covs(m, feature_vector, means, covs_array):
     return covs
 
 
-def _compute_means():
-    pass
+def _compute_means(m, means, feature_vector):
+    n_clusters = len(means)
+    n_features = len(feature_vector)
+
+    new_means = np.zeros((n_clusters, n_features))
+
+    for i in range(n_clusters):
+        new_means[i] = _compute_cov(m, means[i], feature_vector)
+
+    return new_means
 
 
 def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
@@ -301,9 +309,9 @@ def _update_gmm_params(sub_node, node, index, query_feature_vector):
 
     # Calculate mean and cov and update them for the node
     # with the max cpd.
-    new_means = _compute_mean(
+    new_means = _compute_means(
         n_feature_vectors, old_means, query_feature_vector)
-    new_covs_array = _compute_cov(
+    new_covs_array = _compute_covs(
         n_feature_vectors, query_feature_vector, old_covs_array, old_means)
 
     sub_node.set_means(new_means)
