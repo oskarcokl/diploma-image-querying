@@ -7,6 +7,7 @@ from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras import backend as K
 from tensorflow.keras.preprocessing import image
 from tensorflow import keras
+from sklearn import preprocessing
 import numpy as np
 
 import sys
@@ -47,14 +48,23 @@ def add_cli(img_list):
         img_name_list.append(img_name)
         feature_list.append(features)
 
+    normalized_features = normalize_sk_learn(feature_list)
+
     adder = Adder()
 
     ids = []
     for i in range(len(img_name_list)):
-        id = adder.add_img_to_db(feature_list[i], img_name_list[i])
+        id = adder.add_img_to_db(normalized_features[i], img_name_list[i])
         ids.append(id)
 
-    print(ids)
+
+def normalize_sk_learn(feature_list):
+    feature_array = np.array(feature_list)
+    normalized_feature_array = preprocessing.normalize(
+        feature_array, norm="max")
+    normalized_feature_list = normalized_feature_array.tolist()
+
+    return normalized_feature_list
 
 
 if __name__ == "__main__":

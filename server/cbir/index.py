@@ -96,10 +96,7 @@ def init_index(dataset_src):
         img_name_list.append(img_name)
         feature_list.append(features)
 
-    print(feature_list[0])
-
     normalized_feature_list = normalize_sk_learn(feature_list)
-    print(normalized_feature_list[0])
 
     tuple_list = list(zip(img_name_list, normalized_feature_list))
 
