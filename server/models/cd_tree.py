@@ -274,7 +274,8 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
 
     # Means and covs of root do not get update. This might hurt
     # results in the long run. Maybe tree need to be rebuilt once
-    # in a while.
+    # in a while. The algorthim doesn't call for it but I might still
+    # do it.
     curr_node = root_node
     n_feature_vectors_parent = 0
     while not curr_node.is_leaf:
@@ -291,8 +292,7 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
         sub_node.ids.append(id)
         sub_node.n_feature_vectors += 1
 
-        _update_gmm_params(sub_node, curr_node,
-                           max_cpd_index, query_feature_vector)
+        _update_gmm_params(sub_node, query_feature_vector)
 
         curr_node = sub_node
 
@@ -302,10 +302,10 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
     return (curr_node, n_feature_vectors_parent)
 
 
-def _update_gmm_params(sub_node, node, index, query_feature_vector):
+def _update_gmm_params(sub_node, query_feature_vector):
     n_feature_vectors = sub_node.n_feature_vectors
-    old_means = node.gmm_parameters["means"]
-    old_covs_array = node.gmm_parameters["means"]
+    old_means = sub_node.gmm_parameters["means"]
+    old_covs_array = sub_node.gmm_parameters["means"]
 
     print(f"Shape means {old_means.shape}")
     print(f"Shape covs {old_covs_array.shape}")
