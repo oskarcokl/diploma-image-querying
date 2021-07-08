@@ -375,11 +375,11 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
         node.n_sub_clusters = 2
         node.make_inner_node()
 
-    print(f"New parent node: {node}")
+    #print(f"New parent node: {node}")
 
-    if node.sub_nodes:
-        print(f"Sub node 1: {node.sub_nodes[0]}")
-        print(f"Sub node 2: {node.sub_nodes[1]}")
+    # if node.sub_nodes:
+    #     print(f"Sub node 1: {node.sub_nodes[0]}")
+    #     print(f"Sub node 2: {node.sub_nodes[1]}")
 
     return root_node
 
