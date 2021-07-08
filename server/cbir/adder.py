@@ -25,7 +25,7 @@ class Adder:
         id = table_operations.insert_tuple((img_name, img_features))
         return id
 
-    def add_to_cd_tree(self, id, img_features):
+    def add_to_cd_tree(self, id, img_features, img_name):
         root_node = self._get_root_node()
-        node = cd_tree.add_to_cd_tree(id, img_features, root_node)
+        node = cd_tree.add_to_cd_tree(id, img_features, img_name, root_node)
         return node

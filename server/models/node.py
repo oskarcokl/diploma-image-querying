@@ -160,6 +160,10 @@ class Node(persistent.Persistent):
         self.feature_vectors.append(feature_vector)
         self._p_changed = True
 
+    def add_img(self, img_name):
+        self.img_names.append(img_name)
+        self._p_changed = True
+
     def make_leaf(self, feature_vectors, img_names):
         self.is_leaf = True
         # Only the leaf nodes should explicitly hold feature vectors,

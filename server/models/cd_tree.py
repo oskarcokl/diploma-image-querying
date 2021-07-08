@@ -275,7 +275,7 @@ def _compute_means(m, means, feature_vector):
     return new_means
 
 
-def _find_leaf_node_for_adding(id, feature_vector, root_node):
+def _find_leaf_node_for_adding(id, feature_vector, img_name, root_node):
     # Algorithm finds leaf node of query_feature_vector. It finds
     # the leaf by calculating cpd's for each subnode and choosing
     # the subnode with the highest cpd.
@@ -306,6 +306,7 @@ def _find_leaf_node_for_adding(id, feature_vector, root_node):
         curr_node = sub_node
 
     curr_node.add_feature_vector(feature_vector)
+    curr_node.add_img(img_name)
 
     return (curr_node, n_feature_vectors_parent)
 
@@ -326,13 +327,13 @@ def _update_gmm_params(sub_node, query_feature_vector):
     sub_node.set_covs_array(new_covs_array)
 
 
-def add_to_cd_tree(id, feature_vector, root_node):
+def add_to_cd_tree(id, feature_vector, img_name, root_node):
     # Used to determine if leaf need to be split with new
     # data insertion. Could be set by user.
     gama = 0.1
 
     node, n_feature_vectors_parent = _find_leaf_node_for_adding(
-        id, feature_vector, root_node)
+        id, feature_vector, img_name, root_node)
 
     # Split the leaf node into two nodes if parent n features * gama is
     # smaller than then feature of the leaf node.

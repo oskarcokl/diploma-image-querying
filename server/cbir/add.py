@@ -60,12 +60,13 @@ def add_cli(img_list):
 
     reduced_features = reduce_features(normalized_features, 10)
 
-    add_to_cd_tree(ids, reduced_features, adder)
+    add_to_cd_tree(ids, reduced_features, img_name_list, adder)
 
 
-def add_to_cd_tree(ids, feature_vectors, adder):
+def add_to_cd_tree(ids, feature_vectors, img_name_list, adder):
     for i in range(len(feature_vectors)):
-        node = adder.add_to_cd_tree(ids[i], feature_vectors[i])
+        node = adder.add_to_cd_tree(
+            ids[i], feature_vectors[i], img_name_list[i])
         print(node)
 
 
