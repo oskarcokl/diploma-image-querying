@@ -95,9 +95,6 @@ def init_cd_tree(
 
 
 def _asign_ids_to_clusters(ids, cluster_asigments):
-    print("Asign ids to clusters")
-    print(len(ids))
-    print(len(cluster_asigments))
 
     new_data = []
     for i in range(len(ids)):
