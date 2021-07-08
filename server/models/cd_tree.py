@@ -32,17 +32,17 @@ def init_cd_tree(
 
     while curr_node is not None:
         if _check_stop_conditions(curr_node, min_node, l_max):
-            leaf_feature_vectors = _get_feature_vectors_by_id(
-                data, curr_node.ids)
-            leaf_img_names = _get_img_names_by_id(
+            leaf_feature_vectors, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
                 data, curr_node.ids)
 
             curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
         else:
             print(curr_node.ids)
 
-            curr_node_feature_array = np.array(
-                _get_feature_vectors_by_id(data, curr_node.ids))
+            feature_vectors, _ = _get_feature_vectors_and_imgs_by_id(
+                data, curr_node.ids)
+
+            curr_node_feature_array = np.array(feature_vectors)
 
             print(curr_node_feature_array.shape)
 
@@ -372,10 +372,8 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
                         node.feature_vectors[i]))
 
         for sub_node in sub_nodes:
-            leaf_feature_vectors = _get_feature_vectors_by_id(
-                data, sub_node.ids)
-            leaf_img_names = _get_img_names_by_id(
-                data, sub_node.ids)
+            leaf_feature_vectors, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
+                data, sub_nodes.ids)
             sub_node.make_leaf(leaf_feature_vectors, leaf_img_names)
 
         print(f"Sub node 1: {sub_nodes[0]}")
