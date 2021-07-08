@@ -39,8 +39,12 @@ def init_cd_tree(
 
             curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
         else:
+            print(curr_node.ids)
+
             curr_node_feature_array = np.array(
                 _get_feature_vectors_by_id(data, curr_node.ids))
+
+            print(curr_node_feature_array.shape)
 
             best_model = None
             min_bic = np.inf
@@ -72,6 +76,7 @@ def init_cd_tree(
 
             # Save GMM parameters into curr_node
             curr_node.set_gmm_parameters(node_gmm_parameters)
+
             ids_with_clusters = _asign_ids_to_clusters(
                 curr_node.ids, cluster_asigments)
 
@@ -144,12 +149,18 @@ def _get_cluster_of_data(resp_array, index):
     return cluster
 
 
-def _get_feature_vectors_by_id(data, ids):
+def _get_feature_vectors_and_imgs_by_id(data, ids):
     features = []
-    for i, id in enumerate(ids):
-        if data[i][0] == id:
-            features.append(data[i][2])
-    return features
+    img_names = []
+    data_start_index = 0
+    for id in enumerate(ids):
+        for i in range(data_start_index, len(data)):
+            if data[i][0] == id:
+                features.append(data[i][2])
+                img_names.append(data[i][1])
+                data_start_index = i + 1
+                break
+    return (features, img_names)
 
 
 def _get_img_names_by_id(data, ids):
