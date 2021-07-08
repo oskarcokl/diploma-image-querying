@@ -95,6 +95,7 @@ def init_cd_tree(
 
 
 def _asign_ids_to_clusters(ids, cluster_asigments):
+    print("Asign ids to clusters")
     print(len(ids))
     print(len(cluster_asigments))
 
@@ -114,10 +115,6 @@ def _predict(feature_vectors, means, covs_array):
         cpds = _compute_cpds(feature_vector, means, covs_array)
         max_cpd_cluster = _get_max_cpd_index(cpds)
         assigments.append(max_cpd_cluster)
-
-    print("Predcit")
-    print(len(feature_vectors))
-    print(len(assigments))
 
     return assigments
 
@@ -340,8 +337,6 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
     if node.n_feature_vectors > gama * n_feature_vectors_parent:
         feature_vectors_array = np.array(node.feature_vectors)
 
-        feature_vectors_array = np.append(
-            feature_vectors_array, [feature_vector], axis=0)
         gmm = mixture.GaussianMixture(
             n_components=2, covariance_type="diag").fit(feature_vectors_array)
 
