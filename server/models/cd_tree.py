@@ -365,7 +365,7 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
         node.n_sub_clusters = 2
         node.make_inner_node()
 
-    return node
+    return root_node
 
 
 def _create_sub_nodes(

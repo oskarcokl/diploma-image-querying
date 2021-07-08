@@ -73,11 +73,10 @@ def add_to_cd_tree(ids, feature_vectors, img_name_list, adder):
     for i in range(len(feature_vectors)):
         root_node = adder.add_to_cd_tree(
             ids[i], feature_vectors[i], img_name_list[i])
+        save_cd_tree(root_node)
 
-    return root_node
 
-
-def save_cd_tree(root_node):
+def save_cd_tree(root_node, root):
     storage = ZODB.FileStorage.FileStorage(
         "cd_tree.fs", blob_dir="cd_tree_blob")
     db = ZODB.DB(storage)
