@@ -37,14 +37,11 @@ def init_cd_tree(
 
             curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
         else:
-            print(curr_node.ids)
 
             feature_vectors, _ = _get_feature_vectors_and_imgs_by_id(
                 data, curr_node.ids)
 
             curr_node_feature_array = np.array(feature_vectors)
-
-            print(curr_node_feature_array.shape)
 
             best_model = None
             min_bic = np.inf
@@ -153,7 +150,7 @@ def _get_feature_vectors_and_imgs_by_id(data, ids):
     features = []
     img_names = []
     data_start_index = 0
-    for id in enumerate(ids):
+    for id in ids:
         for i in range(data_start_index, len(data)):
             if data[i][0] == id:
                 features.append(data[i][2])
