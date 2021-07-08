@@ -209,6 +209,9 @@ def _compute_cpd(feature_vector, mean, cov_array):
     a = np.power(two_pi, half_d)
     b = np.linalg.det(cov_array_dig)
     b_power = b ** -0.5
+    if np.isnan(b_power):
+        b_power = 0
+
     c = np.exp(
         -0.5
         * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array_dig)),
