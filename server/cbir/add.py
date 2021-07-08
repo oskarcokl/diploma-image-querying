@@ -67,7 +67,6 @@ def add_to_cd_tree(ids, feature_vectors, img_name_list, adder):
     for i in range(len(feature_vectors)):
         node = adder.add_to_cd_tree(
             ids[i], feature_vectors[i], img_name_list[i])
-        print(node)
 
 
 def reduce_features(add_features, n_components=100):

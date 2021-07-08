@@ -305,7 +305,7 @@ def _find_leaf_node_for_adding(id, feature_vector, img_name, root_node):
 
         curr_node = sub_node
 
-    curr_node.add_feature_vector(feature_vector)
+    curr_node.add_feature_vector(feature_vector.tolist())
     curr_node.add_img(img_name)
 
     return (curr_node, n_feature_vectors_parent)
@@ -340,12 +340,6 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
     if node.n_feature_vectors > gama * n_feature_vectors_parent:
         feature_vectors_array = np.array(node.feature_vectors)
 
-        print(node.n_feature_vectors)
-        print(len(node.feature_vectors))
-        print(len(node.ids))
-
-        print(feature_vectors_array.shape)
-
         feature_vectors_array = np.append(
             feature_vectors_array, [feature_vector], axis=0)
         gmm = mixture.GaussianMixture(
@@ -360,16 +354,8 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
         cluster_asigments = _predict(
             feature_vectors_array, gmm.means_, gmm.covariances_)
 
-        node.n_feature_vectors += 1
-
-        new_ids = node.ids
-        new_ids.append(id)
-
-        print(node.n_feature_vectors)
-        print(len(new_ids))
-
         ids_with_clusters = _asign_ids_to_clusters(
-            new_ids, cluster_asigments)
+            node.ids, cluster_asigments)
 
         # Node ID could be removed, or I have to somehow presistently store the curr
         # counter.
