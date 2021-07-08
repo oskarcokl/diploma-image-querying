@@ -363,7 +363,10 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
             0
         )
 
-        data =
+        data = []
+        for i in range(node.ids):
+            data.append((node.ids[i], node.img_names[i],
+                        node.feature_vectors[i]))
 
         for sub_node in sub_nodes:
             leaf_feature_vectors = _get_feature_vectors_by_id(
