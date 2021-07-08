@@ -11,6 +11,7 @@ from tensorflow import keras
 from sklearn import preprocessing
 from sklearn.decomposition import TruncatedSVD
 import numpy as np
+import cv2
 
 import sys
 sys.path.insert(0, "../")
@@ -36,6 +37,7 @@ def add_cli(img_list):
 
     for img_path in img_list:
         img_name = img_path.split("/")[-1]
+        save_img_to_disk(img_path, img_name, "./test")
         img = image.load_img(img_path, target_size=(224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
@@ -85,6 +87,17 @@ def reduce_features(add_features, n_components=100):
     result = svd.transform(feature_array)
     add_reduced = result[len(result) - len(add_features):]
     return add_reduced
+
+
+def save_img_to_disk(img_path, img_name, path):
+    img = cv2.imread(img_path)
+    save_path = os.path.join(path, img_name)
+    print(save_path)
+    result = cv2.imwrite(save_path, img)
+    if result:
+        print("Saved image successfully. :^)")
+    else:
+        print("Error while saving image.")
 
 
 def get_data():
