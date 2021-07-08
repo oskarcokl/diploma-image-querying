@@ -11,6 +11,10 @@ from tensorflow import keras
 from sklearn import preprocessing
 from sklearn.decomposition import TruncatedSVD
 import numpy as np
+import ZODB
+import ZODB.FileStorage
+import BTrees
+import transaction
 
 import sys
 sys.path.insert(0, "../")
@@ -60,13 +64,28 @@ def add_cli(img_list):
 
     reduced_features = reduce_features(normalized_features, 10)
 
-    add_to_cd_tree(ids, reduced_features, img_name_list, adder)
+    root_node = add_to_cd_tree(ids, reduced_features, img_name_list, adder)
+
+    save_cd_tree(root_node)
 
 
 def add_to_cd_tree(ids, feature_vectors, img_name_list, adder):
     for i in range(len(feature_vectors)):
-        node = adder.add_to_cd_tree(
+        root_node = adder.add_to_cd_tree(
             ids[i], feature_vectors[i], img_name_list[i])
+
+    return root_node
+
+
+def save_cd_tree(root_node):
+    storage = ZODB.FileStorage.FileStorage(
+        "cd_tree.fs", blob_dir="cd_tree_blob")
+    db = ZODB.DB(storage)
+    connection = db.open()
+    root = connection.root
+    root.cd_tree = BTrees.OOBTree.BTree()
+    root.cd_tree["root_node"] = root_node
+    transaction.commit()
 
 
 def reduce_features(add_features, n_components=100):
