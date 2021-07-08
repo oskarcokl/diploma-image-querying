@@ -36,6 +36,7 @@ def init_cd_tree(
                 data, curr_node.ids)
             leaf_img_names = _get_img_names_by_id(
                 data, curr_node.ids)
+
             curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
         else:
             curr_node_feature_array = np.array(
@@ -45,20 +46,20 @@ def init_cd_tree(
             min_bic = np.inf
             n_clusters = -1
 
-            print(f"Current layer: {curr_node.layer}")
+            #print(f"Current layer: {curr_node.layer}")
             for i in range(min_clusters, max_clusters + 1):
                 # Using diagonals covariance matrices speeds thing up tremendously.
                 gmm = mixture.GaussianMixture(
                     n_components=i, covariance_type="diag").fit(curr_node_feature_array)
 
                 curr_bic = gmm.bic(curr_node_feature_array)
-                print(f"Trying with {i} clusters, bic: {curr_bic}")
+                #print(f"Trying with {i} clusters, bic: {curr_bic}")
                 if (curr_bic < min_bic):
                     best_model = gmm
                     min_bic = curr_bic
                     n_clusters = i
 
-            print(f"Choosing {n_clusters} clusters")
+            #print(f"Choosing {n_clusters} clusters")
 
             node_gmm_parameters = {
                 "covs_array": best_model.covariances_,
@@ -94,6 +95,9 @@ def init_cd_tree(
 
 
 def _asign_ids_to_clusters(ids, cluster_asigments):
+    print(len(ids))
+    print(len(cluster_asigments))
+
     new_data = []
     for i in range(len(ids)):
         new_data_item = (ids[i], cluster_asigments[i])
@@ -262,12 +266,12 @@ def _compute_means(m, means, feature_vector):
     new_means = np.zeros((n_clusters, n_features))
 
     for i in range(n_clusters):
-        new_means[i] = _compute_cov(m, means[i], feature_vector)
+        new_means[i] = _compute_mean(m, means[i], feature_vector)
 
     return new_means
 
 
-def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
+def _find_leaf_node_for_adding(id, feature_vector, root_node):
     # Algorithm finds leaf node of query_feature_vector. It finds
     # the leaf by calculating cpd's for each subnode and choosing
     # the subnode with the highest cpd.
@@ -284,7 +288,7 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
         means = curr_node.gmm_parameters["means"]
         cov_arrays = curr_node.gmm_parameters["covs_array"]
 
-        cpds = _compute_cpds(query_feature_vector, means, cov_arrays)
+        cpds = _compute_cpds(feature_vector, means, cov_arrays)
 
         max_cpd_index = _get_max_cpd_index(cpds)
 
@@ -292,12 +296,14 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
         sub_node.ids.append(id)
         sub_node.n_feature_vectors += 1
 
-        _update_gmm_params(sub_node, query_feature_vector)
+        if not sub_node.is_leaf:
+            _update_gmm_params(sub_node, feature_vector)
 
         curr_node = sub_node
 
     curr_node.add_id(id)
     curr_node.n_feature_vectors += 1
+    curr_node.add_feature_vector(feature_vector)
 
     return (curr_node, n_feature_vectors_parent)
 
@@ -305,10 +311,7 @@ def _find_leaf_node_for_adding(id, query_feature_vector, root_node):
 def _update_gmm_params(sub_node, query_feature_vector):
     n_feature_vectors = sub_node.n_feature_vectors
     old_means = sub_node.gmm_parameters["means"]
-    old_covs_array = sub_node.gmm_parameters["means"]
-
-    print(f"Shape means {old_means.shape}")
-    print(f"Shape covs {old_covs_array.shape}")
+    old_covs_array = sub_node.gmm_parameters["covs_array"]
 
     # Calculate mean and cov and update them for the node
     # with the max cpd.
@@ -321,18 +324,27 @@ def _update_gmm_params(sub_node, query_feature_vector):
     sub_node.set_covs_array(new_covs_array)
 
 
-def add_to_cd_tree(id, query_feature_vector, root_node):
+def add_to_cd_tree(id, feature_vector, root_node):
     # Used to determine if leaf need to be split with new
     # data insertion. Could be set by user.
     gama = 0.1
 
     node, n_feature_vectors_parent = _find_leaf_node_for_adding(
-        id, query_feature_vector, root_node)
+        id, feature_vector, root_node)
 
     # Split the leaf node into two nodes if parent n features * gama is
     # smaller than then feature of the leaf node.
     if node.n_feature_vectors > gama * n_feature_vectors_parent:
         feature_vectors_array = np.array(node.feature_vectors)
+
+        print(node.n_feature_vectors)
+        print(len(node.feature_vectors))
+        print(len(node.ids))
+
+        print(feature_vectors_array.shape)
+
+        feature_vectors_array = np.append(
+            feature_vectors_array, [feature_vector], axis=0)
         gmm = mixture.GaussianMixture(
             n_components=2, covariance_type="diag").fit(feature_vectors_array)
 
@@ -345,7 +357,16 @@ def add_to_cd_tree(id, query_feature_vector, root_node):
         cluster_asigments = _predict(
             feature_vectors_array, gmm.means_, gmm.covariances_)
 
-        ids_with_clusters = _asign_ids_to_clusters(node.ids, cluster_asigments)
+        node.n_feature_vectors += 1
+
+        new_ids = node.ids
+        new_ids.append(id)
+
+        print(node.n_feature_vectors)
+        print(len(new_ids))
+
+        ids_with_clusters = _asign_ids_to_clusters(
+            new_ids, cluster_asigments)
 
         # Node ID could be removed, or I have to somehow presistently store the curr
         # counter.

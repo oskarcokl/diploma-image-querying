@@ -20,10 +20,9 @@ from sklearn import preprocessing
 
 # Local application imports
 sys.path.insert(0, "../")
-from db_connector import DbConnector
+from db_utils.db_connector import DbConnector
 from models import cd_tree
-from config import config
-import table_operations
+from db_utils import table_operations
 
 
 def insert_image_vector(image_name, image_vector):
@@ -185,7 +184,8 @@ def get_cd_tree_from_storage():
     connection = db.open()
     root = connection.root
 
-    print(root.cd_tree["root_node"].sub_nodes[0])
+    print(len(root.cd_tree["root_node"].sub_nodes[0].ids))
+    print(root.cd_tree["root_node"].sub_nodes[0].n_feature_vectors)
 
 
 def make_test_query_feature(query_img_path):
@@ -273,5 +273,4 @@ if __name__ == "__main__":
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))
     else:
-        # get_cd_tree_from_storage()
-        print(get_data())
+        get_cd_tree_from_storage()
