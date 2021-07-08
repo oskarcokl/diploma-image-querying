@@ -11,15 +11,11 @@ from tensorflow import keras
 from sklearn import preprocessing
 from sklearn.decomposition import TruncatedSVD
 import numpy as np
-import ZODB
-import ZODB.FileStorage
-import BTrees
-import transaction
 
 import sys
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
-from adder import Adder
+from adder import Adder, ZODBConnector
 from db_utils.db_connector import DbConnector
 
 
@@ -64,27 +60,18 @@ def add_cli(img_list):
 
     reduced_features = reduce_features(normalized_features, 10)
 
-    root_node = add_to_cd_tree(ids, reduced_features, img_name_list, adder)
+    zodb_connector = ZODBConnector()
+    zodb_connector.connect("./cd_tree.fs")
 
-    save_cd_tree(root_node)
+    add_to_cd_tree(ids, reduced_features, img_name_list, adder, zodb_connector)
 
 
-def add_to_cd_tree(ids, feature_vectors, img_name_list, adder):
+def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, zodb_connector):
     for i in range(len(feature_vectors)):
-        root_node = adder.add_to_cd_tree(
-            ids[i], feature_vectors[i], img_name_list[i])
-        save_cd_tree(root_node)
-
-
-def save_cd_tree(root_node, root):
-    storage = ZODB.FileStorage.FileStorage(
-        "cd_tree.fs", blob_dir="cd_tree_blob")
-    db = ZODB.DB(storage)
-    connection = db.open()
-    root = connection.root
-    root.cd_tree = BTrees.OOBTree.BTree()
-    root.cd_tree["root_node"] = root_node
-    transaction.commit()
+        old_root_node = zodb_connector.get_root_node()
+        new_root_node = adder.add_to_cd_tree(
+            ids[i], feature_vectors[i], img_name_list[i], old_root_node)
+        zodb_connector.save_cd_tree(new_root_node)
 
 
 def reduce_features(add_features, n_components=100):
