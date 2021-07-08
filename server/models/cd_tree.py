@@ -346,8 +346,6 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
             "weights": gmm.weights_,
         })
 
-        print(f"New parent node: {node}")
-
         cluster_asigments = _predict(
             feature_vectors_array, gmm.means_, gmm.covariances_)
 
@@ -364,21 +362,24 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
         )
 
         data = []
-        for i in range(node.ids):
+        for i in range(len(node.ids)):
             data.append((node.ids[i], node.img_names[i],
                         node.feature_vectors[i]))
 
         for sub_node in sub_nodes:
             leaf_feature_vectors, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
-                data, sub_nodes.ids)
+                data, sub_node.ids)
             sub_node.make_leaf(leaf_feature_vectors, leaf_img_names)
-
-        print(f"Sub node 1: {sub_nodes[0]}")
-        print(f"Sub node 2: {sub_nodes[1]}")
 
         node.set_sub_nodes(sub_nodes)
         node.n_sub_clusters = 2
         node.make_inner_node()
+
+    print(f"New parent node: {node}")
+
+    if node.sub_nodes:
+        print(f"Sub node 1: {node.sub_nodes[0]}")
+        print(f"Sub node 2: {node.sub_nodes[1]}")
 
     return root_node
 
