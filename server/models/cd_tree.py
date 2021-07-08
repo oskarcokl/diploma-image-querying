@@ -163,14 +163,6 @@ def _get_feature_vectors_and_imgs_by_id(data, ids):
     return (features, img_names)
 
 
-def _get_img_names_by_id(data, ids):
-    names = []
-    for i, id in enumerate(ids):
-        if data[i][0] == id:
-            names.append(data[i][1])
-    return names
-
-
 def _check_stop_conditions(node, min_node, l_max):
     # If stop conditions have been met the functino returns true.
     # Else it retusn false.
