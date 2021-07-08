@@ -145,19 +145,19 @@ def _get_cluster_of_data(resp_array, index):
 
 
 def _get_feature_vectors_by_id(data, ids):
-    indexes = [id - 1 for id in ids]
-
-    features = [data[index][2] for index in indexes]
-
+    features = []
+    for i, id in enumerate(ids):
+        if data[i][0] == id:
+            features.append(data[i][2])
     return features
 
 
 def _get_img_names_by_id(data, ids):
-    indexes = [id - 1 for id in ids]
-
-    features = [data[index][1] for index in indexes]
-
-    return features
+    names = []
+    for i, id in enumerate(ids):
+        if data[i][0] == id:
+            names.append(data[i][1])
+    return names
 
 
 def _check_stop_conditions(node, min_node, l_max):
@@ -346,6 +346,8 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
             "weights": gmm.weights_,
         })
 
+        print(f"New parent node: {node}")
+
         cluster_asigments = _predict(
             feature_vectors_array, gmm.means_, gmm.covariances_)
 
@@ -360,6 +362,18 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
             2,
             0
         )
+
+        data =
+
+        for sub_node in sub_nodes:
+            leaf_feature_vectors = _get_feature_vectors_by_id(
+                data, sub_node.ids)
+            leaf_img_names = _get_img_names_by_id(
+                data, sub_node.ids)
+            sub_node.make_leaf(leaf_feature_vectors, leaf_img_names)
+
+        print(f"Sub node 1: {sub_nodes[0]}")
+        print(f"Sub node 2: {sub_nodes[1]}")
 
         node.set_sub_nodes(sub_nodes)
         node.n_sub_clusters = 2
