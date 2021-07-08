@@ -115,6 +115,10 @@ def _predict(feature_vectors, means, covs_array):
         max_cpd_cluster = _get_max_cpd_index(cpds)
         assigments.append(max_cpd_cluster)
 
+    print("Predcit")
+    print(len(feature_vectors))
+    print(len(assigments))
+
     return assigments
 
 
@@ -301,8 +305,6 @@ def _find_leaf_node_for_adding(id, feature_vector, root_node):
 
         curr_node = sub_node
 
-    curr_node.add_id(id)
-    curr_node.n_feature_vectors += 1
     curr_node.add_feature_vector(feature_vector)
 
     return (curr_node, n_feature_vectors_parent)
