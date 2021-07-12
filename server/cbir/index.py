@@ -13,7 +13,6 @@ from tensorflow.keras import backend as K
 import ZODB
 import ZODB.FileStorage
 import BTrees
-from tensorflow.python.ops.gen_math_ops import squared_difference_eager_fallback
 import transaction
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
@@ -156,7 +155,7 @@ def reduce_features(feature_list, n_components=100):
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
-    reduced_feature_vectors = reduce_features(feature_vectors, 10)
+    reduced_feature_vectors = reduce_features(feature_vectors, 100)
     new_data = []
     for i, item in enumerate(data):
         # Appending tuples here.

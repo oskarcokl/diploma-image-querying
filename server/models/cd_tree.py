@@ -199,21 +199,25 @@ def _compute_cpd(feature_vector, mean, cov_array):
     # TODO first component is probably not useful. Calculate determinante in
     # a better way since it's diagonal
 
-    cov_array_dig = np.diag(cov_array)
-    det_cov_array = np.prod(cov_array)
-    b = det_cov_array ** -0.5
-    if np.isnan(b):
-        print(f"Determinant {det_cov_array}")
-        return 0
+    try:
+        cov_array_dig = np.diag(cov_array)
+        det_cov_array = np.prod(cov_array)
+        b = det_cov_array
+        # b = np.power(det_cov_array, -0.5)
+        if np.isnan(b):
+            print(f"Determinant {det_cov_array}")
+            return 0
 
-    c = np.exp(
-        -0.5
-        * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array_dig)),
-                    (feature_vector - mean),
-                    )
-    )
-    cpd = b * c
-    return cpd
+        c = np.exp(
+            -0.5
+            * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array_dig)),
+                        (feature_vector - mean),
+                        )
+        )
+        cpd = b * c
+        return cpd
+    except:
+        return 0
 
 
 def _compute_means_and_covs(m, feature_vector, mean, cov_array):

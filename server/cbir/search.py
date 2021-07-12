@@ -81,7 +81,7 @@ def find_similar_imgs(img_array, model, searcher):
     normalized_feature_query = preprocessing.normalize(
         features_query.reshape(1, -1), norm="max")
 
-    reduced_feature_query = reduce_features(normalized_feature_query, 10)
+    reduced_feature_query = reduce_features(normalized_feature_query, 100)
 
     img_names = searcher.search(reduced_feature_query, 10)
     return img_names
