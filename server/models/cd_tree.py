@@ -200,10 +200,11 @@ def _compute_cpd(feature_vector, mean, cov_array):
     # a better way since it's diagonal
 
     cov_array_dig = np.diag(cov_array)
-    b = np.linalg.det(cov_array_dig)
-    b_power = b ** -0.5
-    if np.isnan(b_power):
-        b_power = 0
+    det_cov_array = np.pord(cov_array)
+    b = det_cov_array ** -0.5
+    if np.isnan(b):
+        print(f"Determinant {det_cov_array}")
+        return 0
 
     c = np.exp(
         -0.5
@@ -211,7 +212,7 @@ def _compute_cpd(feature_vector, mean, cov_array):
                     (feature_vector - mean),
                     )
     )
-    cpd = b_power * c
+    cpd = b * c
     return cpd
 
 
