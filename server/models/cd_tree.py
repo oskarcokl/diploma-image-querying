@@ -200,10 +200,6 @@ def _compute_cpd(feature_vector, mean, cov_array):
     # a better way since it's diagonal
 
     cov_array_dig = np.diag(cov_array)
-    d = len(feature_vector)
-    half_d = d / 2
-    two_pi = 2 * np.pi
-    a = np.power(two_pi, half_d)
     b = np.linalg.det(cov_array_dig)
     b_power = b ** -0.5
     if np.isnan(b_power):
@@ -215,8 +211,7 @@ def _compute_cpd(feature_vector, mean, cov_array):
                     (feature_vector - mean),
                     )
     )
-    first_part = a * b_power
-    cpd = first_part * c
+    cpd = b_power * c
     return cpd
 
 

@@ -64,8 +64,6 @@ def show_results(query_img_path, img_paths):
     query_img = cv2.imread(query_img_path)
     query_resized = cv2.resize(query_img, (720, 480))
     cv2.imshow("Query", query_resized)
-    # TODO maybe remove first wait key.
-    cv2.waitKey(0)
 
     for img_path in img_paths:
         result_img = cv2.imread(img_path)
