@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
+    "-d",
     "--dest_folder",
     metavar="d",
     type=str,
@@ -15,6 +16,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-s",
     "--src_folder",
     metavar="s",
     type=str,
@@ -23,6 +25,7 @@ parser.add_argument(
 
 
 parser.add_argument(
+    "-n",
     "--n_elements",
     metavar="n",
     type=int,
@@ -37,8 +40,10 @@ for directory in os.listdir(src_dir):
     # print(os.path.join(args.src_folder, directory))
     curr_dir = os.path.join(src_dir, directory)
     files = [file for file in os.listdir(curr_dir)]
-    for x in range(args.n_elements):
-        copy_file = random.choice(files)
+    for x in range(len(files)):
+        copy_file = files[x]
+        print(copy_file)
         shutil.copyfile(
-            os.path.join(curr_dir, copy_file), os.path.join(args.dest_folder, copy_file)
+            os.path.join(curr_dir, copy_file), os.path.join(
+                args.dest_folder, copy_file)
         )

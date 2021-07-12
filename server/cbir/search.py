@@ -75,13 +75,13 @@ def show_results(query_img_path, img_paths):
 def find_similar_imgs(img_array, model, searcher):
     processed_img_array = preprocess_input(img_array)
     get_fc2_layer_output = K.function(
-        [model.layers[0].input], model.layers[22].output)
+        [model.layers[0].input], model.layers[21].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
     normalized_feature_query = preprocessing.normalize(
         features_query.reshape(1, -1), norm="max")
 
-    reduced_feature_query = reduce_features(normalized_feature_query, 100)
+    reduced_feature_query = reduce_features(normalized_feature_query, 10)
 
     img_names = searcher.search(reduced_feature_query, 10)
     return img_names

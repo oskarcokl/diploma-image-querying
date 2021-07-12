@@ -16,6 +16,7 @@ import BTrees
 import transaction
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
+from progress.bar import Bar
 
 # Local application imports
 sys.path.insert(0, "../")
@@ -79,6 +80,8 @@ def init_index(dataset_src):
     img_name_list = []
     feature_list = []
 
+    bar = Bar("Extracting features", max=len(os.listdir(dataset_src)))
+
     for img_name in os.listdir(dataset_src):
         img_path = os.path.join(dataset_src, img_name)
         img = image.load_img(img_path, target_size=(224, 224))
@@ -87,12 +90,15 @@ def init_index(dataset_src):
         img_array = preprocess_input(img_array)
 
         get_fc2_layer_output = K.function(
-            [model.layers[0].input], model.layers[22].output
+            [model.layers[0].input], model.layers[21].output
         )
         features = get_fc2_layer_output([img_array])[0]
 
         img_name_list.append(img_name)
         feature_list.append(features)
+        bar.next()
+
+    bar.finish()
 
     normalized_feature_list = normalize_sk_learn(feature_list)
 
@@ -155,7 +161,7 @@ def reduce_features(feature_list, n_components=100):
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
-    reduced_feature_vectors = reduce_features(feature_vectors, 100)
+    reduced_feature_vectors = reduce_features(feature_vectors, 10)
     new_data = []
     for i, item in enumerate(data):
         # Appending tuples here.
