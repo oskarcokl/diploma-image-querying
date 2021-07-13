@@ -30,9 +30,9 @@ T_ALL = 0
 
 
 def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
-    t_all = Timer(name="All")
+    t_all = Timer(name="All", logger=None)
     t_all.start()
-    t_model = Timer(name="Model")
+    t_model = Timer(name="Model", logger=None)
     t_model.start()
 
     if os.path.isdir("./vgg16"):
@@ -46,6 +46,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         print("Saving model to disk.")
         model.save("./vgg16")
 
+    global T_MODEL
     T_MODEL = t_model.stop()
     searcher = Searcher()
 
@@ -63,6 +64,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
             #  for img_name in img_names]
 
             # show_results(query_img_path, img_paths)
+            global T_ALL
             T_ALL = t_all.stop()
         except Exception as e:
             print(e)
@@ -94,37 +96,45 @@ def find_similar_imgs(img_array, model, searcher):
         [model.layers[0].input], model.layers[21].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
-    t = Timer(name="Normalization", logger=None)
-    t.start()
+    t_norm = Timer(name="Normalization", logger=None)
+    t_norm.start()
     normalized_feature_query = preprocessing.normalize(
         features_query.reshape(1, -1), norm="max")
-    print("hello")
-    norm_time = t.stop()
+    global T_NORMALIZATION
+    T_NORMALIZATION = t_norm.stop()
 
-    t = Timer(name="Feature reduction", logger=None)
-    t.start()
     reduced_feature_query = reduce_features(normalized_feature_query, 40)
-    feat_reduction_time = t.stop()
 
-    img_names, search_time = searcher.search(reduced_feature_query, 10)
-    return img_names, search_time, norm_time
+    global T_SEARCH
+    img_names, T_SEARCH = searcher.search(reduced_feature_query, 10)
+    return img_names
 
 
-@Timer(name="Feature reduction", text="Reducing features took {:.4f}s")
 def reduce_features(query_features, n_components=100):
+    t_db = Timer(name="Database", logger=None)
+    t_db.start()
+
     feature_vectors = get_data()
+
+    global T_DB
+    T_DB = t_db.stop()
+
+    t_feat_reduce = Timer(name="Feature reduction", logger=None)
+    t_feat_reduce.start()
+
     feature_vectors_plus = np.append(
         feature_vectors, np.array(query_features), axis=0)
-
     feature_array = np.array(feature_vectors_plus)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_array)
     result = svd.transform(feature_array)
     query_reduced = result[len(result) - 1]
+
+    global T_FEAT_REDUCTION
+    T_FEAT_REDUCTION = t_feat_reduce.stop()
     return query_reduced
 
 
-@Timer(name="Database", text="Loading from database took {:.4f}s")
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
@@ -158,3 +168,6 @@ if __name__ == "__main__":
 
     search(query_img_path=args["query"],
            cli=args["terminal"], dataset=args["dataset"])
+
+
+print(T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL)

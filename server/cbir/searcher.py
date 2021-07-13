@@ -21,7 +21,7 @@ class Searcher:
         return root.cd_tree["root_node"]
 
     def search(self, query_features, n_similar_images):
-        search_time = Timer(name="Search")
+        search_time = Timer(name="Search", logger=None)
         search_time.start()
         root_node = self._get_root_node()
         result_images = cd_tree.find_similar_images(
