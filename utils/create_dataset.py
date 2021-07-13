@@ -17,7 +17,7 @@ parser.add_argument(
 
 parser.add_argument(
     "-s",
-    "--src_folder",
+   "--src_folder",
     metavar="s",
     type=str,
     help="Folder from where you want to copy files.",

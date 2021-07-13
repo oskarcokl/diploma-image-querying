@@ -161,7 +161,7 @@ def reduce_features(feature_list, n_components=100):
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
-    reduced_feature_vectors = reduce_features(feature_vectors, 10)
+    reduced_feature_vectors = reduce_features(feature_vectors, 40)
     new_data = []
     for i, item in enumerate(data):
         # Appending tuples here.
@@ -273,7 +273,7 @@ if __name__ == "__main__":
         init_index(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 10, 20, 6)
+        root_node = init_cd_tree(data, 1, 5, 30, 4)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))

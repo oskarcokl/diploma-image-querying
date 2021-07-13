@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 
 import cv2
 import numpy as np
@@ -20,6 +21,8 @@ from db_utils.db_connector import DbConnector
 
 
 def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
+    start_time = time.perf_counter()
+
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
@@ -45,8 +48,11 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
 
             img_paths = [os.path.join(dataset, img_name)
                          for img_name in img_names]
-            print(img_paths)
 
+            WARNING = "\033[93m"
+
+            print(
+                f"{WARNING}Searching took {time.perf_counter() - start_time:0.4f} seconds")
             show_results(query_img_path, img_paths)
         except Exception as e:
             print(e)
@@ -81,7 +87,7 @@ def find_similar_imgs(img_array, model, searcher):
     normalized_feature_query = preprocessing.normalize(
         features_query.reshape(1, -1), norm="max")
 
-    reduced_feature_query = reduce_features(normalized_feature_query, 10)
+    reduced_feature_query = reduce_features(normalized_feature_query, 40)
 
     img_names = searcher.search(reduced_feature_query, 10)
     return img_names
@@ -103,7 +109,6 @@ def reduce_features(query_features, n_components=100):
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    print("Number of indexed images: ", connector.cursor.rowcount)
     data = connector.cursor.fetchall()
     data_array = np.array(data, dtype=object)
 
