@@ -3,6 +3,7 @@ import pickle
 
 import ZODB
 import ZODB.FileStorage
+from codetiming import Timer
 
 
 sys.path.insert(0, "../")
@@ -20,6 +21,8 @@ class Searcher:
         return root.cd_tree["root_node"]
 
     def search(self, query_features, n_similar_images):
+        search_time = Timer(name="Search")
+        search_time.start()
         root_node = self._get_root_node()
         result_images = cd_tree.find_similar_images(
             root_node=root_node,
@@ -31,7 +34,8 @@ class Searcher:
         for i in range(n_similar_images):
             img_names.append(result_images[i][2])
 
-        return img_names
+        elapsed_time = search_time.stop()
+        return img_names, elapsed_time
 
 
 if __name__ == "__main__":

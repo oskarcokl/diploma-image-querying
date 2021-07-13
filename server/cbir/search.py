@@ -1,6 +1,6 @@
 import argparse
+import logging
 import os
-import time
 
 import cv2
 import numpy as np
@@ -21,11 +21,19 @@ sys.path.insert(0, "./")
 from db_utils.db_connector import DbConnector
 from term_colors import TerminalColors
 
+T_FEAT_REDUCTION = 0
+T_SEARCH = 0
+T_NORMALIZATION = 0
+T_DB = 0
+T_MODEL = 0
+T_ALL = 0
 
-@Timer(name="Search", text="Search took {:.4f}s")
+
 def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
-    timer_model = Timer(name="Model", text="Loading model took {:.4f}s")
-    timer_model.start()
+    t_all = Timer(name="All")
+    t_all.start()
+    t_model = Timer(name="Model")
+    t_model.start()
 
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
@@ -38,7 +46,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         print("Saving model to disk.")
         model.save("./vgg16")
 
-    timer_model.stop()
+    T_MODEL = t_model.stop()
     searcher = Searcher()
 
     if cli:
@@ -51,10 +59,11 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
                 img_array=img_array, model=model, searcher=searcher
             )
 
-            img_paths = [os.path.join(dataset, img_name)
-                         for img_name in img_names]
+            # img_paths = [os.path.join(dataset, img_name)
+            #  for img_name in img_names]
 
-            show_results(query_img_path, img_paths)
+            # show_results(query_img_path, img_paths)
+            T_ALL = t_all.stop()
         except Exception as e:
             print(e)
     else:
@@ -85,15 +94,23 @@ def find_similar_imgs(img_array, model, searcher):
         [model.layers[0].input], model.layers[21].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
+    t = Timer(name="Normalization", logger=None)
+    t.start()
     normalized_feature_query = preprocessing.normalize(
         features_query.reshape(1, -1), norm="max")
+    print("hello")
+    norm_time = t.stop()
 
+    t = Timer(name="Feature reduction", logger=None)
+    t.start()
     reduced_feature_query = reduce_features(normalized_feature_query, 40)
+    feat_reduction_time = t.stop()
 
-    img_names = searcher.search(reduced_feature_query, 10)
-    return img_names
+    img_names, search_time = searcher.search(reduced_feature_query, 10)
+    return img_names, search_time, norm_time
 
 
+@Timer(name="Feature reduction", text="Reducing features took {:.4f}s")
 def reduce_features(query_features, n_components=100):
     feature_vectors = get_data()
     feature_vectors_plus = np.append(
@@ -107,6 +124,7 @@ def reduce_features(query_features, n_components=100):
     return query_reduced
 
 
+@Timer(name="Database", text="Loading from database took {:.4f}s")
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
