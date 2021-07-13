@@ -1,5 +1,4 @@
 import argparse
-import logging
 import os
 
 import cv2
@@ -19,6 +18,7 @@ sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 
 from db_utils.db_connector import DbConnector
+from csv_writer import save_to_csv
 from term_colors import TerminalColors
 
 T_FEAT_REDUCTION = 0
@@ -168,6 +168,10 @@ if __name__ == "__main__":
 
     search(query_img_path=args["query"],
            cli=args["terminal"], dataset=args["dataset"])
+
+    row = [T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
+    print(row)
+    save_to_csv("../experiments/oxford.csv", row)
 
 
 print(T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL)
