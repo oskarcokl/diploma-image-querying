@@ -12,6 +12,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
+from codetiming import Timer
 
 import sys
 sys.path.insert(0, "../")
@@ -21,8 +22,10 @@ from db_utils.db_connector import DbConnector
 from term_colors import TerminalColors
 
 
+@Timer(name="Search", text="Search took {:.4f}s")
 def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
-    start_time = time.perf_counter()
+    timer_model = Timer(name="Model", text="Loading model took {:.4f}s")
+    timer_model.start()
 
     if os.path.isdir("./vgg16"):
         print("Model already downloaded loading from disk.")
@@ -35,6 +38,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         print("Saving model to disk.")
         model.save("./vgg16")
 
+    timer_model.stop()
     searcher = Searcher()
 
     if cli:
@@ -50,8 +54,6 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
             img_paths = [os.path.join(dataset, img_name)
                          for img_name in img_names]
 
-            print(
-                f"{TerminalColors.OKGREEN}Searching took {time.perf_counter() - start_time:0.4f} seconds {TerminalColors.ENDC}")
             show_results(query_img_path, img_paths)
         except Exception as e:
             print(e)
