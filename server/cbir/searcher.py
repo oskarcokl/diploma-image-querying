@@ -12,7 +12,6 @@ from models import cd_tree
 
 class Searcher:
     def _get_root_node(self):
-        print(f"searcher {self.__class__}")
         storage = ZODB.FileStorage.FileStorage("./cd_tree.fs")
         db = ZODB.DB(storage)
         connection = db.open()
