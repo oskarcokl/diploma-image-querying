@@ -18,6 +18,7 @@ sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 
 from db_utils.db_connector import DbConnector
+from term_colors import TerminalColors
 
 
 def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
@@ -49,10 +50,8 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
             img_paths = [os.path.join(dataset, img_name)
                          for img_name in img_names]
 
-            WARNING = "\033[93m"
-
             print(
-                f"{WARNING}Searching took {time.perf_counter() - start_time:0.4f} seconds")
+                f"{TerminalColors.OKGREEN}Searching took {time.perf_counter() - start_time:0.4f} seconds {TerminalColors.ENDC}")
             show_results(query_img_path, img_paths)
         except Exception as e:
             print(e)
