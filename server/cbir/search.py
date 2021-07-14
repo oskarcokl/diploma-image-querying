@@ -60,10 +60,10 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
                 img_array=img_array, model=model, searcher=searcher
             )
 
-            # img_paths = [os.path.join(dataset, img_name)
-            #  for img_name in img_names]
+            img_paths = [os.path.join(dataset, img_name)
+                         for img_name in img_names]
 
-            # show_results(query_img_path, img_paths)
+            show_results(query_img_path, img_paths)
             global T_ALL
             T_ALL = t_all.stop()
 
