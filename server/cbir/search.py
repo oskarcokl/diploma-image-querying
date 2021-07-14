@@ -66,6 +66,12 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
             # show_results(query_img_path, img_paths)
             global T_ALL
             T_ALL = t_all.stop()
+
+            with open("../experiments/result.txt", "w") as f:
+                img_names_pruned = [name.split(".")[0] for name in img_names]
+                for img_name in img_names_pruned:
+                    f.write(img_name + "\n")
+
         except Exception as e:
             print(e)
     else:
@@ -106,7 +112,7 @@ def find_similar_imgs(img_array, model, searcher):
     reduced_feature_query = reduce_features(normalized_feature_query, 40)
 
     global T_SEARCH
-    img_names, T_SEARCH = searcher.search(reduced_feature_query, 10)
+    img_names, T_SEARCH = searcher.search(reduced_feature_query, 20)
     return img_names
 
 
@@ -170,8 +176,4 @@ if __name__ == "__main__":
            cli=args["terminal"], dataset=args["dataset"])
 
     row = [T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
-    print(row)
     save_to_csv("../experiments/oxford.csv", row)
-
-
-print(T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL)
