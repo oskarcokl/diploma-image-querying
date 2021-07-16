@@ -110,7 +110,7 @@ def brute_force_search(query_img_path=None, dataset=""):
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
 
-        img_names = find_similar_imgs(
+        img_names = find_similar_imgs_force(
             img_array=img_array, model=model, searcher=searcher
         )
 
@@ -161,18 +161,6 @@ def find_similar_imgs_force(img_array, model, searcher):
     img_names, T_SEARCH = searcher.search_force(
         reduced_feature_query, reduced_feature_vectors, 20)
     return img_names
-
-
-def show_results(query_img_path, img_paths):
-    query_img = cv2.imread(query_img_path)
-    query_resized = cv2.resize(query_img, (720, 480))
-    cv2.imshow("Query", query_resized)
-
-    for img_path in img_paths:
-        result_img = cv2.imread(img_path)
-        result_resized = cv2.resize(result_img, (720, 480))
-        cv2.imshow("Result", result_resized)
-        cv2.waitKey(0)
 
 
 def find_similar_imgs(img_array, model, searcher):
@@ -229,6 +217,18 @@ def get_feature_vectors():
     feature_vectors = data_array[:, 2]
     result = [np.array(feature_vector) for feature_vector in feature_vectors]
     return np.array(result)
+
+
+def show_results(query_img_path, img_paths):
+    query_img = cv2.imread(query_img_path)
+    query_resized = cv2.resize(query_img, (720, 480))
+    cv2.imshow("Query", query_resized)
+
+    for img_path in img_paths:
+        result_img = cv2.imread(img_path)
+        result_resized = cv2.resize(result_img, (720, 480))
+        cv2.imshow("Result", result_resized)
+        cv2.waitKey(0)
 
 
 if __name__ == "__main__":
