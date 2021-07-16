@@ -223,7 +223,7 @@ def get_feature_vectors():
     return np.array(result)
 
 
-def get_feature_vectors():
+def get_img_names():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
     data = connector.cursor.fetchall()
@@ -232,6 +232,21 @@ def get_feature_vectors():
     img_names = data_array[:, 1]
     result = [np.array(img_name) for img_name in img_names]
     return np.array(result)
+
+
+def get_names_and_features():
+    connector = DbConnector()
+    connector.cursor.execute("SELECT * FROM cbir_index")
+    data = connector.cursor.fetchall()
+    data_array = np.array(data, dtype=object)
+
+    img_names = data_array[:, 1]
+    result_img_names = [np.array(img_name) for img_name in img_names]
+
+    feature_vectors = data_array[:, 2]
+    result_feature_vectors = [np.array(feature_vector)
+                              for feature_vector in feature_vectors]
+    return np.array(result_img_names), np.array(result_feature_vectors)
 
 
 def show_results(query_img_path, img_paths):
