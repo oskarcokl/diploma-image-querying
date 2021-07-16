@@ -50,7 +50,7 @@ def insert_image_vector(image_name, image_vector):
 
 # This function is intented to be run only when setting up the initial db.
 # WARNING! The function will drop cbir_index table if it already exists!
-def init_index(dataset_src):
+def init_db(dataset_src):
     command = """
         CREATE TABLE cbir_index (
             id SERIAL PRIMARY KEY,
@@ -270,7 +270,7 @@ if __name__ == "__main__":
     args = vars(argParser.parse_args())
 
     if args.get("init_db"):
-        init_index(args.get("dataset"))
+        init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
         root_node = init_cd_tree(data, 1, 3, 50, 6)
