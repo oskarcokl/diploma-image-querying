@@ -4,6 +4,7 @@ import pickle
 import ZODB
 import ZODB.FileStorage
 from codetiming import Timer
+from sklearn.neighbors import KNeighborsClassifier
 
 
 sys.path.insert(0, "../")
@@ -37,17 +38,22 @@ class Searcher:
         elapsed_time = search_time.stop()
         return img_names, elapsed_time
 
-    def search_force(self, query_features, feature_vectors, n_similar_images):
+    def search_force(self, query_features, feature_vectors, img_names, n_similar_images):
         search_time = Timer(name="Search", logger=None)
         search_time.start()
 
-        img_names = []
+        result_img_names = []
 
-        for i in range(n_similar_images):
-            img_names.append(result_images[i][2])
+        neighbors = KNeighborsClassifier(n_neighbors=1)
+        neighbors.fit(feature_vectors)
+        _, indexes = neighbors.kneighbors(
+            X=query_features, n_neighbors=n_similar_images)
+
+        for index in indexes:
+            result_img_names.append(img_names[index])
 
         elapsed_time = search_time.stop()
-        return img_names, elapsed_time
+        return result_img_names, elapsed_time
 
 
 if __name__ == "__main__":
