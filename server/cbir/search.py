@@ -151,7 +151,7 @@ def find_similar_imgs_force(img_array, model, searcher):
 
     n_components = 40
 
-    reduced_feature_query = reduce_features(
+    reduced_feature_query = reduce_features_query(
         normalized_feature_query, feature_vectors, n_components)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_vectors)
@@ -182,7 +182,7 @@ def find_similar_imgs(img_array, model, searcher):
     global T_DB
     T_DB = t_db.stop()
 
-    reduced_feature_query = reduce_features(
+    reduced_feature_query = reduce_features_query(
         normalized_feature_query, feature_vectors, 40)
 
     global T_SEARCH
@@ -191,7 +191,7 @@ def find_similar_imgs(img_array, model, searcher):
     return img_names
 
 
-def reduce_features(query_features, feature_vectors, n_components=100):
+def reduce_features_query(query_features, feature_vectors, n_components=100):
     t_feat_reduce = Timer(name="Feature reduction", logger=None)
     t_feat_reduce.start()
 
