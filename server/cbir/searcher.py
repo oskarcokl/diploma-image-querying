@@ -37,6 +37,18 @@ class Searcher:
         elapsed_time = search_time.stop()
         return img_names, elapsed_time
 
+    def search_force(self, query_features, feature_vectors, n_similar_images):
+        search_time = Timer(name="Search", logger=None)
+        search_time.start()
+
+        img_names = []
+
+        for i in range(n_similar_images):
+            img_names.append(result_images[i][2])
+
+        elapsed_time = search_time.stop()
+        return img_names, elapsed_time
+
 
 if __name__ == "__main__":
     query_feature_vector = []

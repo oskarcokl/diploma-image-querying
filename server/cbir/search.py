@@ -84,6 +84,85 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         return img_names
 
 
+def brute_force_search(query_img_path=None, dataset=""):
+    t_all = Timer(name="All", logger=None)
+    t_all.start()
+    t_model = Timer(name="Model", logger=None)
+    t_model.start()
+
+    if os.path.isdir("./vgg16"):
+        print("Model already downloaded loading from disk.")
+        model = keras.models.load_model("./vgg16")
+    else:
+        print("Downloading model.")
+        model = VGG16(
+            weights="imagenet",
+        )
+        print("Saving model to disk.")
+        model.save("./vgg16")
+
+    global T_MODEL
+    T_MODEL = t_model.stop()
+    searcher = Searcher()
+
+    try:
+        img = image.load_img(query_img_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+
+        img_names = find_similar_imgs(
+            img_array=img_array, model=model, searcher=searcher
+        )
+
+        img_paths = [os.path.join(dataset, img_name)
+                     for img_name in img_names]
+
+        show_results(query_img_path, img_paths)
+        global T_ALL
+        T_ALL = t_all.stop()
+
+        with open("../experiments/result.txt", "w") as f:
+            img_names_pruned = [name.split(".")[0] for name in img_names]
+            for img_name in img_names_pruned:
+                f.write(img_name + "\n")
+
+    except Exception as e:
+        print(e)
+
+
+def find_similar_imgs_force(img_array, model, searcher):
+    processed_img_array = preprocess_input(img_array)
+    get_fc2_layer_output = K.function(
+        [model.layers[0].input], model.layers[21].output)
+    features_query = get_fc2_layer_output([processed_img_array])[0]
+
+    t_norm = Timer(name="Normalization", logger=None)
+    t_norm.start()
+    normalized_feature_query = preprocessing.normalize(
+        features_query.reshape(1, -1), norm="max")
+    global T_NORMALIZATION
+    T_NORMALIZATION = t_norm.stop()
+
+    t_db = Timer(name="Database", logger=None)
+    t_db.start()
+    feature_vectors = get_feature_vectors()
+    global T_DB
+    T_DB = t_db.stop()
+
+    n_components = 40
+
+    reduced_feature_query = reduce_features(
+        normalized_feature_query, feature_vectors, n_components)
+    svd = TruncatedSVD(n_components=n_components)
+    svd.fit(feature_vectors)
+    reduced_feature_vectors = svd.transform(feature_vectors)
+
+    global T_SEARCH
+    img_names, T_SEARCH = searcher.search_force(
+        reduced_feature_query, reduced_feature_vectors, 20)
+    return img_names
+
+
 def show_results(query_img_path, img_paths):
     query_img = cv2.imread(query_img_path)
     query_resized = cv2.resize(query_img, (720, 480))
@@ -109,22 +188,22 @@ def find_similar_imgs(img_array, model, searcher):
     global T_NORMALIZATION
     T_NORMALIZATION = t_norm.stop()
 
-    reduced_feature_query = reduce_features(normalized_feature_query, 40)
-
-    global T_SEARCH
-    img_names, T_SEARCH = searcher.search(reduced_feature_query, 20)
-    return img_names
-
-
-def reduce_features(query_features, n_components=100):
     t_db = Timer(name="Database", logger=None)
     t_db.start()
-
-    feature_vectors = get_data()
-
+    feature_vectors = get_feature_vectors()
     global T_DB
     T_DB = t_db.stop()
 
+    reduced_feature_query = reduce_features(
+        normalized_feature_query, feature_vectors, 40)
+
+    global T_SEARCH
+    img_names, T_SEARCH = searcher.search(
+        reduced_feature_query, 20)
+    return img_names
+
+
+def reduce_features(query_features, feature_vectors, n_components=100):
     t_feat_reduce = Timer(name="Feature reduction", logger=None)
     t_feat_reduce.start()
 
@@ -141,7 +220,7 @@ def reduce_features(query_features, n_components=100):
     return query_reduced
 
 
-def get_data():
+def get_feature_vectors():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
     data = connector.cursor.fetchall()
@@ -164,16 +243,24 @@ if __name__ == "__main__":
         action="store_true",
     )
     argParser.add_argument(
+        "-F",
+        "--force",
+        help="Choose the brute force search.",
+        action="store_true",
+    )
+    argParser.add_argument(
         "-d",
         "--dataset",
         help="Path to where images are being stored"
     )
     args = vars(argParser.parse_args())
 
-    print(args["terminal"])
-
-    search(query_img_path=args["query"],
-           cli=args["terminal"], dataset=args["dataset"])
+    if (args["force"]):
+        brute_force_search(
+            query_img_path=args["query"], dataset=args["dataset"])
+    else:
+        search(query_img_path=args["query"],
+               cli=args["terminal"], dataset=args["dataset"])
 
     row = [T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
     save_to_csv("../experiments/oxford.csv", row)
