@@ -49,7 +49,7 @@ class Searcher:
         _, indexes = neighbors.kneighbors(
             X=query_features, n_neighbors=n_similar_images)
 
-        for index in indexes:
+        for index in indexes[0]:
             result_img_names.append(img_names[index])
 
         elapsed_time = search_time.stop()
