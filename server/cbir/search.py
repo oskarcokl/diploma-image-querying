@@ -163,7 +163,7 @@ def find_similar_imgs_force(img_array, model, searcher):
 
     global T_SEARCH
     result_img_names, T_SEARCH = searcher.search_force(
-        reduced_feature_query, reduced_feature_vectors, 20)
+        reduced_feature_query, reduced_feature_vectors, img_names, 20)
     return result_img_names
 
 

@@ -4,7 +4,7 @@ import pickle
 import ZODB
 import ZODB.FileStorage
 from codetiming import Timer
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import NearestNeighbors
 
 
 sys.path.insert(0, "../")
@@ -44,10 +44,10 @@ class Searcher:
 
         result_img_names = []
 
-        neighbors = KNeighborsClassifier(n_neighbors=1)
+        neighbors = NearestNeighbors(n_neighbors=1)
         neighbors.fit(feature_vectors)
         _, indexes = neighbors.kneighbors(
-            X=query_features, n_neighbors=n_similar_images)
+            X=query_features.reshape(1, -1), n_neighbors=n_similar_images)
 
         for index in indexes[0]:
             result_img_names.append(img_names[index])
