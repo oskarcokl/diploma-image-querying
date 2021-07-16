@@ -153,14 +153,18 @@ def find_similar_imgs_force(img_array, model, searcher):
 
     reduced_feature_query = reduce_features_query(
         normalized_feature_query, feature_vectors, n_components)
+    # We are almost doing the same operation twice. but since we are adding
+    # the query features in reduce features query. The reduction would not be the same.
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_vectors)
     reduced_feature_vectors = svd.transform(feature_vectors)
 
+    img_names = get_img_names()
+
     global T_SEARCH
-    img_names, T_SEARCH = searcher.search_force(
+    result_img_names, T_SEARCH = searcher.search_force(
         reduced_feature_query, reduced_feature_vectors, 20)
-    return img_names
+    return result_img_names
 
 
 def find_similar_imgs(img_array, model, searcher):
@@ -216,6 +220,17 @@ def get_feature_vectors():
 
     feature_vectors = data_array[:, 2]
     result = [np.array(feature_vector) for feature_vector in feature_vectors]
+    return np.array(result)
+
+
+def get_feature_vectors():
+    connector = DbConnector()
+    connector.cursor.execute("SELECT * FROM cbir_index")
+    data = connector.cursor.fetchall()
+    data_array = np.array(data, dtype=object)
+
+    img_names = data_array[:, 1]
+    result = [np.array(img_name) for img_name in img_names]
     return np.array(result)
 
 
