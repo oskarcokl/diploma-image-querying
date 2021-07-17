@@ -214,28 +214,29 @@ def _compute_cpd(feature_vector, mean, cov_array):
     # (2π)^(−d/2) * |Σi|^(−1/2) * exp(−1/2(X−μi)TΣ−1i(X−μi)).
     # Function calculates the above equation
     # All the bad var names are made on a saturday ad 20:55 pls forgive me.
-    # TODO first component is probably not useful. Calculate determinante in
-    # a better way since it's diagonal
 
-    try:
-        cov_array_dig = np.diag(cov_array)
-        det_cov_array = np.prod(cov_array)
-        # b = det_cov_array
-        b = np.power(det_cov_array, -0.5)
-        if np.isnan(b):
-            print(f"Determinant {det_cov_array}")
-            return 0
+    cov_array_dig = np.diag(cov_array)
+    det_cov_array = np.prod(cov_array)
 
-        c = np.exp(
-            -0.5
-            * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array_dig)),
-                        (feature_vector - mean),
-                        )
-        )
-        cpd = b * c
-        return cpd
-    except:
+    print(np.linalg.det(cov_array_dig))
+    print(det_cov_array)
+
+    if (det_cov_array == 0):
         return 0
+
+    b = np.power(det_cov_array, -0.5)
+    if np.isnan(b):
+        print(f"Determinant {det_cov_array}")
+        return 0
+
+    c = np.exp(
+        -0.5
+        * np.matmul(np.matmul((feature_vector - mean).T, np.linalg.inv(cov_array_dig)),
+                    (feature_vector - mean),
+                    )
+    )
+    cpd = b * c
+    return cpd
 
 
 def _compute_means_and_covs(m, feature_vector, mean, cov_array):
