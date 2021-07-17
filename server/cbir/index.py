@@ -100,13 +100,7 @@ def init_db(dataset_src):
 
     bar.finish()
 
-    # TODO if this method works rename the variable
-    normalized_feature_list = shift_features(feature_list, 10)
-
-    # for n_features in normalized_feature_list:
-    #     print(f"max: {np.max(n_features)}, min: {np.min(n_features)}")
-
-    tuple_list = list(zip(img_name_list, normalized_feature_list))
+    tuple_list = list(zip(img_name_list, feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
 
