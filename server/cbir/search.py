@@ -149,13 +149,13 @@ def find_similar_imgs_force(img_array, model, searcher):
     global T_DB
     T_DB = t_db.stop()
 
-    n_components = 40
+    n_features = 80
 
     reduced_feature_query = reduce_features_query(
-        normalized_feature_query, feature_vectors, n_components)
+        normalized_feature_query, feature_vectors, n_features)
     # We are almost doing the same operation twice. but since we are adding
     # the query features in reduce features query. The reduction would not be the same.
-    svd = TruncatedSVD(n_components=n_components)
+    svd = TruncatedSVD(n_components=n_features)
     svd.fit(feature_vectors)
     reduced_feature_vectors = svd.transform(feature_vectors)
 
