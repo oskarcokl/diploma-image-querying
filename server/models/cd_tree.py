@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import linalg
 from numpy.core.numeric import Inf
 from sklearn import mixture
 
@@ -62,8 +63,10 @@ def init_cd_tree(
 
             #print(f"Choosing {n_clusters} clusters")
 
+            covs = _get_covs_array(best_model.precisions_)
+
             node_gmm_parameters = {
-                "covs_array": best_model.covariances_,
+                "covs_array": covs,
                 "means": best_model.means_,
                 "weights": best_model.weights_,
             }
@@ -94,6 +97,21 @@ def init_cd_tree(
             curr_node = stack.pop()
         else:
             return root_node
+
+
+def _get_covs_array(precisions):
+    """
+    Get precisions array and convert it to covs array
+    by calculating the inverse.
+    """
+    new_covs_list = []
+    for precision in precisions:
+        precision_mat = np.diag(precision)
+        precision_mat_i = np.linalg.inv(precision_mat)
+        precision_mat_i_diag = np.diag(precision_mat_i)
+        new_covs_list.append(precision_mat_i_diag)
+
+    return np.array(new_covs_list)
 
 
 def _asign_ids_to_clusters(ids, cluster_asigments):
