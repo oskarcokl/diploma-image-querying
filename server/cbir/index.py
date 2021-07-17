@@ -100,11 +100,24 @@ def init_db(dataset_src):
 
     bar.finish()
 
-    normalized_feature_list = normalize_sk_learn(feature_list)
+    # TODO if this method works rename the variable
+    normalized_feature_list = shift_features(feature_list, 10)
+
+    # for n_features in normalized_feature_list:
+    #     print(f"max: {np.max(n_features)}, min: {np.min(n_features)}")
 
     tuple_list = list(zip(img_name_list, normalized_feature_list))
 
     table_operations.insert_tuple_list(tuple_list)
+
+
+def shift_features(features_list, scalar=1000):
+    scaled_features_list = []
+
+    for feature_vector in features_list:
+        scaled_features_list.append((feature_vector * scalar).tolist())
+
+    return scaled_features_list
 
 
 def normalize_sk_learn(feature_list):
