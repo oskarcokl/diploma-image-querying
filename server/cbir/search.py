@@ -114,13 +114,6 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
 
     features_query = backbone.get_features(processed_img_array)
 
-    t_norm = Timer(name="Normalization", logger=None)
-    t_norm.start()
-    normalized_feature_query = preprocessing.normalize(
-        features_query.reshape(1, -1), norm="l1")
-    global T_NORMALIZATION
-    T_NORMALIZATION = t_norm.stop()
-
     t_db = Timer(name="Database", logger=None)
     t_db.start()
     feature_vectors = get_feature_vectors()
