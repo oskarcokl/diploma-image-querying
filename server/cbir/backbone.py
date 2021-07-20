@@ -6,9 +6,17 @@ from keras.models import Model
 
 
 class Backbone:
+    """
+    The class will be used for loading a CNN model and extracting
+    features from images with said model. 
+    """
     model = None
 
     def load_model(self):
+        """
+        Loads model either from disk if it is already downloaded or
+        it downloads it from the internet.
+        """
         if os.path.isdir("./vgg16"):
             model = self._load_model_from_disk()
         else:
