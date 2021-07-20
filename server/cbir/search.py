@@ -139,7 +139,7 @@ def find_similar_imgs_force(img_array, model, searcher):
     t_norm = Timer(name="Normalization", logger=None)
     t_norm.start()
     normalized_feature_query = preprocessing.normalize(
-        features_query.reshape(1, -1), norm="max")
+        features_query.reshape(1, -1), norm="l1")
     global T_NORMALIZATION
     T_NORMALIZATION = t_norm.stop()
 
@@ -173,12 +173,12 @@ def find_similar_imgs(img_array, model, searcher):
         [model.layers[0].input], model.layers[22].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
-    # t_norm = Timer(name="Normalization", logger=None)
-    # t_norm.start()
-    # normalized_feature_query = preprocessing.normalize(
-    #     features_query.reshape(1, -1), norm="max")
-    # global T_NORMALIZATION
-    # T_NORMALIZATION = t_norm.stop()
+    t_norm = Timer(name="Normalization", logger=None)
+    t_norm.start()
+    normalized_feature_query = preprocessing.normalize(
+        features_query.reshape(1, -1), norm="l1")
+    global T_NORMALIZATION
+    T_NORMALIZATION = t_norm.stop()
 
     t_db = Timer(name="Database", logger=None)
     t_db.start()
@@ -187,7 +187,7 @@ def find_similar_imgs(img_array, model, searcher):
     T_DB = t_db.stop()
 
     reduced_feature_query = reduce_features_query(
-        features_query.reshape(1, -1), feature_vectors, 70)
+        normalized_feature_query, feature_vectors, 70)
 
     global T_SEARCH
     img_names, T_SEARCH = searcher.search(
