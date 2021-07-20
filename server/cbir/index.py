@@ -70,7 +70,7 @@ def init_db(dataset_src):
     img_name_list = []
     feature_list = []
 
-    bar = Bar("Extracting features", max=len(os.listdir(dataset_src)))
+    #bar = Bar("Extracting features", max=len(os.listdir(dataset_src)))
 
     for img_name in os.listdir(dataset_src):
         img_path = os.path.join(dataset_src, img_name)
@@ -79,13 +79,13 @@ def init_db(dataset_src):
         img_array = np.expand_dims(img_array, axis=0)
         img_array = preprocess_input(img_array)
 
-        features = backbone.get_features(img)
+        features = backbone.get_features(img_array)
 
         img_name_list.append(img_name)
         feature_list.append(features.tolist())
-        bar.next()
+    #     bar.next()
 
-    bar.finish()
+    # bar.finish()
 
     tuple_list = list(zip(img_name_list, feature_list))
 

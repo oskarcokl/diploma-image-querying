@@ -130,7 +130,7 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
     n_features = 200
 
     reduced_feature_query = reduce_features_query(
-        normalized_feature_query, feature_vectors, n_features)
+        features_query.reshape(1, -1), feature_vectors, n_features)
     # We are almost doing the same operation twice. but since we are adding
     # the query features in reduce features query. The reduction would not be the same.
     svd = TruncatedSVD(n_components=n_features)
@@ -150,12 +150,12 @@ def find_similar_imgs(img_array, backbone: Backbone, searcher):
 
     features_query = backbone.get_features(processed_img_array)
 
-    t_norm = Timer(name="Normalization", logger=None)
-    t_norm.start()
-    normalized_feature_query = preprocessing.normalize(
-        features_query.reshape(1, -1), norm="l1")
-    global T_NORMALIZATION
-    T_NORMALIZATION = t_norm.stop()
+    # t_norm = Timer(name="Normalization", logger=None)
+    # t_norm.start()
+    # normalized_feature_query = preprocessing.normalize(
+    #     features_query.reshape(1, -1), norm="l1")
+    # global T_NORMALIZATION
+    # T_NORMALIZATION = t_norm.stop()
 
     t_db = Timer(name="Database", logger=None)
     t_db.start()
@@ -196,8 +196,9 @@ def get_feature_vectors():
     data_array = np.array(data, dtype=object)
 
     feature_vectors = data_array[:, 2]
-    result = [np.array(feature_vector) for feature_vector in feature_vectors]
-    return np.array(result)
+    result = np.array([np.array(feature_vector)
+                       for feature_vector in feature_vectors])
+    return result
 
 
 def get_img_names():
