@@ -13,6 +13,9 @@ class Backbone:
     """
     model = None
 
+    def __init__(self):
+        self.model = self.load_model()
+
     def load_model(self):
         """
         Loads model either from disk if it is already downloaded or
@@ -24,8 +27,8 @@ class Backbone:
             model = self._download_model()
             self._save_model_to_disk(model)
 
-        self.model = Model(inputs=model.inputs,
-                           outputs=model.layers[-2].output)
+        return Model(inputs=model.inputs,
+                     outputs=model.layers[-2].output)
 
     def _load_model_from_disk(self):
         print("Model already downloaded loading from disk.")
