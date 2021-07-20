@@ -1,9 +1,9 @@
+import logging
 import os
-from PIL.Image import RASTERIZE
 
-from tensorflow import keras
 from keras.applications.vgg16 import VGG16
 from keras.models import Model
+from tensorflow import keras
 
 
 class Backbone:
@@ -31,19 +31,19 @@ class Backbone:
                      outputs=model.layers[-2].output)
 
     def _load_model_from_disk(self):
-        print("Model already downloaded loading from disk.")
+        logging.info("Model already downloaded loading from disk.")
         model = keras.models.load_model("./vgg16")
         return model
 
     def _download_model(self):
-        print("Downloading model.")
+        logging.info("Downloading model.")
         model = VGG16(
             weights="imagenet",
         )
         return model
 
     def _save_model_to_disk(self, model):
-        print("Saving model to disk.")
+        logging.info("Saving model to disk.")
         model.save("./vgg16")
 
     def get_features(self, img):
