@@ -41,3 +41,14 @@ class Backbone:
     def _save_model_to_disk(self, model):
         print("Saving model to disk.")
         model.save("./vgg16")
+
+    def get_features(self, img):
+        """
+        Function extracs features from preprocessed img and returns them.
+
+        Parameters:
+            img: np.ndarray
+
+        """
+        features = self.mode.predict(img)
+        return features
