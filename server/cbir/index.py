@@ -90,12 +90,12 @@ def init_db(dataset_src):
         img_array = preprocess_input(img_array)
 
         get_fc2_layer_output = K.function(
-            [model.layers[0].input], model.layers[21].output
+            [model.layers[0].input], model.layers[20].output
         )
         features = get_fc2_layer_output([img_array])[0]
 
         img_name_list.append(img_name)
-        feature_list.append(features)
+        feature_list.append(features.tolist())
         bar.next()
 
     bar.finish()
@@ -117,7 +117,7 @@ def shift_features(features_list, scalar=1000):
 def normalize_sk_learn(feature_list):
     feature_array = np.array(feature_list)
     normalized_feature_array = preprocessing.normalize(
-        feature_array, norm="max")
+        feature_array, norm="l1")
     normalized_feature_list = normalized_feature_array.tolist()
 
     return normalized_feature_list
@@ -168,7 +168,7 @@ def reduce_features(feature_list, n_components=100):
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
-    reduced_feature_vectors = reduce_features(feature_vectors, 40)
+    reduced_feature_vectors = reduce_features(feature_vectors, 200)
     new_data = []
     for i, item in enumerate(data):
         # Appending tuples here.
@@ -280,7 +280,7 @@ if __name__ == "__main__":
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 3, 50, 6)
+        root_node = init_cd_tree(data, 1, 5, 20, 6)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))

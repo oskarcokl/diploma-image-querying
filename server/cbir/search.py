@@ -133,7 +133,7 @@ def brute_force_search(query_img_path=None, dataset=""):
 def find_similar_imgs_force(img_array, model, searcher):
     processed_img_array = preprocess_input(img_array)
     get_fc2_layer_output = K.function(
-        [model.layers[0].input], model.layers[21].output)
+        [model.layers[0].input], model.layers[20].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
     t_norm = Timer(name="Normalization", logger=None)
@@ -149,7 +149,7 @@ def find_similar_imgs_force(img_array, model, searcher):
     global T_DB
     T_DB = t_db.stop()
 
-    n_features = 80
+    n_features = 200
 
     reduced_feature_query = reduce_features_query(
         normalized_feature_query, feature_vectors, n_features)
@@ -170,15 +170,15 @@ def find_similar_imgs_force(img_array, model, searcher):
 def find_similar_imgs(img_array, model, searcher):
     processed_img_array = preprocess_input(img_array)
     get_fc2_layer_output = K.function(
-        [model.layers[0].input], model.layers[21].output)
+        [model.layers[0].input], model.layers[22].output)
     features_query = get_fc2_layer_output([processed_img_array])[0]
 
-    t_norm = Timer(name="Normalization", logger=None)
-    t_norm.start()
-    normalized_feature_query = preprocessing.normalize(
-        features_query.reshape(1, -1), norm="max")
-    global T_NORMALIZATION
-    T_NORMALIZATION = t_norm.stop()
+    # t_norm = Timer(name="Normalization", logger=None)
+    # t_norm.start()
+    # normalized_feature_query = preprocessing.normalize(
+    #     features_query.reshape(1, -1), norm="max")
+    # global T_NORMALIZATION
+    # T_NORMALIZATION = t_norm.stop()
 
     t_db = Timer(name="Database", logger=None)
     t_db.start()
@@ -187,7 +187,7 @@ def find_similar_imgs(img_array, model, searcher):
     T_DB = t_db.stop()
 
     reduced_feature_query = reduce_features_query(
-        normalized_feature_query, feature_vectors, 40)
+        features_query.reshape(1, -1), feature_vectors, 70)
 
     global T_SEARCH
     img_names, T_SEARCH = searcher.search(

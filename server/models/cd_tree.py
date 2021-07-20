@@ -218,9 +218,6 @@ def _compute_cpd(feature_vector, mean, cov_array):
     cov_array_dig = np.diag(cov_array)
     det_cov_array = np.prod(cov_array)
 
-    print(np.linalg.det(cov_array_dig))
-    print(det_cov_array)
-
     if (det_cov_array == 0):
         return 0
 
