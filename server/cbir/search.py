@@ -4,7 +4,7 @@ import os
 import cv2
 import numpy as np
 from searcher import Searcher
-from tensorflow.keras.applications.vgg16 import preprocess_input
+from tensorflow.keras.applications.resnet import preprocess_input
 from tensorflow.keras.preprocessing import image
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
@@ -164,7 +164,7 @@ def find_similar_imgs(img_array, backbone: Backbone, searcher):
     T_DB = t_db.stop()
 
     reduced_feature_query = reduce_features_query(
-        normalized_feature_query, feature_vectors, 70)
+        features_query.reshape(1, -1), feature_vectors, 140)
 
     global T_SEARCH
     img_names, T_SEARCH = searcher.search(

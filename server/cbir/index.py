@@ -6,10 +6,8 @@ import pickle
 import psycopg2
 import numpy as np
 from tensorflow import keras
-from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.applications.vgg16 import preprocess_input
+from tensorflow.keras.applications.resnet import preprocess_input
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras import backend as K
 import ZODB
 import ZODB.FileStorage
 import BTrees
@@ -157,7 +155,8 @@ def reduce_features(feature_list, n_components=100):
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
-    reduced_feature_vectors = reduce_features(feature_vectors, 200)
+    normalized_feature_vectors = normalize_sk_learn(feature_vectors)
+    reduced_feature_vectors = reduce_features(feature_vectors, 140)
     new_data = []
     for i, item in enumerate(data):
         # Appending tuples here.
