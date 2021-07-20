@@ -19,8 +19,7 @@ sys.path.insert(0, "./")
 
 from db_utils.db_connector import DbConnector
 from csv_writer import save_to_csv
-from term_colors import TerminalColors
-from server.cbir.backbone import Backbone
+from backbone import Backbone
 
 T_FEAT_REDUCTION = 0
 T_SEARCH = 0

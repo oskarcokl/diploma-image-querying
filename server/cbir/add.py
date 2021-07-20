@@ -18,6 +18,7 @@ import sys
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 from adder import Adder, ZODBConnector
+from backbone import Backbone
 from db_utils.db_connector import DbConnector
 
 
