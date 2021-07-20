@@ -1,14 +1,10 @@
 import argparse
 from functools import reduce
 import os
-from server.cbir.backbone import Backbone
 
 
-from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
-from tensorflow.keras import backend as K
 from tensorflow.keras.preprocessing import image
-from tensorflow import keras
 from sklearn import preprocessing
 from sklearn.decomposition import TruncatedSVD
 import numpy as np

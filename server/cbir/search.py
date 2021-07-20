@@ -4,11 +4,8 @@ import os
 import cv2
 import numpy as np
 from searcher import Searcher
-from tensorflow import keras
-from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras import backend as K
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
 from codetiming import Timer
