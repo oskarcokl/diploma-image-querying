@@ -1,4 +1,5 @@
 import os
+from PIL.Image import RASTERIZE
 
 from tensorflow import keras
 from keras.applications.vgg16 import VGG16
@@ -45,10 +46,16 @@ class Backbone:
     def get_features(self, img):
         """
         Function extracs features from preprocessed img and returns them.
+        Before calling this function load_model must be called.
 
         Parameters:
             img: np.ndarray
 
         """
-        features = self.mode.predict(img)
+        if self.model is not None:
+            features = self.mode.predict(img)
+        else:
+            raise RuntimeError(
+                "Model not loaded. Use load_model() to load it.")
+
         return features
