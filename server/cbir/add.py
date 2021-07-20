@@ -1,6 +1,7 @@
 import argparse
 from functools import reduce
 import os
+from server.cbir.backbone import Backbone
 
 
 from tensorflow.keras.applications.vgg16 import VGG16
@@ -21,16 +22,7 @@ from db_utils.db_connector import DbConnector
 
 
 def add_cli(img_list):
-    if os.path.isdir("./vgg16"):
-        print("Model already downloaded loading from disk.")
-        model = keras.models.load_model("./vgg16")
-    else:
-        print("Downloading model.")
-        model = VGG16(
-            weights="imagenet",
-        )
-        print("Saving model to disk.")
-        model.save("./vgg16")
+    backbone = Backbone()
 
     img_name_list = []
     feature_list = []
@@ -43,10 +35,7 @@ def add_cli(img_list):
         img_array = np.expand_dims(img_array, axis=0)
         img_array = preprocess_input(img_array)
 
-        get_fc2_layer_output = K.function(
-            [model.layers[0].input], model.layers[22].output
-        )
-        features = get_fc2_layer_output([img_array])[0]
+        features = backbone.get_features()
 
         img_name_list.append(img_name)
         feature_list.append(features)
