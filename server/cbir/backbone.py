@@ -56,7 +56,7 @@ class Backbone:
 
         """
         if self.model is not None:
-            features = self.mode.predict(img)
+            features = self.model.predict(img)
         else:
             raise RuntimeError(
                 "Model not loaded. Use load_model() to load it.")
