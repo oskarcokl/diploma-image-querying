@@ -20,6 +20,7 @@ sys.path.insert(0, "./")
 from db_utils.db_connector import DbConnector
 from csv_writer import save_to_csv
 from term_colors import TerminalColors
+from server.cbir.backbone import Backbone
 
 T_FEAT_REDUCTION = 0
 T_SEARCH = 0
@@ -35,16 +36,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
     t_model = Timer(name="Model", logger=None)
     t_model.start()
 
-    if os.path.isdir("./vgg16"):
-        print("Model already downloaded loading from disk.")
-        model = keras.models.load_model("./vgg16")
-    else:
-        print("Downloading model.")
-        model = VGG16(
-            weights="imagenet",
-        )
-        print("Saving model to disk.")
-        model.save("./vgg16")
+    backbone = Backbone()
 
     global T_MODEL
     T_MODEL = t_model.stop()
@@ -57,7 +49,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
             img_array = np.expand_dims(img_array, axis=0)
 
             img_names = find_similar_imgs(
-                img_array=img_array, model=model, searcher=searcher
+                img_array=img_array, backbone=backbone, searcher=searcher
             )
 
             img_paths = [os.path.join(dataset, img_name)
@@ -79,7 +71,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         img_array = np.expand_dims(query_img_array, axis=0)
 
         img_names = find_similar_imgs(
-            img_array=img_array, model=model, searcher=searcher
+            img_array=img_array, backbone=backbone, searcher=searcher
         )
         return img_names
 
@@ -90,16 +82,7 @@ def brute_force_search(query_img_path=None, dataset=""):
     t_model = Timer(name="Model", logger=None)
     t_model.start()
 
-    if os.path.isdir("./vgg16"):
-        print("Model already downloaded loading from disk.")
-        model = keras.models.load_model("./vgg16")
-    else:
-        print("Downloading model.")
-        model = VGG16(
-            weights="imagenet",
-        )
-        print("Saving model to disk.")
-        model.save("./vgg16")
+    backbone = Backbone()
 
     global T_MODEL
     T_MODEL = t_model.stop()
@@ -111,7 +94,7 @@ def brute_force_search(query_img_path=None, dataset=""):
         img_array = np.expand_dims(img_array, axis=0)
 
         img_names = find_similar_imgs_force(
-            img_array=img_array, model=model, searcher=searcher
+            img_array=img_array, backbone=backbone, searcher=searcher
         )
 
         img_paths = [os.path.join(dataset, img_name)
@@ -130,11 +113,10 @@ def brute_force_search(query_img_path=None, dataset=""):
         print(e)
 
 
-def find_similar_imgs_force(img_array, model, searcher):
+def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
     processed_img_array = preprocess_input(img_array)
-    get_fc2_layer_output = K.function(
-        [model.layers[0].input], model.layers[20].output)
-    features_query = get_fc2_layer_output([processed_img_array])[0]
+
+    features_query = backbone.get_features(processed_img_array)
 
     t_norm = Timer(name="Normalization", logger=None)
     t_norm.start()
@@ -167,11 +149,10 @@ def find_similar_imgs_force(img_array, model, searcher):
     return result_img_names
 
 
-def find_similar_imgs(img_array, model, searcher):
+def find_similar_imgs(img_array, backbone: Backbone, searcher):
     processed_img_array = preprocess_input(img_array)
-    get_fc2_layer_output = K.function(
-        [model.layers[0].input], model.layers[22].output)
-    features_query = get_fc2_layer_output([processed_img_array])[0]
+
+    features_query = backbone.get_features(processed_img_array)
 
     t_norm = Timer(name="Normalization", logger=None)
     t_norm.start()
