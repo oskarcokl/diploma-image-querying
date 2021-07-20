@@ -115,8 +115,9 @@ __pycache__/
 # Ignore db connection setting file
 database.ini
 
-# Ignore downloaded vgg16 model
+# Ignore downloaded models
 vgg16
+resnet101
 
 # Ignore dataset images still need to figure out a good way of storing them.
 dataset
