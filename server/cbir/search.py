@@ -10,7 +10,6 @@ from sklearn import preprocessing
 from codetiming import Timer
 
 import sys
-sys.path.insert(0, "./cbir")
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 
