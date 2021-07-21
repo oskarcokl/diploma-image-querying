@@ -11,7 +11,8 @@ def make_queries(file_name):
         print(lines)
         for line in lines:
             query_img_name = line[:-1]
-            query_img_path = os.path.join("../vacations", query_img_name)
+            query_img_path = os.path.join(
+                "../../dataset/vacations", query_img_name)
 
             print(query_img_path)
             # search(query_img_name, cli=True, dataset="")
