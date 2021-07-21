@@ -1,10 +1,9 @@
 import argparse
 import os
-import sys
 
 
 from cbir import search
-sys.path.insert(0, "./cbir/")
+
 
 def make_queries(file_name):
     with open(file_name, "r") as f:

@@ -12,6 +12,7 @@ from codetiming import Timer
 import sys
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
+sys.path.insert(0, "./cbir/")
 
 from db_utils.db_connector import DbConnector
 from csv_writer import save_to_csv
