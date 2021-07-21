@@ -3,7 +3,6 @@ import os
 
 import cv2
 import numpy as np
-from searcher import Searcher
 from tensorflow.keras.applications.resnet import preprocess_input
 from tensorflow.keras.preprocessing import image
 from sklearn.decomposition import TruncatedSVD
@@ -11,12 +10,14 @@ from sklearn import preprocessing
 from codetiming import Timer
 
 import sys
+sys.path.insert(0, "./cbir")
 sys.path.insert(0, "../")
 sys.path.insert(0, "./")
 
 from db_utils.db_connector import DbConnector
 from csv_writer import save_to_csv
 from backbone import Backbone
+from searcher import Searcher
 
 T_FEAT_REDUCTION = 0
 T_SEARCH = 0
