@@ -40,29 +40,38 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
     searcher = Searcher()
 
     if cli:
-        try:
-            img = image.load_img(query_img_path, target_size=(224, 224))
-            img_array = image.img_to_array(img)
-            img_array = np.expand_dims(img_array, axis=0)
+        img = image.load_img(query_img_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
 
-            img_names = find_similar_imgs(
-                img_array=img_array, backbone=backbone, searcher=searcher
-            )
+        print("Finding similar images")
 
-            img_paths = [os.path.join(dataset, img_name)
-                         for img_name in img_names]
+        img_names = find_similar_imgs(
+            img_array=img_array, backbone=backbone, searcher=searcher
+        )
 
-            show_results(query_img_path, img_paths)
-            global T_ALL
-            T_ALL = t_all.stop()
+        # TODO uncomment
+        # img_paths = [os.path.join(dataset, img_name)
+        #              for img_name in img_names]
 
-            with open("../experiments/result.txt", "w") as f:
-                img_names_pruned = [name.split(".")[0] for name in img_names]
-                for img_name in img_names_pruned:
-                    f.write(img_name + "\n")
+        # show_results(query_img_path, img_paths)
+        # global T_ALL
+        # T_ALL = t_all.stop()
 
-        except Exception as e:
-            print(e)
+        # Only to be used while evaluating system.
+        ranked_img_names = []
+        for i, img_name in enumerate(img_names):
+            ranked_img_name = " ".join((str(i), img_name))
+            ranked_img_names.append(ranked_img_name)
+
+        line = " ".join(ranked_img_names)
+        return line
+
+        # with open("../experiments/result.txt", "wa") as f:
+        #     img_names_pruned = [name.split(".")[0] for name in img_names]
+        #     for img_name in img_names_pruned:
+        #         f.write(img_name + "\n")
+
     else:
         query_img_array = np.array(query_img_list)
         img_array = np.expand_dims(query_img_array, axis=0)
