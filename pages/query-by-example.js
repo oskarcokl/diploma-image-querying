@@ -13,6 +13,7 @@ import SectionTitle from "../components/sectionTitle";
 const API = "http://localhost:8888/";
 
 export default function QueryByExample(params) {
+  const [selectedFile, setSelectedFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
 
@@ -30,9 +31,7 @@ export default function QueryByExample(params) {
     console.log("Uploading images to server.");
 
     const data = new FormData();
-    for (let i = 0; i < selectedFiles.length; i++) {
-      data.append("file", selectedFiles[i]);
-    }
+    data.append("file", selectedFile);
 
     axios
       .post(API + "cbir-query", data, {
@@ -60,6 +59,7 @@ export default function QueryByExample(params) {
     const exampleImageURL = URL.createObjectURL(event.target.files[0]);
 
     setImageSrc(exampleImageURL);
+    setSelectedFile(event.target.files[0]);
     queryByExample();
   };
 
