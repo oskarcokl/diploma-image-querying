@@ -17,6 +17,9 @@ export default function QueryByExample(params) {
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
 
+  console.log(imageSrc);
+  console.log(resultImages);
+
   const setResultImages = (src) => {
     const temp = [];
     for (let i = 0; i < src.length; i++) temp.push(src[i]);
