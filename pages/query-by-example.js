@@ -17,9 +17,6 @@ export default function QueryByExample(params) {
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
 
-  console.log(imageSrc);
-  console.log(resultImages);
-
   const setResultImages = (src) => {
     const temp = [];
     for (let i = 0; i < src.length; i++) temp.push(src[i]);
@@ -27,11 +24,11 @@ export default function QueryByExample(params) {
     _setResultImages(temp);
   };
 
-  const queryByExample = () => {
+  const queryByExample = (queryFile) => {
     console.log("Uploading images to server.");
 
     const data = new FormData();
-    data.append("file", selectedFile);
+    data.append("file", queryFile);
 
     axios
       .post(API + "cbir-query", data, {
@@ -60,7 +57,7 @@ export default function QueryByExample(params) {
 
     setImageSrc(exampleImageURL);
     setSelectedFile(event.target.files[0]);
-    queryByExample();
+    queryByExample(event.target.files[0]);
   };
 
   return (
