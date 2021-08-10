@@ -13,7 +13,6 @@ import SectionTitle from "../components/sectionTitle";
 const API = "http://localhost:8888/";
 
 export default function QueryByExample(params) {
-  const [selectedFiles, setSelectedFiles] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
 
@@ -27,9 +26,7 @@ export default function QueryByExample(params) {
     _setResultImages(temp);
   };
 
-  const onClickHandler = (e) => {
-    e.preventDefault();
-
+  const queryByExample = () => {
     console.log("Uploading images to server.");
 
     const data = new FormData();
@@ -63,7 +60,7 @@ export default function QueryByExample(params) {
     const exampleImageURL = URL.createObjectURL(event.target.files[0]);
 
     setImageSrc(exampleImageURL);
-    setSelectedFiles(event.target.files);
+    queryByExample();
   };
 
   return (
@@ -87,11 +84,6 @@ export default function QueryByExample(params) {
               onChangeHandler={onChangeHandler}
               text={"select file"}
             ></FileUpload>
-            <Button
-              additionalClasses="flex-none"
-              name="Upload image"
-              clickHandler={onClickHandler}
-            ></Button>
           </form>
           <ImageResults
             styleName="query-example-grid-results"
