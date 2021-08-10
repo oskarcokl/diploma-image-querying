@@ -51,21 +51,21 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         )
 
         # TODO uncomment
-        # img_paths = [os.path.join(dataset, img_name)
-        #              for img_name in img_names]
+        img_paths = [os.path.join(dataset, img_name)
+                     for img_name in img_names]
 
-        # show_results(query_img_path, img_paths)
-        # global T_ALL
-        # T_ALL = t_all.stop()
+        show_results(query_img_path, img_paths)
+        global T_ALL
+        T_ALL = t_all.stop()
 
         # Only to be used while evaluating system.
-        ranked_img_names = []
-        for i, img_name in enumerate(img_names):
-            ranked_img_name = " ".join((str(i), img_name))
-            ranked_img_names.append(ranked_img_name)
+        # ranked_img_names = []
+        # for i, img_name in enumerate(img_names):
+        #     ranked_img_name = " ".join((str(i), img_name))
+        #     ranked_img_names.append(ranked_img_name)
 
-        line = " ".join(ranked_img_names)
-        return line
+        # line = " ".join(ranked_img_names)
+        # return line
 
         # with open("../experiments/result.txt", "wa") as f:
         #     img_names_pruned = [name.split(".")[0] for name in img_names]
@@ -156,7 +156,7 @@ def find_similar_imgs(img_array, backbone: Backbone, searcher):
     # t_norm = Timer(name="Normalization", logger=None)
     # t_norm.start()
     # normalized_feature_query = preprocessing.normalize(
-    #     features_query.reshape(1, -1), norm="l1")
+    #     features_query.reshape(1, -1), norm="l2")
     # global T_NORMALIZATION
     # T_NORMALIZATION = t_norm.stop()
 

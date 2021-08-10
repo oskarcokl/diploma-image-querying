@@ -104,7 +104,7 @@ def shift_features(features_list, scalar=1000):
 def normalize_sk_learn(feature_list):
     feature_array = np.array(feature_list)
     normalized_feature_array = preprocessing.normalize(
-        feature_array, norm="l1")
+        feature_array, norm="l2")
     normalized_feature_list = normalized_feature_array.tolist()
 
     return normalized_feature_list
@@ -155,7 +155,7 @@ def reduce_features(feature_list, n_components=100):
 
 def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
-    normalized_feature_vectors = normalize_sk_learn(feature_vectors)
+    # normalized_feature_vectors = normalize_sk_learn(feature_vectors)
     reduced_feature_vectors = reduce_features(feature_vectors, 140)
     new_data = []
     for i, item in enumerate(data):
@@ -268,7 +268,7 @@ if __name__ == "__main__":
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 13, 40, 10)
+        root_node = init_cd_tree(data, 1, 5, 40, 5)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))
