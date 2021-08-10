@@ -85,6 +85,7 @@ export default function QueryByExample(params) {
               additionalClasses=""
               name={"file"}
               onChangeHandler={onChangeHandler}
+              text={"select file"}
             ></FileUpload>
             <Button
               additionalClasses="flex-none"
