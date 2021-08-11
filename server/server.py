@@ -38,7 +38,7 @@ class MainHandler(BaseHandler):
         self.write("Hello, world")
 
 
-class FileUploadHandler(BaseHandler):
+class AddIndexHandler(BaseHandler):
     def post(self):
         for field_name, files in self.request.files.items():
             for info in files:
@@ -91,7 +91,7 @@ def main():
     app = tornado.web.Application(
         [
             (r"/", MainHandler),
-            (r"/file-upload", FileUploadHandler),
+            (r"/add-index", AddIndexHandler),
             (r"/celery", CeleryHandler),
             (r"/cbir-query", CBIRQueryHandler),
         ],

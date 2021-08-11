@@ -6,6 +6,9 @@ import FileUpload from "../components/fileUpload";
 import AddImages from "../components/addImages";
 import Button from "../components/button";
 import { useState } from "react";
+import axios from "axios";
+
+const API = "http://localhost:8888/";
 
 export default function AddToIndex(params) {
   const [addUrls, setAddUrls] = useState([]);
@@ -24,8 +27,33 @@ export default function AddToIndex(params) {
     e.preventDefault();
 
     // Clear add images
-    console.log(addImgs);
     setAddUrls([]);
+    addToIndex(addImgs);
+  };
+
+  const addToIndex = (addImages) => {
+    console.log("Uploading images to server.");
+
+    const data = new FormData();
+
+    for (let i = 0; i < addImages.length; i++) {
+      data.append("file", addImages[i]);
+    }
+
+    //console.log(data);
+
+    axios
+      .post(API + "add-index", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .then((res) => {
+        console.log(res);
+      });
   };
 
   return (

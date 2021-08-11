@@ -10,7 +10,6 @@ export default function ImageResults({ srcs, styleName }) {
 
     return (
       <div className={`image-results-container ${styleName}`}>
-        <SectionTitle title="Results" />
         <div className="result-images-container">
           <div className="column-1">{addImages}</div>
         </div>
