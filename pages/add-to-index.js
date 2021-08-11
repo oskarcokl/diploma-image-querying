@@ -9,12 +9,14 @@ import { useState } from "react";
 
 export default function AddToIndex(params) {
   const [addUrls, setAddUrls] = useState([]);
+  const [addImgs, setAddImgs] = useState([]);
 
   const onChangeHandler = async (e) => {
     const urls = [];
     for (let file of e.target.files) {
       urls.push(URL.createObjectURL(file));
     }
+    setAddImgs(e.target.files);
     setAddUrls(urls);
   };
 
@@ -22,9 +24,8 @@ export default function AddToIndex(params) {
     e.preventDefault();
 
     // Clear add images
+    console.log(addImgs);
     setAddUrls([]);
-
-    console.log("You clicked a button buddy.");
   };
 
   return (

@@ -3,8 +3,6 @@ import SectionTitle from "./sectionTitle";
 
 export default function ImageResults({ srcs, styleName }) {
   if (srcs) {
-    console.log(srcs);
-
     const addImages = [];
     for (let i = 0; i < srcs.length; i++) {
       addImages.push(<ResultImage src={srcs[i]} />);
