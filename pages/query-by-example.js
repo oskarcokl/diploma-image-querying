@@ -79,7 +79,7 @@ export default function QueryByExample(params) {
               additionalClasses=""
               name={"file"}
               onChangeHandler={onChangeHandler}
-              text={"select file"}
+              text={"select image"}
             ></FileUpload>
           </form>
           <ImageResults
