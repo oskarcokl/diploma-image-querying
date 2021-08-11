@@ -21,6 +21,9 @@ export default function AddToIndex(params) {
   const onClickHandler = (e) => {
     e.preventDefault();
 
+    // Clear add images
+    setAddUrls([]);
+
     console.log("You clicked a button buddy.");
   };
 
