@@ -18,7 +18,7 @@ server = "./cbir/cd_tree.fs"
 
 class Searcher:
     def _get_root_node(self):
-        storage = ZODB.FileStorage.FileStorage(cli)
+        storage = ZODB.FileStorage.FileStorage(server)
         db = ZODB.DB(storage)
         connection = db.open()
         root = connection.root

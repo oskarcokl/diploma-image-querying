@@ -9,6 +9,7 @@ import UploadedImage from "../components/uploadedImage";
 import ImageResults from "../components/imageResults";
 import Navbar from "../components/navbar";
 import SectionTitle from "../components/sectionTitle";
+import { MoonLoader } from "react-spinners";
 
 const API = "http://localhost:8888/";
 
@@ -16,12 +17,17 @@ export default function QueryByExample(params) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const setResultImages = (src) => {
     const temp = [];
     for (let i = 0; i < src.length; i++) temp.push(src[i]);
 
     _setResultImages(temp);
+  };
+
+  const clearResultImages = () => {
+    _setResultImages([]);
   };
 
   const queryByExample = (queryFile) => {
@@ -49,6 +55,7 @@ export default function QueryByExample(params) {
         console.log(returnedImages);
 
         setResultImages(returnedImages);
+        setLoading(false);
       });
   };
 
@@ -57,6 +64,8 @@ export default function QueryByExample(params) {
 
     setImageSrc(exampleImageURL);
     setSelectedFile(event.target.files[0]);
+    clearResultImages();
+    setLoading(true);
     queryByExample(event.target.files[0]);
   };
 
@@ -74,7 +83,13 @@ export default function QueryByExample(params) {
           />
           <form className="image-upload-container query-example-grid-query">
             <SectionTitle title="Upload example image" />
-            <UploadedImage src={imageSrc} />
+            {/* <UploadedImage src={imageSrc} /> */}
+            <MoonLoader
+              color={"#45a191"}
+              loading={loading}
+              size={125}
+              speedMultiplier={0.5}
+            />
             <FileUpload
               additionalClasses=""
               name={"file"}
@@ -82,6 +97,7 @@ export default function QueryByExample(params) {
               text={"select image"}
             ></FileUpload>
           </form>
+
           <ImageResults
             styleName="query-example-grid-results"
             srcs={resultImages}

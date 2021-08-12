@@ -449,7 +449,7 @@ def _rank_images(query_feature_vector, similar_images):
         similar_images[i].append(d)
 
     ranked_similar_images = sorted(
-        similar_images, reverse=False, key=lambda x: x[3])
+        similar_images, reverse=True, key=lambda x: x[3])
 
     return ranked_similar_images
 

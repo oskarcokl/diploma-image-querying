@@ -1,3 +1,4 @@
+import { MoonLoader } from "react-spinners";
 import ResultImage from "./resultImage";
 import SectionTitle from "./sectionTitle";
 

@@ -66,7 +66,6 @@ class CBIRQueryHandler(BaseHandler):
         self.write(result_str)
 
     def post(self):
-        print(self.request.files.items())
         result_json = None
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files)

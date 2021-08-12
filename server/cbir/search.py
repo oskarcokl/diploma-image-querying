@@ -51,26 +51,26 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         )
 
         # TODO uncomment
-        img_paths = [os.path.join(dataset, img_name)
-                     for img_name in img_names]
+        # img_paths = [os.path.join(dataset, img_name)
+        #              for img_name in img_names]
 
-        show_results(query_img_path, img_paths)
-        global T_ALL
-        T_ALL = t_all.stop()
+        # show_results(query_img_path, img_paths)
+        # global T_ALL
+        # T_ALL = t_all.stop()
 
         # Only to be used while evaluating system.
-        # ranked_img_names = []
-        # for i, img_name in enumerate(img_names):
-        #     ranked_img_name = " ".join((str(i), img_name))
-        #     ranked_img_names.append(ranked_img_name)
+        ranked_img_names = []
+        for i, img_name in enumerate(img_names):
+            ranked_img_name = " ".join((str(i), img_name))
+            ranked_img_names.append(ranked_img_name)
 
-        # line = " ".join(ranked_img_names)
-        # return line
+        line = " ".join(ranked_img_names)
+        return line
 
-        # with open("../experiments/result.txt", "wa") as f:
-        #     img_names_pruned = [name.split(".")[0] for name in img_names]
-        #     for img_name in img_names_pruned:
-        #         f.write(img_name + "\n")
+        with open("../experiments/result.txt", "wa") as f:
+            img_names_pruned = [name.split(".")[0] for name in img_names]
+            for img_name in img_names_pruned:
+                f.write(img_name + "\n")
 
     else:
         query_img_array = np.array(query_img_list)
@@ -171,7 +171,7 @@ def find_similar_imgs(img_array, backbone: Backbone, searcher):
 
     global T_SEARCH
     img_names, T_SEARCH = searcher.search(
-        reduced_feature_query, 20)
+        reduced_feature_query, 10)
     return img_names
 
 
