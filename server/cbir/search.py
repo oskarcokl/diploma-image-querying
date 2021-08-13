@@ -24,17 +24,21 @@ T_MODEL = 0
 T_ALL = 0
 
 
-def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
+def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, searcher=None):
     t_all = Timer(name="All", logger=None)
     t_all.start()
     t_model = Timer(name="Model", logger=None)
     t_model.start()
 
-    backbone = Backbone()
+    if not backbone:
+        print("No backbone")
+        backbone = Backbone()
+
+    if not searcher:
+        searcher = Searcher()
 
     global T_MODEL
     T_MODEL = t_model.stop()
-    searcher = Searcher()
 
     if cli:
         img = image.load_img(query_img_path, target_size=(224, 224))
@@ -55,7 +59,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
         # global T_ALL
         # T_ALL = t_all.stop()
 
-        # Only to be used while evaluating system.
+        # TODO Only to be used while evaluating system.
         ranked_img_names = []
         for i, img_name in enumerate(img_names):
             ranked_img_name = " ".join((str(i), img_name))

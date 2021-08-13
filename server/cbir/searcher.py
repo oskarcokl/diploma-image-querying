@@ -17,13 +17,18 @@ server = "./cbir/cd_tree.fs"
 
 
 class Searcher:
-    def _get_root_node(self):
-        storage = ZODB.FileStorage.FileStorage(server)
-        db = ZODB.DB(storage)
-        connection = db.open()
-        root = connection.root
+    root = None
 
-        return root.cd_tree["root_node"]
+    def _get_root_node(self):
+        if self.root:
+            return self.root.cd_tree["root_node"]
+        else:
+            self.storage = ZODB.FileStorage.FileStorage(server)
+            self.db = ZODB.DB(self.storage)
+            self.connection = self.db.open()
+            self.root = self.connection.root
+
+            return self.root.cd_tree["root_node"]
 
     def search(self, query_features, n_similar_images):
         search_time = Timer(name="Search", logger=None)

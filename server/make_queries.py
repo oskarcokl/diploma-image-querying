@@ -1,5 +1,7 @@
 import argparse
 import os
+from cbir.searcher import Searcher
+from cbir.backbone import Backbone
 
 
 from cbir.search import search
@@ -9,12 +11,15 @@ def make_queries(file_name):
     result_lines = []
     with open(file_name, "r") as f:
         lines = f.readlines()
+        backbone = Backbone()
+        searcher = Searcher()
         for line in lines:
             query_img_name = line[:-1]
             query_img_path = os.path.join(
                 "../../dataset/vacations", query_img_name)
 
-            result = search(query_img_path=query_img_path, cli=True)
+            result = search(query_img_path=query_img_path,
+                            cli=True, backbone=backbone, searcher=searcher)
 
             result_line = " ".join((query_img_name, result))
             print(result_line)

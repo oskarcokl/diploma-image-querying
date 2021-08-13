@@ -28,6 +28,8 @@ class Backbone:
             model = self._download_model()
             self._save_model_to_disk(model)
 
+        print("Loading model")
+
         return Model(inputs=model.inputs,
                      outputs=model.layers[-2].output)
 
