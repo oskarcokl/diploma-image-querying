@@ -19,10 +19,7 @@ from csv_writer import save_to_csv
 from backbone import Backbone
 from searcher import Searcher
 
-T_FEAT_REDUCTION = 0
 T_SEARCH = 0
-T_NORMALIZATION = 0
-T_DB = 0
 T_MODEL = 0
 T_ALL = 0
 
@@ -65,12 +62,10 @@ def search(query_img_path=None, query_img_list=None, cli=False, dataset=""):
             ranked_img_names.append(ranked_img_name)
 
         line = " ".join(ranked_img_names)
+        global T_ALL
+        T_ALL = t_all.stop()
+        write_time()
         return line
-
-        with open("../experiments/result.txt", "wa") as f:
-            img_names_pruned = [name.split(".")[0] for name in img_names]
-            for img_name in img_names_pruned:
-                f.write(img_name + "\n")
 
     else:
         query_img_array = np.array(query_img_list)
@@ -124,11 +119,7 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
 
     features_query = backbone.get_features(processed_img_array)
 
-    t_db = Timer(name="Database", logger=None)
-    t_db.start()
     feature_vectors = get_feature_vectors()
-    global T_DB
-    T_DB = t_db.stop()
 
     n_features = 200
 
@@ -160,18 +151,19 @@ def find_similar_imgs(img_array, backbone: Backbone, searcher):
     # global T_NORMALIZATION
     # T_NORMALIZATION = t_norm.stop()
 
-    t_db = Timer(name="Database", logger=None)
-    t_db.start()
-    feature_vectors = get_feature_vectors()
-    global T_DB
-    T_DB = t_db.stop()
+    # t_db = Timer(name="Database", logger=None)
+    # t_db.start()
+    # feature_vectors = get_feature_vectors()
+    # global T_DB
+    # T_DB = t_db.stop()
 
-    reduced_feature_query = reduce_features_query(
-        features_query.reshape(1, -1), feature_vectors, 140)
+    # reduced_feature_query = reduce_features_query(
+    #     features_query.reshape(1, -1), feature_vectors, 140)
 
+    # TODO change back to reduced_feature_query
     global T_SEARCH
     img_names, T_SEARCH = searcher.search(
-        reduced_feature_query, 10)
+        features_query.reshape(1, -1), 20)
     return img_names
 
 
@@ -242,6 +234,11 @@ def show_results(query_img_path, img_paths):
         cv2.waitKey(0)
 
 
+def write_time():
+    row = [T_MODEL, T_SEARCH, T_ALL]
+    save_to_csv("./experiments/oxford.csv", row)
+
+
 if __name__ == "__main__":
     argParser = argparse.ArgumentParser()
     argParser.add_argument(
@@ -273,5 +270,5 @@ if __name__ == "__main__":
         search(query_img_path=args["query"],
                cli=args["terminal"], dataset=args["dataset"])
 
-    row = [T_MODEL, T_NORMALIZATION, T_DB, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
+    row = [T_MODEL, T_SEARCH, T_ALL]
     save_to_csv("../experiments/oxford.csv", row)

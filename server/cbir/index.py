@@ -162,8 +162,9 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
         # Appending tuples here.
         new_data.append((item[0], item[1], reduced_feature_vectors[i]))
 
+    # TODO Change back to new data
     root_node = cd_tree.init_cd_tree(
-        new_data, min_clusters, max_clusters, min_node=min_node, l_max=l_max)
+        data, min_clusters, max_clusters, min_node=min_node, l_max=l_max)
     return root_node
 
 
