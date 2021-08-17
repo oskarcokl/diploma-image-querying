@@ -24,13 +24,13 @@ T_MODEL = 0
 T_ALL = 0
 
 
-def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, searcher=None):
+def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, searcher=None, query_features=None):
     t_all = Timer(name="All", logger=None)
     t_all.start()
     t_model = Timer(name="Model", logger=None)
     t_model.start()
 
-    if not backbone:
+    if not backbone and not query_features:
         print("No backbone")
         backbone = Backbone()
 
@@ -72,13 +72,19 @@ def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, s
         return line
 
     else:
-        query_img_array = np.array(query_img_list)
-        img_array = np.expand_dims(query_img_array, axis=0)
+        if query_features:
+            img_names = find_similar_imgs(
+                backbone=backbone, searcher=searcher, features_query=query_features
+            )
+            return img_names
+        else:
+            query_img_array = np.array(query_img_list)
+            img_array = np.expand_dims(query_img_array, axis=0)
 
-        img_names = find_similar_imgs(
-            img_array=img_array, backbone=backbone, searcher=searcher
-        )
-        return img_names
+            img_names = find_similar_imgs(
+                img_array=img_array, backbone=backbone, searcher=searcher
+            )
+            return img_names
 
 
 def brute_force_search(query_img_path=None, dataset=""):
@@ -143,32 +149,21 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
     return result_img_names
 
 
-def find_similar_imgs(img_array, backbone: Backbone, searcher):
-    processed_img_array = preprocess_input(img_array)
-
-    features_query = backbone.get_features(processed_img_array)
-
-    # t_norm = Timer(name="Normalization", logger=None)
-    # t_norm.start()
-    # normalized_feature_query = preprocessing.normalize(
-    #     features_query.reshape(1, -1), norm="l2")
-    # global T_NORMALIZATION
-    # T_NORMALIZATION = t_norm.stop()
-
-    # t_db = Timer(name="Database", logger=None)
-    # t_db.start()
-    # feature_vectors = get_feature_vectors()
-    # global T_DB
-    # T_DB = t_db.stop()
-
-    # reduced_feature_query = reduce_features_query(
-    #     features_query.reshape(1, -1), feature_vectors, 140)
-
-    # TODO change back to reduced_feature_query
+def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None):
     global T_SEARCH
-    img_names, T_SEARCH = searcher.search(
-        features_query.reshape(1, -1), 20)
-    return img_names
+    print(f"Type of feature_query: ${type(features_query)}")
+    if (features_query):
+        features_query_array = np.array(features_query)
+        img_names, T_SEARCH = searcher.search(
+            features_query_array.reshape(1, -1), 20)
+        del searcher
+        return img_names
+    else:
+        processed_img_array = preprocess_input(img_array)
+        features_query = backbone.get_features(processed_img_array)
+        img_names, T_SEARCH = searcher.search(
+            features_query.reshape(1, -1), 20)
+        return img_names
 
 
 def reduce_features_query(query_features, feature_vectors, n_components=100):

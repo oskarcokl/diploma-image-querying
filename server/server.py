@@ -7,15 +7,22 @@ import numpy as np
 from celery_app.tasks import add
 from celery_app.cbir_tasks import cbir_query
 from tornado.options import define, options, parse_command_line
+from tensorflow.keras.applications.resnet import preprocess_input
 
 from db_utils.table_operations import get_feature_vectors
+from cbir.backbone import Backbone
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
 
 
+backbone = Backbone()
+print("Loaded backbone")
+
 # Coppied from https://stackoverflow.com/questions/35254742/tornado-server-enable-cors-requests
 # Thank you kwarunek :^)
+
+
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         print("setting headers!!!")
@@ -71,9 +78,9 @@ class CBIRQueryHandler(BaseHandler):
         result_json = None
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files)
-            decoded_img_list = decoded_img_array.tolist()
+            query_features = backbone.get_features(decoded_img_array)
             result_imgs = cbir_query.delay(
-                query_img_list=decoded_img_list, cli=False,
+                cli=False, query_features=query_features.tolist()
             ).get()
 
             result = {"ordered_result": result_imgs, "dict": {}}
@@ -123,9 +130,12 @@ def decode_uploaded_img(file):
         img_bytes, np.uint8), cv2.IMREAD_COLOR)
     img_array = cv2.resize(img_array, (224, 224))
     img_array = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
+    np_img_array = np.array(img_array)
+    np_img_array = np.expand_dims(np_img_array, axis=0)
+    processed_img_array = preprocess_input(np_img_array)
     # Think image should be RGB after this but couldn't test.
     # Chechk here if some problem arise.
-    return img_array
+    return processed_img_array
 
 
 if __name__ == "__main__":

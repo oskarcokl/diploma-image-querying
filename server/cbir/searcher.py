@@ -30,6 +30,9 @@ class Searcher:
 
             return self.root.cd_tree["root_node"]
 
+    def _close_connection(self):
+        self.db.close()
+
     def search(self, query_features, n_similar_images):
         search_time = Timer(name="Search", logger=None)
         search_time.start()
@@ -39,6 +42,7 @@ class Searcher:
             query_feature_vector=query_features,
             n_similar_images=n_similar_images)
 
+        self._close_connection()
         img_names = []
 
         for i in range(n_similar_images):
