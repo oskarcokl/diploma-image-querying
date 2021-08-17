@@ -59,9 +59,6 @@ export default function QueryByExample(params) {
   };
 
   const onChangeHandler = async (event) => {
-    const exampleImageURL = URL.createObjectURL(event.target.files[0]);
-
-    setImageSrc(exampleImageURL);
     setSelectedFile(event.target.files[0]);
     clearResultImages();
     setLoading(true);

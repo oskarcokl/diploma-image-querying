@@ -1,10 +1,5 @@
 .result-image {
   object-fit: cover;
-  width: 400px;
-  height: 400px;
-  transition: transform 0.3s;
-}
-
-.result-image:hover {
-  transform: scale(1.5);
+  width: 600px;
+  height: 600px;
 }
