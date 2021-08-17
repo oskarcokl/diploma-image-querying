@@ -50,6 +50,7 @@ export default function QueryByExample(params) {
         console.log(e);
       })
       .then((res) => {
+        console.log(res);
         const imgNames = res.data.result_imgs;
         let returnedImages = [];
         for (let imgName of imgNames) {

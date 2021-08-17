@@ -73,7 +73,14 @@ class CBIRQueryHandler(BaseHandler):
             result_imgs = cbir_query.delay(
                 query_img_list=decoded_img_list, cli=False,
             ).get()
-            result = {"result_imgs": result_imgs}
+
+            result = {"ordered_result": result_imgs, "dict": {}}
+            #feautre_vectors = getFeatureVectorsFromDb()
+
+            for result_img in result_imgs:
+                name = result_img.split(".")[0]
+                result["dict"][result_img] = {"name": name}
+
             print(result)
             result_json = json.dumps(result)
         self.write(result_json)
