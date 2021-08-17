@@ -51,7 +51,7 @@ export default function QueryByExample(params) {
         console.log(e);
       })
       .then((res) => {
-        //console.log(res);
+        console.log(res);
         const imgNames = res.data.ordered_result;
 
         setNonSelectedImages(res.data.dict);

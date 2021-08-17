@@ -151,7 +151,6 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
 
 def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None):
     global T_SEARCH
-    print(f"Type of feature_query: ${type(features_query)}")
     if (features_query):
         features_query_array = np.array(features_query)
         img_names, T_SEARCH = searcher.search(

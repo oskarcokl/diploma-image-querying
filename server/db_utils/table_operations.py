@@ -71,9 +71,9 @@ def get_feature_vector(img_name, db_connector=None):
     sql = """SELECT image_vector FROM cbir_index WHERE image_name=%s"""
 
     try:
-        logging.info(f"Getting feature vector for ${img_name}")
+        #logging.info(f"Getting feature vector for {img_name}")
         db_connector.cursor.execute(sql, (img_name,))
-        feature_vector = db_connector.cursor.fetchall()[0]
+        feature_vector = db_connector.cursor.fetchone()[0]
         return feature_vector
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)

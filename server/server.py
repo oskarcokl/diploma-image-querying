@@ -79,11 +79,13 @@ class CBIRQueryHandler(BaseHandler):
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files)
             query_features = backbone.get_features(decoded_img_array)
+            query_features_list = query_features.tolist()
             result_imgs = cbir_query.delay(
-                cli=False, query_features=query_features.tolist()
+                cli=False, query_features=query_features_list
             ).get()
 
-            result = {"ordered_result": result_imgs, "dict": {}}
+            result = {"ordered_result": result_imgs,
+                      "dict": {}, "query_features": query_features_list}
             feautre_vectors = get_feature_vectors(result_imgs)
 
             for index, result_img in enumerate(result_imgs):
@@ -91,7 +93,6 @@ class CBIRQueryHandler(BaseHandler):
                 result["dict"][result_img] = {
                     "name": name, "feature_vector": feautre_vectors[index]}
 
-            print(result)
             result_json = json.dumps(result)
         self.write(result_json)
 
