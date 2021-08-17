@@ -74,6 +74,7 @@ class CBIRQueryHandler(BaseHandler):
                 query_img_list=decoded_img_list, cli=False,
             ).get()
             result = {"result_imgs": result_imgs}
+            print(result)
             result_json = json.dumps(result)
         self.write(result_json)
 

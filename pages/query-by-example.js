@@ -29,6 +29,11 @@ export default function QueryByExample(params) {
     _setResultImages([]);
   };
 
+  const onClickImgHandler = (e) => {
+    console.log(e.target);
+    e.target.classList.toggle("selected");
+  };
+
   const queryByExample = (queryFile) => {
     console.log("Uploading images to server.");
 
@@ -100,6 +105,7 @@ export default function QueryByExample(params) {
             <ImageResults
               styleName="query-example-grid-results"
               srcs={resultImages}
+              onClick={(e) => onClickImgHandler(e)}
             ></ImageResults>
           )}
         </div>
