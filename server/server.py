@@ -8,6 +8,8 @@ from celery_app.tasks import add
 from celery_app.cbir_tasks import cbir_query
 from tornado.options import define, options, parse_command_line
 
+from db_utils.table_operations import get_feature_vectors
+
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
 
@@ -75,11 +77,12 @@ class CBIRQueryHandler(BaseHandler):
             ).get()
 
             result = {"ordered_result": result_imgs, "dict": {}}
-            #feautre_vectors = getFeatureVectorsFromDb()
+            feautre_vectors = get_feature_vectors(result_imgs)
 
-            for result_img in result_imgs:
+            for index, result_img in enumerate(result_imgs):
                 name = result_img.split(".")[0]
-                result["dict"][result_img] = {"name": name}
+                result["dict"][result_img] = {
+                    "name": name, "feature_vector": feautre_vectors[index]}
 
             print(result)
             result_json = json.dumps(result)

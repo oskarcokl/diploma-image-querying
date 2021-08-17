@@ -17,6 +17,7 @@ export default function QueryByExample(params) {
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [nonSelectedImages, setNonSelectedImages] = useState({});
 
   const setResultImages = (src) => {
     const temp = [];
@@ -50,14 +51,15 @@ export default function QueryByExample(params) {
         console.log(e);
       })
       .then((res) => {
-        console.log(res);
-        const imgNames = res.data.result_imgs;
+        //console.log(res);
+        const imgNames = res.data.ordered_result;
+
+        setNonSelectedImages(res.data.dict);
+
         let returnedImages = [];
         for (let imgName of imgNames) {
           returnedImages.push("/dataset/" + imgName);
         }
-
-        console.log(returnedImages);
 
         setResultImages(returnedImages);
         setLoading(false);
