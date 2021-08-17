@@ -17,6 +17,8 @@
 }
 
 .query-example-grid-query {
+  margin-top: 30px;
+  margin-bottom: 30px;
   grid-area: query;
 }
 
@@ -31,6 +33,7 @@
   grid-template-areas:
     "navbar navbar"
     "header header"
-    "query results"
+    "results results"
+    "query query"
     "footer footer";
 }

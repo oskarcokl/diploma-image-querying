@@ -5,7 +5,6 @@ import { useState } from "react";
 import axios from "axios";
 import Head from "next/head";
 import FileUpload from "../components/fileUpload";
-import UploadedImage from "../components/uploadedImage";
 import ImageResults from "../components/imageResults";
 import Navbar from "../components/navbar";
 import SectionTitle from "../components/sectionTitle";
@@ -82,26 +81,30 @@ export default function QueryByExample(params) {
             styleName="query-example-grid-header"
           />
           <form className="image-upload-container query-example-grid-query">
-            <SectionTitle title="Upload example image" />
-            {/* <UploadedImage src={imageSrc} /> */}
+            {!selectedFile && <SectionTitle title="Upload example image" />}
+
             <MoonLoader
               color={"#45a191"}
               loading={loading}
               size={125}
               speedMultiplier={0.5}
             />
-            <FileUpload
-              additionalClasses=""
-              name={"file"}
-              onChangeHandler={onChangeHandler}
-              text={"select image"}
-            ></FileUpload>
+            {!loading && (
+              <FileUpload
+                additionalClasses=""
+                name={"file"}
+                onChangeHandler={onChangeHandler}
+                text={"select image"}
+              ></FileUpload>
+            )}
           </form>
 
-          <ImageResults
-            styleName="query-example-grid-results"
-            srcs={resultImages}
-          ></ImageResults>
+          {resultImages.length > 0 && (
+            <ImageResults
+              styleName="query-example-grid-results"
+              srcs={resultImages}
+            ></ImageResults>
+          )}
         </div>
       </Container>
     </div>

@@ -71,7 +71,7 @@ class CBIRQueryHandler(BaseHandler):
             decoded_img_array = decode_uploaded_img(files)
             decoded_img_list = decoded_img_array.tolist()
             result_imgs = cbir_query.delay(
-                query_img_list=decoded_img_list, cli=False
+                query_img_list=decoded_img_list, cli=False,
             ).get()
             result = {"result_imgs": result_imgs}
             result_json = json.dumps(result)
