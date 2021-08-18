@@ -38,6 +38,8 @@ export default function QueryByExample(params) {
   };
 
   const onClickQueryAgainHandler = () => {
+    console.log("Bruh what the hell");
+    clearResultImages();
     setLoading(true);
     queryRocchio();
   };
@@ -144,6 +146,7 @@ export default function QueryByExample(params) {
               styleName="query-example-grid-results"
               srcs={resultImages}
               onClick={(e) => onClickImgHandler(e)}
+              buttonOnClick={onClickQueryAgainHandler}
             ></ImageResults>
           )}
         </div>

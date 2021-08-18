@@ -1,9 +1,13 @@
-import { MoonLoader } from "react-spinners";
 import ResultImage from "./resultImage";
 import SectionTitle from "./sectionTitle";
 import Button from "./button";
 
-export default function ImageResults({ srcs, styleName, onClick }) {
+export default function ImageResults({
+  srcs,
+  styleName,
+  onClick,
+  buttonOnClick,
+}) {
   return (
     <div className={`image-results-container ${styleName}`}>
       <SectionTitle title="Results" />
@@ -18,7 +22,7 @@ export default function ImageResults({ srcs, styleName, onClick }) {
         <ResultImage src={srcs[7]} onClick={onClick}></ResultImage>
         <ResultImage src={srcs[8]} onClick={onClick}></ResultImage>
         <ResultImage src={srcs[9]} onClick={onClick}></ResultImage>
-        <Button name="Query again"></Button>
+        <Button name="Query again" clickHandler={buttonOnClick}></Button>
       </div>
     </div>
   );
