@@ -1,3 +1,4 @@
+from re import A
 import tornado.ioloop
 import tornado.web
 import json
@@ -19,6 +20,8 @@ define("debug", default=True, help="run in debug mode")
 
 backbone = Backbone()
 print("Loaded backbone")
+
+n_images = 10
 
 # Coppied from https://stackoverflow.com/questions/35254742/tornado-server-enable-cors-requests
 # Thank you kwarunek :^)
@@ -69,13 +72,26 @@ class ROCCHIOQueryHandler(BaseHandler):
 
     def post(self):
         result_json = None
-        selected_images_str = (self.get_body_argument(
+        rocchio_data_str = (self.get_body_argument(
             "rocchioData", default=None, strip=False))
-        selected_images = json.loads(selected_images_str)
+        rocchio_data = json.loads(rocchio_data_str)
 
-        print(selected_images.keys())
+        old_query_feautres = np.array(rocchio_data["query"])
+        relevant_images = []
+        non_relevant_images = []
 
-        #new_query = make_new_query()
+        images = rocchio_data["selectedImages"]
+
+        for image_name in images:
+            image_data = images[image_name]
+            if image_data["selected"]:
+                relevant_images.append(np.array(image_data["feature_vector"]))
+            else:
+                non_relevant_images.append(
+                    np.array(image_data["feature_vector"]))
+
+        new_query = make_new_query(
+            old_query_feautres, relevant_images, non_relevant_images)
 
         # Somehow get query features.
         # result_imgs = cbir_query.delay(
@@ -122,7 +138,7 @@ class CBIRQueryHandler(BaseHandler):
             query_features = backbone.get_features(decoded_img_array)
             query_features_list = query_features.tolist()
             result_imgs = cbir_query.delay(
-                cli=False, query_features=query_features_list
+                cli=False, query_features=query_features_list, n_images=10
             ).get()
 
             result = {"ordered_result": result_imgs,
