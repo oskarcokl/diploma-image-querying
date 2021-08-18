@@ -55,7 +55,7 @@ export default function QueryByExample(params) {
     data.append("selectedImages", JSON.stringify(selectedImages));
 
     axios
-      .post(API + "cbir-query", data, {
+      .post(API + "rocchio-query", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -64,7 +64,8 @@ export default function QueryByExample(params) {
         console.log(e);
       })
       .then((res) => {
-        parseResults(res);
+        console.log(res);
+        // parseResults(res);
       });
   };
 
