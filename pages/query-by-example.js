@@ -70,8 +70,7 @@ export default function QueryByExample(params) {
         console.log(e);
       })
       .then((res) => {
-        console.log(res);
-        // parseResults(res);
+        parseResults(res);
       });
   };
 

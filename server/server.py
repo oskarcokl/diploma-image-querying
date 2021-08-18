@@ -93,23 +93,23 @@ class ROCCHIOQueryHandler(BaseHandler):
         new_query = make_new_query(
             old_query_feautres, relevant_images, non_relevant_images)
 
-        # Somehow get query features.
-        # result_imgs = cbir_query.delay(
-        #     cli=False, query_features=query_features_list
-        # ).get()
+        new_query_feautres_list = new_query.tolist()
 
-        # result = {"ordered_result": result_imgs,
-        #           "dict": {}, "query_features": query_features_list}
-        # feautre_vectors = get_feature_vectors(result_imgs)
+        result_imgs = cbir_query.delay(
+            cli=False, query_features=new_query_feautres_list, n_images=10
+        ).get()
 
-        # for index, result_img in enumerate(result_imgs):
-        #     name = result_img.split(".")[0]
-        #     result["dict"][result_img] = {
-        #         "name": name, "feature_vector": feautre_vectors[index], "selected": False}
+        result = {"ordered_result": result_imgs,
+                  "dict": {}, "query_features": new_query_feautres_list}
+        feautre_vectors = get_feature_vectors(result_imgs)
 
-        # result_json = json.dumps(result)
-        # self.write(result_json)
-        self.write("ok")
+        for index, result_img in enumerate(result_imgs):
+            name = result_img.split(".")[0]
+            result["dict"][result_img] = {
+                "name": name, "feature_vector": feautre_vectors[index], "selected": False}
+
+        result_json = json.dumps(result)
+        self.write(result_json)
 
 
 class CBIRQueryHandler(BaseHandler):
