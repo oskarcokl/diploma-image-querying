@@ -17,7 +17,7 @@ export default function QueryByExample(params) {
   const [imageSrc, setImageSrc] = useState(null);
   const [resultImages, _setResultImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [nonSelectedImages, setNonSelectedImages] = useState({});
+  const [selectedImages, setSelectedImages] = useState({});
 
   const setResultImages = (src) => {
     const temp = [];
@@ -31,8 +31,14 @@ export default function QueryByExample(params) {
   };
 
   const onClickImgHandler = (e) => {
-    console.log(e.target);
-    e.target.classList.toggle("selected");
+    const target = e.target;
+    target.classList.toggle("selected");
+    const imageName = target.src.split("/")[4];
+    toggleSelectedImage(imageName);
+  };
+
+  const toggleSelectedImage = (imageName) => {
+    selectedImages[imageName].selected = !selectedImages[imageName].selected;
   };
 
   const queryByExample = (queryFile) => {
@@ -40,6 +46,8 @@ export default function QueryByExample(params) {
 
     const data = new FormData();
     data.append("file", queryFile);
+
+    data.append("selectedImages", JSON.stringify(selectedImages));
 
     axios
       .post(API + "cbir-query", data, {
@@ -54,7 +62,7 @@ export default function QueryByExample(params) {
         console.log(res);
         const imgNames = res.data.ordered_result;
 
-        setNonSelectedImages(res.data.dict);
+        setSelectedImages(res.data.dict);
 
         let returnedImages = [];
         for (let imgName of imgNames) {

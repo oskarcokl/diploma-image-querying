@@ -91,7 +91,7 @@ class CBIRQueryHandler(BaseHandler):
             for index, result_img in enumerate(result_imgs):
                 name = result_img.split(".")[0]
                 result["dict"][result_img] = {
-                    "name": name, "feature_vector": feautre_vectors[index]}
+                    "name": name, "feature_vector": feautre_vectors[index], "selected": False}
 
             result_json = json.dumps(result)
         self.write(result_json)
