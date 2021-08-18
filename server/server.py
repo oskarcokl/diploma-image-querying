@@ -61,6 +61,38 @@ class AddIndexHandler(BaseHandler):
         self.write("OK")
 
 
+class ROCCHIOQueryHandler(BaseHandler):
+    def set_default_headers(self):
+        self.set_header("Content-Type", "application/json")
+        self.set_header("Access-Control-Allow-Origin", "*")
+
+    def post(self):
+        result_json = None
+        selected_images_str = (self.get_body_argument(
+            "selectedImages", default=None, strip=False))
+        selected_images = json.loads(selected_images_str)
+
+        print(selected_images)
+
+        # Somehow get query features.
+        # result_imgs = cbir_query.delay(
+        #     cli=False, query_features=query_features_list
+        # ).get()
+
+        # result = {"ordered_result": result_imgs,
+        #           "dict": {}, "query_features": query_features_list}
+        # feautre_vectors = get_feature_vectors(result_imgs)
+
+        # for index, result_img in enumerate(result_imgs):
+        #     name = result_img.split(".")[0]
+        #     result["dict"][result_img] = {
+        #         "name": name, "feature_vector": feautre_vectors[index], "selected": False}
+
+        # result_json = json.dumps(result)
+        # self.write(result_json)
+        self.write("ok")
+
+
 class CBIRQueryHandler(BaseHandler):
     def set_default_headers(self):
         self.set_header("Content-Type", "application/json")
@@ -118,6 +150,7 @@ def main():
             (r"/add-index", AddIndexHandler),
             (r"/celery", CeleryHandler),
             (r"/cbir-query", CBIRQueryHandler),
+            (r"/rocchio-query", ROCCHIOQueryHandler),
         ],
         debug=options.debug,
     )
