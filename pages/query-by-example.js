@@ -37,8 +37,33 @@ export default function QueryByExample(params) {
     toggleSelectedImage(imageName);
   };
 
+  const onClickQueryAgainHandler = () => {
+    setLoading(true);
+    queryRocchio();
+  };
+
   const toggleSelectedImage = (imageName) => {
     selectedImages[imageName].selected = !selectedImages[imageName].selected;
+  };
+
+  const queryRocchio = () => {
+    console.log("Querying again with ROCCHIO.");
+
+    const data = new FormData();
+    data.append("selectedImages", JSON.stringify(selectedImages));
+
+    axios
+      .post(API + "cbir-query", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .then((res) => {
+        parseResults(res);
+      });
   };
 
   const queryByExample = (queryFile) => {
@@ -58,20 +83,22 @@ export default function QueryByExample(params) {
       .catch((e) => {
         console.log(e);
       })
-      .then((res) => {
-        console.log(res);
-        const imgNames = res.data.ordered_result;
+      .then((res) => parseResults(res));
+  };
 
-        setSelectedImages(res.data.dict);
+  const parseResults = (res) => {
+    console.log(res);
+    const imgNames = res.data.ordered_result;
 
-        let returnedImages = [];
-        for (let imgName of imgNames) {
-          returnedImages.push("/dataset/" + imgName);
-        }
+    setSelectedImages(res.data.dict);
 
-        setResultImages(returnedImages);
-        setLoading(false);
-      });
+    let returnedImages = [];
+    for (let imgName of imgNames) {
+      returnedImages.push("/dataset/" + imgName);
+    }
+
+    setResultImages(returnedImages);
+    setLoading(false);
   };
 
   const onChangeHandler = async (event) => {
