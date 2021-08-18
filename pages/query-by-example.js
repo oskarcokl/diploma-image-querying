@@ -18,6 +18,7 @@ export default function QueryByExample(params) {
   const [resultImages, _setResultImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState({});
+  const [queryFeatures, setQueryFeatures] = useState([]);
 
   const setResultImages = (src) => {
     const temp = [];
@@ -51,8 +52,13 @@ export default function QueryByExample(params) {
   const queryRocchio = () => {
     console.log("Querying again with ROCCHIO.");
 
+    const rocchioData = {
+      selectedImages: selectedImages,
+      query: queryFeatures,
+    };
+
     const data = new FormData();
-    data.append("selectedImages", JSON.stringify(selectedImages));
+    data.append("rocchioData", JSON.stringify(rocchioData));
 
     axios
       .post(API + "rocchio-query", data, {
@@ -94,6 +100,7 @@ export default function QueryByExample(params) {
     const imgNames = res.data.ordered_result;
 
     setSelectedImages(res.data.dict);
+    setQueryFeatures(res.data.query_features);
 
     let returnedImages = [];
     for (let imgName of imgNames) {

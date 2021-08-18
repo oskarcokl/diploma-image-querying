@@ -11,6 +11,7 @@ from tensorflow.keras.applications.resnet import preprocess_input
 
 from db_utils.table_operations import get_feature_vectors
 from cbir.backbone import Backbone
+from rocchio import make_new_query
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
@@ -69,10 +70,12 @@ class ROCCHIOQueryHandler(BaseHandler):
     def post(self):
         result_json = None
         selected_images_str = (self.get_body_argument(
-            "selectedImages", default=None, strip=False))
+            "rocchioData", default=None, strip=False))
         selected_images = json.loads(selected_images_str)
 
-        print(selected_images)
+        print(selected_images.keys())
+
+        #new_query = make_new_query()
 
         # Somehow get query features.
         # result_imgs = cbir_query.delay(
