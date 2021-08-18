@@ -76,6 +76,12 @@ class CBIRQueryHandler(BaseHandler):
 
     def post(self):
         result_json = None
+        selected_images_str = (self.get_body_argument(
+            "selectedImages", default=None, strip=False))
+        selected_images = json.loads(selected_images_str)
+
+        print(selected_images)
+
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files)
             query_features = backbone.get_features(decoded_img_array)
