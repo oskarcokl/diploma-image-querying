@@ -3,6 +3,7 @@ from numpy.core.defchararray import decode
 import tornado.ioloop
 import tornado.web
 import json
+import os
 import logging
 import cv2
 import numpy as np
@@ -60,13 +61,20 @@ class AddIndexHandler(BaseHandler):
             for info in files:
                 body = info["body"]
 
+                path_to_save = os.path.join("./test", info["filename"])
+                with open(path_to_save, "wb") as f:
+                    f.write(body)
+
                 decoded_image = decode_uploaded_img(body)
                 decoded_images.append(
-                    (info["filename"], decoded_image))
+                    (info["filename"], decoded_image.tolist()))
 
-            index_add(decoded_images)
+            add = index_add.delay(decoded_images).get()
 
-        self.write("OK")
+        if (add):
+            self.write("ok")
+        else:
+            self.write("notok")
 
 
 class ROCCHIOQueryHandler(BaseHandler):

@@ -48,13 +48,13 @@ def add_cli(img_list):
 
     ids = adder.add_img_to_db(tuple_list)
 
-    # zodb_connector = ZODBConnector()
-    # zodb_connector.connect("./cd_tree.fs")
+    zodb_connector = ZODBConnector()
+    zodb_connector.connect("./cd_tree.fs")
 
-    # add_to_cd_tree(ids, np.array(feature_list),
-    #                img_name_list, adder, zodb_connector)
+    add_to_cd_tree(ids, np.array(feature_list),
+                   img_name_list, adder, zodb_connector)
 
-    # zodb_connector.disconnect()
+    zodb_connector.disconnect()
 
 
 def add(decoded_images, backbone=None):
@@ -67,16 +67,24 @@ def add(decoded_images, backbone=None):
     image_names = []
 
     for decoded_image in decoded_images:
-        features = backbone.get_features(decoded_image[1])
+        features = backbone.get_features(np.arry(decoded_image[1]))
 
         feature_list.append(features.tolist())
+
         image_names.append(decoded_image[0])
 
     tuple_list = list(zip(image_names, feature_list))
 
     ids = adder.add_img_to_db(tuple_list)
 
-    print(ids)
+    zodb_connector = ZODBConnector()
+    print(os.curdir)
+    zodb_connector.connect("./cbir/cd_tree.fs")
+
+    add_to_cd_tree(ids, np.array(feature_list),
+                   image_names, adder, zodb_connector)
+
+    zodb_connector.disconnect()
 
 
 def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, zodb_connector):

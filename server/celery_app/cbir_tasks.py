@@ -15,5 +15,8 @@ def cbir_query(query_img_path=None, query_img_list=None, cli=False, query_featur
 
 @app.task
 def index_add(decoded_images):
-    add(decoded_images)
-    return True
+    try:
+        add(decoded_images)
+        return True
+    except:
+        return False
