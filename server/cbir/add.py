@@ -32,26 +32,51 @@ def add_cli(img_list):
         img_array = np.expand_dims(img_array, axis=0)
         img_array = preprocess_input(img_array)
 
-        features = backbone.get_features()
+        features = backbone.get_features(img_array)
 
         img_name_list.append(img_name)
         feature_list.append(features)
 
-    normalized_features = normalize_sk_learn(feature_list)
+    adder = Adder()
+
+    tuple_list = list(zip(img_name_list, feature_list))
+
+    # ids = []
+    # for i in range(len(img_name_list)):
+    #     id = adder.add_img_to_db(normalized_features[i], img_name_list[i])
+    #     ids.append(id)
+
+    ids = adder.add_img_to_db(tuple_list)
+
+    # zodb_connector = ZODBConnector()
+    # zodb_connector.connect("./cd_tree.fs")
+
+    # add_to_cd_tree(ids, np.array(feature_list),
+    #                img_name_list, adder, zodb_connector)
+
+    # zodb_connector.disconnect()
+
+
+def add(decoded_images, backbone=None):
+    if not backbone:
+        backbone = Backbone()
 
     adder = Adder()
 
-    ids = []
-    for i in range(len(img_name_list)):
-        id = adder.add_img_to_db(normalized_features[i], img_name_list[i])
-        ids.append(id)
+    feature_list = []
+    image_names = []
 
-    reduced_features = reduce_features(normalized_features, 10)
+    for decoded_image in decoded_images:
+        features = backbone.get_features(decoded_image[1])
 
-    zodb_connector = ZODBConnector()
-    zodb_connector.connect("./cd_tree.fs")
+        feature_list.append(features.tolist())
+        image_names.append(decoded_image[0])
 
-    add_to_cd_tree(ids, reduced_features, img_name_list, adder, zodb_connector)
+    tuple_list = list(zip(image_names, feature_list))
+
+    ids = adder.add_img_to_db(tuple_list)
+
+    print(ids)
 
 
 def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, zodb_connector):

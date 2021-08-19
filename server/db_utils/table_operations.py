@@ -49,8 +49,9 @@ def insert_tuple_list(tuple_list):
         print(e)
 
 
-def insert_tuple(tuple):
-    db_connector = DbConnector()
+def insert_tuple(tuple, db_connector=None):
+    if not db_connector:
+        db_connector = DbConnector()
     sql = """INSERT INTO cbir_index (image_name, image_vector)
              VALUES(%s, %s) RETURNING id;"""
 
@@ -62,6 +63,15 @@ def insert_tuple(tuple):
         return id
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
+
+
+def insert_many_tuples(tuple_list):
+    db_connector = DbConnector()
+    ids = []
+
+    for tuple in tuple_list:
+        ids.append(insert_tuple(tuple, db_connector=db_connector))
+    return ids
 
 
 def get_feature_vector(img_name, db_connector=None):

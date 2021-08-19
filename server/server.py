@@ -1,24 +1,25 @@
 from re import A
+from numpy.core.defchararray import decode
 import tornado.ioloop
 import tornado.web
 import json
 import logging
 import cv2
 import numpy as np
-from celery_app.tasks import add
-from celery_app.cbir_tasks import cbir_query
 from tornado.options import define, options, parse_command_line
 from tensorflow.keras.applications.resnet import preprocess_input
 
 from db_utils.table_operations import get_feature_vectors
 from cbir.backbone import Backbone
 from rocchio import make_new_query
+from celery_app.cbir_tasks import cbir_query, index_add
+from celery_app.tasks import add
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
 
 
-backbone = Backbone()
+#backbone = Backbone()
 print("Loaded backbone")
 
 n_images = 10
@@ -54,13 +55,16 @@ class MainHandler(BaseHandler):
 class AddIndexHandler(BaseHandler):
     def post(self):
         for field_name, files in self.request.files.items():
+            decoded_images = []
+            image_names = []
             for info in files:
-                filename, content_type = info["filename"], info["content_type"]
                 body = info["body"]
-                logging.info(
-                    'POST "%s" "%s" %d bytes', filename, content_type, len(
-                        body)
-                )
+
+                decoded_image = decode_uploaded_img(body)
+                decoded_images.append(
+                    (info["filename"], decoded_image))
+
+            index_add(decoded_images)
 
         self.write("OK")
 
@@ -134,7 +138,7 @@ class CBIRQueryHandler(BaseHandler):
         print(selected_images)
 
         for field_name, files in self.request.files.items():
-            decoded_img_array = decode_uploaded_img(files)
+            decoded_img_array = decode_uploaded_img(files[0].body)
             query_features = backbone.get_features(decoded_img_array)
             query_features_list = query_features.tolist()
             result_imgs = cbir_query.delay(
@@ -183,8 +187,7 @@ def server_startup_message():
     print(f"Connect to server from url: http://localhost:{options.port}/")
 
 
-def decode_uploaded_img(file):
-    img_bytes = file[0].body
+def decode_uploaded_img(img_bytes):
     img_array = cv2.imdecode(np.frombuffer(
         img_bytes, np.uint8), cv2.IMREAD_COLOR)
     img_array = cv2.resize(img_array, (224, 224))
