@@ -1,3 +1,6 @@
+import sys
+import uuid
+
 import numpy as np
 from numpy import linalg
 from numpy.core.numeric import Inf
@@ -6,6 +9,13 @@ from sklearn import mixture
 from .gmm import GMM
 from .node import Node
 
+sys.path.insert(0, "../")
+
+from db_utils.zodb_connector import ZODBConnector
+from db_utils import table_operations
+
+node_ids = {}
+
 
 def init_cd_tree(
     data,
@@ -13,8 +23,7 @@ def init_cd_tree(
     max_clusters=10,
     min_node=20,
     l_max=5,
-    # tolerance=0.001,
-    # n_iters=1000,
+    zodb_connector=None
 ):
     """
     Function that initializes the CDTree and returns it.
@@ -25,18 +34,21 @@ def init_cd_tree(
     data: [id: int, img_src: string, feature_vector: [int]]
     """
 
-    node_id = 0
+    if not zodb_connector:
+        zodb_connector = ZODBConnector()
+        zodb_connector.connect()
+
     stack = []
-    root_node = _generate_root_node(data, node_id)
+    root_node = _generate_root_node(data)
     stack.append(root_node)
     curr_node = stack.pop()
 
     while curr_node is not None:
         if _check_stop_conditions(curr_node, min_node, l_max):
-            leaf_feature_vectors, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
+            _, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
                 data, curr_node.ids)
 
-            curr_node.make_leaf(leaf_feature_vectors, leaf_img_names)
+            curr_node.make_leaf(leaf_img_names)
         else:
 
             feature_vectors, _ = _get_feature_vectors_and_imgs_by_id(
@@ -80,22 +92,23 @@ def init_cd_tree(
             ids_with_clusters = _asign_ids_to_clusters(
                 curr_node.ids, cluster_asigments)
 
-            sub_nodes = _create_sub_nodes(
+            sub_nodes, sub_node_ids = _create_sub_nodes(
                 ids_with_clusters,
                 curr_node.layer + 1,
                 n_clusters,
-                node_id
             )
 
             for sub_node in sub_nodes:
                 stack.append(sub_node)
 
             curr_node.set_sub_nodes(sub_nodes)
+            curr_node.set_sub_node_ids(sub_node_ids)
             curr_node.n_sub_clusters = n_clusters
 
         if stack:
             curr_node = stack.pop()
         else:
+            zodb_connector.save_cd_tree(root_node)
             return root_node
 
 
@@ -191,12 +204,16 @@ def _check_stop_conditions(node, min_node, l_max):
     return False
 
 
-def _generate_root_node(data, node_id):
+def _generate_root_node(data):
     ids = []
     feature_vectors = []
     for item in data:
         ids.append(item[0])
         feature_vectors.append(item[2])
+
+    node_id = uuid.uuid1().int
+
+    node_ids[node_id] = 1
 
     root_node = Node(
         n_feature_vectors=len(data),
@@ -401,15 +418,23 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
 
 
 def _create_sub_nodes(
-    ids_with_clusters, sub_node_layer, n_clusters, node_id
+    ids_with_clusters, sub_node_layer, n_clusters, parent_node=None,
 ):
     sub_nodes = []
+    sub_node_ids = []
 
     # Outer loop loops throught all of the clusters and creates
     # a new node for each one.
     for index in range(n_clusters):
-        node_id += 1
-        sub_node = Node(layer=sub_node_layer, node_id=node_id)
+        node_id = uuid.uuid1().int
+
+        while node_id in node_ids:
+            node_id = uuid.uuid1().int
+
+        node_ids[node_id] = 1
+
+        sub_node = Node(layer=sub_node_layer, node_id=node_id,
+                        parent_node=parent_node)
 
         ids = []
 
@@ -422,8 +447,9 @@ def _create_sub_nodes(
         sub_node.set_ids(ids)
         sub_node.n_feature_vectors = len(ids)
         sub_nodes.append(sub_node)
+        sub_node_ids.append(node_id)
 
-    return sub_nodes
+    return sub_nodes, sub_node_ids
 
 
 def _compute_eucledian_distance(query_feature_vector, feature_vector):
@@ -460,7 +486,7 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
     stack = []
     stack.append(root_node)
     n_data_points = 0
-    similar_data_points = []
+    similar_data_points_img_names = []
     while n_data_points < n_similar_images:
         curr_node = stack.pop()
         if not curr_node.is_leaf:
@@ -475,19 +501,25 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
             sorted_cvds = sorted(
                 cvds_index, key=lambda x: x[1], reverse=False)
 
-            for item in sorted_cvds:
-                stack.append(curr_node.sub_nodes[item[0]])
+            for cvd in sorted_cvds:
+                stack.append(curr_node.sub_nodes[cvd[0]])
         else:
             for i in range(curr_node.n_feature_vectors):
-                similar_data_points.append(
-                    [curr_node.ids[i],
-                        curr_node.feature_vectors[i],
-                        curr_node.img_names[i]]
+                similar_data_points_img_names.append(
+                    curr_node.img_names[i]
+
                 )
-            n_data_points = len(similar_data_points)
+            n_data_points = len(similar_data_points_img_names)
+
+    feature_vectors = table_operations.get_feature_vectors(
+        "reduced_features", similar_data_points_img_names)
+
+    similar_images = list(zip(feature_vectors, similar_data_points_img_names))
+
+    return
 
     ranked_images = _rank_images(
-        query_feature_vector, similar_data_points)
+        query_feature_vector, similar_data_points_img_names)
     return ranked_images
 
 

@@ -65,6 +65,8 @@ class Node(persistent.Persistent):
         feature_vectors=[],
         img_names=[],
         node_id=-1,
+        parent_node=None,
+        sub_node_ids=[]
     ):
         self.is_leaf = is_leaf
         self.n_feature_vectors = n_feature_vectors
@@ -78,6 +80,7 @@ class Node(persistent.Persistent):
         self.feature_vectors = feature_vectors
         self.node_id = node_id
         self.img_names = img_names
+        self.parent_node = parent_node
 
     def __str__(self):
         return """
@@ -152,6 +155,10 @@ class Node(persistent.Persistent):
         self.is_leaf = is_leaf
         self._p_changed = True
 
+    def set_sub_node_ids(self, sub_node_ids):
+        self.sub_node_ids = sub_node_ids
+        self._p_changed = True
+
     def add_id(self, id):
         self.ids.append(id)
         self._p_changed = True
@@ -164,11 +171,10 @@ class Node(persistent.Persistent):
         self.img_names.append(img_name)
         self._p_changed = True
 
-    def make_leaf(self, feature_vectors, img_names):
+    def make_leaf(self, img_names):
         self.is_leaf = True
         # Only the leaf nodes should explicitly hold feature vectors,
         # all other nodes should get feature vectors from they're ids.
-        self.set_feature_vectors(feature_vectors)
         self.set_img_names(img_names)
 
     def make_inner_node(self):

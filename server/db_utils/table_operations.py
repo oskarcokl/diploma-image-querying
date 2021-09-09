@@ -7,11 +7,11 @@ sys.path.insert(0, ".")
 from .db_connector import DbConnector
 
 
-def create_table(command):
-    db_connector = DbConnector()
+def create_table(command, db_connector=None):
+    if not db_connector:
+        db_connector = DbConnector()
     try:
         db_connector.cursor.execute(command)
-        db_connector.cursor.close()
         db_connector.connection.commit()
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
@@ -74,11 +74,36 @@ def insert_many_tuples(tuple_list):
     return ids
 
 
-def get_feature_vector(img_name, db_connector=None):
+def insert_tuple_reduced(tuple, db_connector=None):
+    if not db_connector:
+        db_connector = DbConnector()
+    sql = """INSERT INTO reduced_features (image_name, image_vector)
+             VALUES(%s, %s) RETURNING id;"""
+
+    try:
+        print("Writing image vector to database.")
+        db_connector.cursor.execute(sql, tuple)
+        id = db_connector.cursor.fetchone()[0]
+        db_connector.connection.commit()
+        return id
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+
+
+def insert_many_tuples_reduced(tuple_list):
+    db_connector = DbConnector()
+    ids = []
+
+    for tuple in tuple_list:
+        ids.append(insert_tuple_reduced(tuple, db_connector=db_connector))
+    return ids
+
+
+def get_reduced_feature_vector(img_name, db_connector=None):
     if not db_connector:
         db_connector = DbConnector()
 
-    sql = """SELECT image_vector FROM cbir_index WHERE image_name=%s"""
+    sql = """SELECT image_vector FROM reduced_features WHERE image_name=%s"""
 
     try:
         #logging.info(f"Getting feature vector for {img_name}")
@@ -89,13 +114,13 @@ def get_feature_vector(img_name, db_connector=None):
         print(e)
 
 
-def get_feature_vectors(img_names):
+def get_reduced_feature_vectors(table_name, img_names):
     try:
         db_connector = DbConnector()
         feature_vectors = []
         for img_name in img_names:
-            feature_vector = get_feature_vector(
-                img_name, db_connector=db_connector)
+            feature_vector = get_reduced_feature_vector(
+                table_name, img_name, db_connector=db_connector)
             feature_vectors.append(feature_vector)
 
         return feature_vectors

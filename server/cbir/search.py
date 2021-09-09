@@ -171,11 +171,11 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher, feature_vec
     return result_img_names
 
 
-def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None, n_images=10, feature_vectors=None):
+def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None, n_images=10, feature_vectors=np.array([])):
     global T_SEARCH
     if features_query:
         features_query_array = np.array(features_query)
-        if not feature_vectors:
+        if not np.any(feature_vectors):
             feature_vectors = get_feature_vectors()
 
         reduced_features_query = reduce_features_query(
@@ -191,7 +191,7 @@ def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_arr
         processed_img_array = preprocess_input(img_array)
         features_query = backbone.get_features(processed_img_array)
 
-        if feature_vectors.size == 0:
+        if not np.any(feature_vectors):
             feature_vectors = get_feature_vectors()
         reduced_features_query = reduce_features_query(
             features_query.reshape(1, -1), feature_vectors, 140)
@@ -277,7 +277,7 @@ def show_results(query_img_path, img_paths):
 
 def write_time():
     row = [T_MODEL, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
-    save_to_csv("./experiments/coco.csv", row)
+    save_to_csv("./experiments/256.csv", row)
 
 
 if __name__ == "__main__":

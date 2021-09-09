@@ -1,6 +1,7 @@
 import argparse
 import os
 import numpy as np
+from tensorflow.python.keras.backend import switch
 from cbir.searcher import Searcher
 from sklearn.decomposition import TruncatedSVD
 from cbir.backbone import Backbone
@@ -11,16 +12,10 @@ from csv_writer import init_csv
 from cbir import search
 
 
-holidays = "../../dataset/vacations"
-objects = "../../dataset/256_objects"
-coco = "../../../../Datasets/train2017"
-
-
-def make_queries(file_name, force=False):
+def make_queries(file_name, csv_name, datset_path, force=False):
     result_lines = []
-    dataset_name = "coco.csv"
 
-    init_csv(os.path.join("experiments/", dataset_name))
+    init_csv(os.path.join("experiments/", csv_name))
 
     with open(file_name, "r") as f:
         lines = f.readlines()
@@ -31,14 +26,14 @@ def make_queries(file_name, force=False):
         else:
             img_names, feature_vectors = get_names_and_features()
             #svd = TruncatedSVD(n_components=140)
-            #svd.fit(feature_vectors)
+            # svd.fit(feature_vectors)
             #reduced_feature_vectors = svd.transform(feature_vectors)
             reduced_feature_vectors = feature_vectors
 
         for line in lines:
             query_img_name = line[:-1]
             query_img_path = os.path.join(
-                coco, query_img_name)
+                datset_path, query_img_name)
 
             if not force:
                 result = search.search(query_img_path=query_img_path,
@@ -66,7 +61,7 @@ def make_queries(file_name, force=False):
 def get_feature_vectors():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    data = connector.cursor.fetchall()
+    data = connector.cursor.fetchmany(1000)
     data_array = np.array(data, dtype=object)
 
     feature_vectors = data_array[:, 2]
@@ -90,6 +85,15 @@ def get_names_and_features():
     return np.array(result_img_names), np.array(result_feature_vectors)
 
 
+def get_dataset_and_csv(str_db):
+    if str_db == "holidays":
+        return ("../../dataset/vacations", "holidays.csv")
+    elif str_db == "256":
+        return ("../../dataset/256_objects", "256.csv")
+    elif str_db == "coco":
+        return ("../../../../Datasets/train2017", "coco.csv")
+
+
 if __name__ == "__main__":
     argParser = argparse.ArgumentParser()
     argParser.add_argument(
@@ -106,4 +110,9 @@ if __name__ == "__main__":
 
     args = vars(argParser.parse_args())
 
-    make_queries(args["file"], args["force"])
+    database = args["file"].split("_")[1].split(".")[0]
+    dataset, csv_name = get_dataset_and_csv(database)
+
+    print(dataset, csv_name)
+
+    make_queries(args["file"], csv_name, dataset, args["force"])
