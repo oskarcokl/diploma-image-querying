@@ -22,9 +22,11 @@ from searcher import Searcher
 T_SEARCH = 0
 T_MODEL = 0
 T_ALL = 0
+T_FEAT_REDUCTION = 0
+T_DB = 0
 
 
-def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, searcher=None, query_features=None, n_images=10):
+def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, searcher=None, query_features=None, n_images=10, dataset=None, feature_vectors=None):
     t_all = Timer(name="All", logger=None)
     t_all.start()
     t_model = Timer(name="Model", logger=None)
@@ -48,7 +50,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, s
         print("Finding similar images")
 
         img_names = find_similar_imgs(
-            img_array=img_array, backbone=backbone, searcher=searcher, n_images=n_images
+            img_array=img_array, backbone=backbone, searcher=searcher, n_images=n_images, feature_vectors=feature_vectors,
         )
 
         # TODO uncomment
@@ -74,7 +76,7 @@ def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, s
     else:
         if query_features:
             img_names = find_similar_imgs(
-                backbone=backbone, searcher=searcher, features_query=query_features, n_images=n_images
+                backbone=backbone, searcher=searcher, features_query=query_features, n_images=n_images, feature_vectors=feature_vectors
             )
             return img_names
         else:
@@ -82,86 +84,122 @@ def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, s
             img_array = np.expand_dims(query_img_array, axis=0)
 
             img_names = find_similar_imgs(
-                img_array=img_array, backbone=backbone, searcher=searcher, n_images=n_images
+                img_array=img_array, backbone=backbone, searcher=searcher, n_images=n_images, feature_vectors=feature_vectors
             )
             return img_names
 
 
-def brute_force_search(query_img_path=None, dataset=""):
+def brute_force_search(query_img_path=None, backbone=None, searcher=None, n_images=10, feature_vectors=np.array([]), dataset="", img_names=None, reduced_feature_vectors=None):
     t_all = Timer(name="All", logger=None)
     t_all.start()
+
     t_model = Timer(name="Model", logger=None)
     t_model.start()
-
-    backbone = Backbone()
-
+    if not backbone:
+        backbone = Backbone()
     global T_MODEL
     T_MODEL = t_model.stop()
-    searcher = Searcher()
+
+    if not searcher:
+        searcher = Searcher()
 
     try:
         img = image.load_img(query_img_path, target_size=(224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
 
-        img_names = find_similar_imgs_force(
-            img_array=img_array, backbone=backbone, searcher=searcher
+        result_img_names = find_similar_imgs_force(
+            img_array=img_array,
+            backbone=backbone,
+            searcher=searcher,
+            feature_vectors=feature_vectors,
+            n_images=n_images,
+            img_names=img_names,
+            reduced_feature_vectors=reduced_feature_vectors
         )
 
-        img_paths = [os.path.join(dataset, img_name)
-                     for img_name in img_names]
+        # img_paths = [os.path.join(dataset, img_name)
+        #              for img_name in img_names]
+        # show_results(query_img_path, img_paths)
 
-        show_results(query_img_path, img_paths)
+        ranked_img_names = []
+        for i, img_name in enumerate(result_img_names):
+            ranked_img_name = " ".join((str(i), img_name))
+            ranked_img_names.append(ranked_img_name)
+
+        line = " ".join(ranked_img_names)
         global T_ALL
         T_ALL = t_all.stop()
 
-        with open("../experiments/result.txt", "w") as f:
-            img_names_pruned = [name.split(".")[0] for name in img_names]
-            for img_name in img_names_pruned:
-                f.write(img_name + "\n")
+        write_time()
+        return line
 
     except Exception as e:
         print(e)
 
 
-def find_similar_imgs_force(img_array, backbone: Backbone, searcher):
+def find_similar_imgs_force(img_array, backbone: Backbone, searcher, feature_vectors=None, reduced_feature_vectors=None, n_images=10, img_names=None):
+    print("Im forcing")
     processed_img_array = preprocess_input(img_array)
 
     features_query = backbone.get_features(processed_img_array)
 
-    feature_vectors = get_feature_vectors()
+    if feature_vectors.size <= 0:
+        print("no feature vectors")
+        feature_vectors = get_feature_vectors()
 
-    n_features = 200
+    n_features = 140
 
-    reduced_feature_query = reduce_features_query(
-        features_query.reshape(1, -1), feature_vectors, n_features)
     # We are almost doing the same operation twice. but since we are adding
     # the query features in reduce features query. The reduction would not be the same.
-    svd = TruncatedSVD(n_components=n_features)
-    svd.fit(feature_vectors)
-    reduced_feature_vectors = svd.transform(feature_vectors)
+    if reduced_feature_vectors.size <= 0:
+        print("Reducing feature vectors")
+        svd = TruncatedSVD(n_components=n_features)
+        svd.fit(feature_vectors)
+        reduced_feature_vectors = svd.transform(feature_vectors)
 
-    img_names = get_img_names()
+    if len(img_names) <= 0:
+        print("Getting img names")
+        img_names = get_img_names()
+
+    # reduced_feature_query = reduce_features_query(
+    #     features_query.reshape(1, -1), feature_vectors, n_features)
 
     global T_SEARCH
     result_img_names, T_SEARCH = searcher.search_force(
-        reduced_feature_query, reduced_feature_vectors, img_names, 20)
+        features_query.reshape(1, -1), reduced_feature_vectors, img_names, n_images)
     return result_img_names
 
 
-def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None, n_images=10):
+def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None, n_images=10, feature_vectors=None):
     global T_SEARCH
-    if (features_query):
+    if features_query:
         features_query_array = np.array(features_query)
+        if not feature_vectors:
+            feature_vectors = get_feature_vectors()
+
+        reduced_features_query = reduce_features_query(
+            features_query_array.reshape(1, -1), feature_vectors, 140)
+
+        del feature_vectors
+
         img_names, T_SEARCH = searcher.search(
-            features_query_array.reshape(1, -1), n_images)
+            reduced_features_query, n_images)
         del searcher
         return img_names
     else:
         processed_img_array = preprocess_input(img_array)
         features_query = backbone.get_features(processed_img_array)
+
+        if feature_vectors.size == 0:
+            feature_vectors = get_feature_vectors()
+        reduced_features_query = reduce_features_query(
+            features_query.reshape(1, -1), feature_vectors, 140)
+
+        del feature_vectors
+
         img_names, T_SEARCH = searcher.search(
-            features_query.reshape(1, -1), n_images)
+            reduced_features_query, n_images)
         return img_names
 
 
@@ -183,6 +221,9 @@ def reduce_features_query(query_features, feature_vectors, n_components=100):
 
 
 def get_feature_vectors():
+    print("Getting feature vectors")
+    t_db_timer = Timer(name="Db timer", logger=None)
+    t_db_timer.start()
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
     data = connector.cursor.fetchall()
@@ -191,6 +232,8 @@ def get_feature_vectors():
     feature_vectors = data_array[:, 2]
     result = np.array([np.array(feature_vector)
                        for feature_vector in feature_vectors])
+    global T_DB
+    T_DB = t_db_timer.stop()
     return result
 
 
@@ -233,8 +276,8 @@ def show_results(query_img_path, img_paths):
 
 
 def write_time():
-    row = [T_MODEL, T_SEARCH, T_ALL]
-    save_to_csv("./experiments/oxford.csv", row)
+    row = [T_MODEL, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
+    save_to_csv("./experiments/coco.csv", row)
 
 
 if __name__ == "__main__":

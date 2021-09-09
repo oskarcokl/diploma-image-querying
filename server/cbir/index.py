@@ -164,7 +164,7 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
 
     # TODO Change back to new data
     root_node = cd_tree.init_cd_tree(
-        data, min_clusters, max_clusters, min_node=min_node, l_max=l_max)
+        new_data, min_clusters, max_clusters, min_node=min_node, l_max=l_max)
     return root_node
 
 
@@ -225,8 +225,8 @@ def load_model():
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    print("Number of indexed images: ", connector.cursor.rowcount)
-    data = connector.cursor.fetchall()
+    data = connector.cursor.fetchmany(95000)
+    print("Number of indexed images: ", len(data))
     data_array = np.array(data, dtype=object)
 
     return data_array
@@ -269,7 +269,7 @@ if __name__ == "__main__":
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 7, 10, 6)
+        root_node = init_cd_tree(data, 1, 14, 150, 14)
         save_cd_tree(root_node)
     elif args.get("init_query"):
         make_test_query_feature(args.get("query"))

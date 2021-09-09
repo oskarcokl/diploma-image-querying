@@ -10,7 +10,7 @@ def save_to_csv(path, row):
 
 def init_csv(path):
     # Current working headers more will be added
-    header = ["t model", "t search", "t all"]
+    header = ["t model", "t_reduction", "t search", "t all"]
 
     with open(path, "w") as f:
         writer = csv.writer(f)

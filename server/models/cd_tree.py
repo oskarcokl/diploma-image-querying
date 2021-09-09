@@ -52,7 +52,7 @@ def init_cd_tree(
             for i in range(min_clusters, max_clusters + 1):
                 # Using diagonals covariance matrices speeds thing up tremendously.
                 gmm = mixture.GaussianMixture(
-                    n_components=i, covariance_type="diag", max_iter=1000, n_init=10).fit(curr_node_feature_array)
+                    n_components=i, covariance_type="diag", max_iter=1000).fit(curr_node_feature_array)
 
                 curr_bic = gmm.bic(curr_node_feature_array)
                 #print(f"Trying with {i} clusters, bic: {curr_bic}")
@@ -474,8 +474,6 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
 
             sorted_cvds = sorted(
                 cvds_index, key=lambda x: x[1], reverse=False)
-
-            print(sorted_cvds)
 
             for item in sorted_cvds:
                 stack.append(curr_node.sub_nodes[item[0]])

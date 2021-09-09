@@ -20,7 +20,7 @@ define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
 
 
-#backbone = Backbone()
+backbone = Backbone()
 print("Loaded backbone")
 
 n_images = 10
