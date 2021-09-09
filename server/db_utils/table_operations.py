@@ -114,13 +114,13 @@ def get_reduced_feature_vector(img_name, db_connector=None):
         print(e)
 
 
-def get_reduced_feature_vectors(table_name, img_names):
+def get_reduced_feature_vectors(img_names):
     try:
         db_connector = DbConnector()
         feature_vectors = []
         for img_name in img_names:
             feature_vector = get_reduced_feature_vector(
-                table_name, img_name, db_connector=db_connector)
+                img_name, db_connector=db_connector)
             feature_vectors.append(feature_vector)
 
         return feature_vectors

@@ -470,12 +470,12 @@ def _compute_cosine_similarity(query_feature_vector, feature_vector):
 def _rank_images(query_feature_vector, similar_images):
     for i in range(len(similar_images)):
         d = _compute_cosine_similarity(
-            query_feature_vector, similar_images[i][1]
+            query_feature_vector, similar_images[i][0]
         )
-        similar_images[i].append(d)
+        similar_images[i] = similar_images[i] + (d,)
 
     ranked_similar_images = sorted(
-        similar_images, reverse=True, key=lambda x: x[3])
+        similar_images, reverse=True, key=lambda x: x[2])
 
     return ranked_similar_images
 
@@ -511,15 +511,13 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
                 )
             n_data_points = len(similar_data_points_img_names)
 
-    feature_vectors = table_operations.get_feature_vectors(
-        "reduced_features", similar_data_points_img_names)
+    feature_vectors = table_operations.get_reduced_feature_vectors(
+        similar_data_points_img_names)
 
     similar_images = list(zip(feature_vectors, similar_data_points_img_names))
 
-    return
-
     ranked_images = _rank_images(
-        query_feature_vector, similar_data_points_img_names)
+        query_feature_vector, similar_images)
     return ranked_images
 
 
