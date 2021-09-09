@@ -139,7 +139,6 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
         # Appending tuples here.
         new_data.append((item[0], item[1], reduced_feature_vectors[i]))
 
-    # TODO Change back to new data
     root_node = cd_tree.init_cd_tree(
         new_data, min_clusters, max_clusters, min_node=min_node, l_max=l_max)
     return root_node
@@ -154,49 +153,6 @@ def save_cd_tree(root_node):
     root.cd_tree = BTrees.OOBTree.BTree()
     root.cd_tree["root_node"] = root_node
     transaction.commit()
-
-
-def get_cd_tree_from_storage():
-    storage = ZODB.FileStorage.FileStorage("cd_tree.fs")
-    db = ZODB.DB(storage)
-    connection = db.open()
-    root = connection.root
-
-    print(len(root.cd_tree["root_node"].sub_nodes[0].ids))
-    print(root.cd_tree["root_node"].sub_nodes[0].n_feature_vectors)
-
-
-def make_test_query_feature(query_img_path):
-    model = load_model()
-
-    img = image.load_img(query_img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-
-    processed_img_array = preprocess_input(img_array)
-    get_fc2_layer_output = K.function(
-        [model.layers[0].input], model.layers[22].output)
-    features_query = get_fc2_layer_output([processed_img_array])[0]
-
-    with open("query_features", "wb") as f:
-        pickle.dump(features_query, f)
-    return ":)"
-
-
-def load_model():
-    model = None
-    if os.path.isdir("./vgg16"):
-        print("Model already downloaded loading from disk.")
-        model = keras.models.load_model("./vgg16")
-    else:
-        print("Downloading model.")
-        model = VGG16(
-            weights="imagenet",
-        )
-        print("Saving model to disk.")
-        model.save("./vgg16")
-
-    return model
 
 
 def get_data():
@@ -229,12 +185,6 @@ if __name__ == "__main__":
         action="store_true",
     )
     argParser.add_argument(
-        "-IQ",
-        "--init-query",
-        help="Create a query and save it to a file to load it later.",
-        action="store_true",
-    )
-    argParser.add_argument(
         "-q",
         "--query",
         help="Path to query image.",
@@ -248,7 +198,3 @@ if __name__ == "__main__":
         data = get_data()
         root_node = init_cd_tree(data, 1, 14, 150, 14)
         save_cd_tree(root_node)
-    elif args.get("init_query"):
-        make_test_query_feature(args.get("query"))
-    else:
-        get_cd_tree_from_storage()
