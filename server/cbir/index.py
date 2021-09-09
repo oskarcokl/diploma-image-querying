@@ -24,29 +24,6 @@ from models import cd_tree
 from db_utils import table_operations
 
 
-def insert_image_vector(image_name, image_vector):
-    sql = """INSERT INTO cbir_index(image_name, image_vector)
-             VALUES(%s, %s) RETURNING id;"""
-
-    connection = None
-    image_id = None
-    try:
-        params = config()
-        connection = psycopg2.connect(**params)
-        cursor = connection.cursor()
-        cursor.execute(sql, (image_name, image_vector))
-        image_id = cursor.fetchone()[0]
-        connection.commit()
-        cursor.close()
-    except (Exception, psycopg2.DatabaseError) as e:
-        print(e)
-    finally:
-        if connection is not None:
-            connection.close()
-
-    return image_id
-
-
 # This function is intented to be run only when setting up the initial db.
 # WARNING! The function will drop cbir_index table if it already exists!
 def init_db(dataset_src):
