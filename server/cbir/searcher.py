@@ -1,42 +1,21 @@
 import sys
 import pickle
 
-import ZODB
-import ZODB.FileStorage
 from codetiming import Timer
-from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
 
 sys.path.insert(0, "../")
 sys.path.append("./scripts/")
 from models import cd_tree
-
-
-cli = "../cbir/cd_tree.fs"
-server = "./cbir/cd_tree.fs"
+from db_utils.zodb_connector import ZODBConnector
 
 
 class Searcher:
-    root = None
-
-    def _get_root_node(self):
-        if self.root:
-            return self.root.cd_tree["root_node"]
-        else:
-            self.storage = ZODB.FileStorage.FileStorage(server)
-            self.db = ZODB.DB(self.storage)
-            self.connection = self.db.open()
-            self.root = self.connection.root
-
-            return self.root.cd_tree["root_node"]
-
-    def _close_connection(self):
-        print("Closing connection")
-        self.db.close()
-
     def search(self, query_features, n_similar_images):
-        root_node = self._get_root_node()
+        z_connector = ZODBConnector()
+        z_connector.connect()
+        root_node = z_connector.get_root_node()
         search_time = Timer(name="Search", logger=None)
         search_time.start()
         result_images = cd_tree.find_similar_images(
@@ -45,7 +24,7 @@ class Searcher:
             n_similar_images=n_similar_images)
 
         elapsed_time = search_time.stop()
-        self._close_connection()
+        z_connector.disconnect()
         img_names = []
 
         for i in range(n_similar_images):
