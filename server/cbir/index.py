@@ -1,20 +1,13 @@
 import argparse
 import os
 import sys
-import pickle
 
-import psycopg2
 import numpy as np
-from tensorflow import keras
 from tensorflow.keras.applications.resnet import preprocess_input
 from tensorflow.keras.preprocessing import image
-import ZODB
 import ZODB.FileStorage
-import BTrees
-import transaction
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
-from progress.bar import Bar
 
 # Local application imports
 sys.path.insert(0, "../")
@@ -22,6 +15,7 @@ from backbone import Backbone
 from db_utils.db_connector import DbConnector
 from models import cd_tree
 from db_utils import table_operations
+from db_utils.zodb_connector import ZODBConnector
 
 
 # This function is intented to be run only when setting up the initial db.
@@ -144,17 +138,6 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     return root_node
 
 
-def save_cd_tree(root_node):
-    storage = ZODB.FileStorage.FileStorage(
-        "cd_tree.fs", blob_dir="cd_tree_blob")
-    db = ZODB.DB(storage)
-    connection = db.open()
-    root = connection.root
-    root.cd_tree = BTrees.OOBTree.BTree()
-    root.cd_tree["root_node"] = root_node
-    transaction.commit()
-
-
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
@@ -196,5 +179,8 @@ if __name__ == "__main__":
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 14, 150, 14)
-        save_cd_tree(root_node)
+        root_node = init_cd_tree(data, 1, 3, 20, 4)
+        print("CD-tree created")
+        zodb_connector = ZODBConnector()
+        zodb_connector.connect()
+        zodb_connector.save_cd_tree(root_node)

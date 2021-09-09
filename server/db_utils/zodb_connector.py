@@ -9,6 +9,18 @@ from ZODB.POSException import ConnectionStateError
 cli = "../db_utils/zodb.zconfig"
 server = "./db_utils/zodb.zconfig"
 
+conf = """
+%%import relstorage
+<zodb main>
+<relstorage>
+  <postgresql>
+    # The dsn is optional, as are each of the parameters in the dsn.
+    dsn dbname='%s' user='%s' host='%s' password='%s'
+  </postgresql>
+</relstorage>
+</zodb>
+""" % ("image_querying", "postgres", "localhost", "harambe2016!")
+
 
 class ZODBConnector:
     def __init__(self):
@@ -17,7 +29,7 @@ class ZODBConnector:
         self.root = None
 
     def connect(self):
-        self.db = ZODB.config.databaseFromURL(cli)
+        self.db = ZODB.config.databaseFromString(conf)
         self.connection = self.db.open()
         self.root = self.connection.root
 
@@ -25,7 +37,7 @@ class ZODBConnector:
         self.db.close()
 
     def save_cd_tree(self, root_node):
-        if self.storage is None or self.connection is None or self.db is None or self.root is None:
+        if self.connection is None or self.db is None or self.root is None:
             raise ConnectionStateError("ERROR: Not connected to ZODB database")
 
         self.root.cd_tree = BTrees.OOBTree.BTree()
