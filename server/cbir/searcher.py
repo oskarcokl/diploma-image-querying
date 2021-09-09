@@ -1,9 +1,7 @@
 import sys
-import pickle
 
 from codetiming import Timer
 import numpy as np
-
 
 sys.path.insert(0, "../")
 sys.path.append("./scripts/")
@@ -39,16 +37,8 @@ class Searcher:
 
         result_img_names = []
 
-        #neighbors = NearestNeighbors(n_neighbors=1, algorithm="brute")
-
         distances = self._compute_distances(
             query_features, feature_vectors, img_names)
-        # neighbors.fit(feature_vectors)
-        # _, indexes = neighbors.kneighbors(
-        #     X=query_features.reshape(1, -1), n_neighbors=n_similar_images)
-
-        # for index in indexes[0]:
-        #     result_img_names.append(img_names[index])
 
         ranked_distances = sorted(distances, reverse=True, key=lambda x: x[0])
 
@@ -72,12 +62,3 @@ class Searcher:
         magnitude_f = np.linalg.norm(y)
         result = dot_product / (magnitude_f * magnitude_q)
         return result
-
-
-if __name__ == "__main__":
-    query_feature_vector = []
-
-    with open("query_features", "rb") as f:
-        query_feature_vector = pickle.load(f)
-
-    Searcher().search(n_similar_images=10, query_features=query_feature_vector)
