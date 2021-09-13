@@ -5,7 +5,7 @@ cli = "../db_utils/database.ini"
 server = "./db_utils/database.ini"
 
 
-def config(filename=cli, section="postgresql"):
+def config(filename=server, section="postgresql"):
     parser = ConfigParser()
     parser.read(filename)
     db = {}

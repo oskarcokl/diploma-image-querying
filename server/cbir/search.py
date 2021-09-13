@@ -54,24 +54,24 @@ def search(query_img_path=None, query_img_list=None, cli=False, backbone=None, s
         )
 
         # TODO uncomment
-        # img_paths = [os.path.join(dataset, img_name)
-        #              for img_name in img_names]
+        img_paths = [os.path.join(dataset, img_name)
+                     for img_name in img_names]
 
-        # show_results(query_img_path, img_paths)
-        # global T_ALL
-        # T_ALL = t_all.stop()
-
-        # TODO Only to be used while evaluating system.
-        ranked_img_names = []
-        for i, img_name in enumerate(img_names):
-            ranked_img_name = " ".join((str(i), img_name))
-            ranked_img_names.append(ranked_img_name)
-
-        line = " ".join(ranked_img_names)
+        show_results(query_img_path, img_paths)
         global T_ALL
         T_ALL = t_all.stop()
-        write_time()
-        return line
+
+        # TODO Only to be used while evaluating system.
+        # ranked_img_names = []
+        # for i, img_name in enumerate(img_names):
+        #     ranked_img_name = " ".join((str(i), img_name))
+        #     ranked_img_names.append(ranked_img_name)
+
+        # line = " ".join(ranked_img_names)
+        # global T_ALL
+        # T_ALL = t_all.stop()
+        # write_time()
+        # return line
 
     else:
         if query_features:

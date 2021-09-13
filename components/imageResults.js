@@ -9,7 +9,7 @@ export default function ImageResults({
   buttonOnClick,
 }) {
   return (
-    <div className={`image-results-container ${styleName}`}>
+    <div className={`results-container ${styleName}`}>
       <SectionTitle title="Results" />
       <div className="result-images-container">
         <ResultImage src={srcs[0]} onClick={onClick}></ResultImage>
@@ -22,8 +22,9 @@ export default function ImageResults({
         <ResultImage src={srcs[7]} onClick={onClick}></ResultImage>
         <ResultImage src={srcs[8]} onClick={onClick}></ResultImage>
         <ResultImage src={srcs[9]} onClick={onClick}></ResultImage>
-        <Button name="Query again" clickHandler={buttonOnClick}></Button>
       </div>
+
+      <Button name="Query again" clickHandler={buttonOnClick}></Button>
     </div>
   );
 }

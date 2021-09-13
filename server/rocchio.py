@@ -11,7 +11,7 @@ def make_new_query(query_features, related_images, non_related_images, a=1, b=0.
     for non_related_features in non_related_images:
         non_related_sum = non_related_sum + non_related_features
 
-    new_query = (a * query_features) + (b * 1 / len(related_images) *
-                                        related_sum) - (c * 1 / len(non_related_images) * non_related_sum)
+    new_query = (a * query_features) + (b * (1 / len(related_images)) *
+                                        related_sum) - (c * (1 / len(non_related_images)) * non_related_sum)
 
     return new_query

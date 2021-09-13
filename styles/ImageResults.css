@@ -1,11 +1,18 @@
 .result-images-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
-.result-images-container > *:not(:first-child) {
+.results-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+button {
   margin-top: 1rem;
 }

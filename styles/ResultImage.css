@@ -1,7 +1,9 @@
 .result-image {
   object-fit: cover;
-  width: 600px;
-  height: 600px;
+  width: 250px;
+  height: 250px;
+  margin-top: 1rem;
+  margin-left: 1rem;
 }
 
 .result-image:hover {
@@ -9,5 +11,5 @@
 }
 
 .selected {
-  border: 5px solid var(--main-darker);
+  border: 10px solid var(--main-darker);
 }
