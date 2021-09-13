@@ -4,7 +4,6 @@ import tornado.ioloop
 import tornado.web
 import json
 import os
-import logging
 import cv2
 import numpy as np
 from tornado.options import define, options, parse_command_line

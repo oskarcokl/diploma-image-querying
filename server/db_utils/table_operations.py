@@ -73,6 +73,7 @@ def insert_many_tuples(tuple_list):
         ids.append(insert_tuple(tuple, db_connector=db_connector))
     return ids
 
+
 def insert_tuple_list_reduced(tuple_list):
     db_connector = DbConnector()
     sql = """INSERT INTO reduced_features (image_name, image_vector)
@@ -133,6 +134,35 @@ def get_reduced_feature_vectors(img_names):
         feature_vectors = []
         for img_name in img_names:
             feature_vector = get_reduced_feature_vector(
+                img_name, db_connector=db_connector)
+            feature_vectors.append(feature_vector)
+
+        return feature_vectors
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+
+
+def get_feature_vector(img_name, db_connector=None):
+    if not db_connector:
+        db_connector = DbConnector()
+
+    sql = """SELECT image_vector FROM cbir_index WHERE image_name=%s"""
+
+    try:
+        #logging.info(f"Getting feature vector for {img_name}")
+        db_connector.cursor.execute(sql, (img_name,))
+        feature_vector = db_connector.cursor.fetchone()[0]
+        return feature_vector
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+
+
+def get_feature_vectors(img_names):
+    try:
+        db_connector = DbConnector()
+        feature_vectors = []
+        for img_name in img_names:
+            feature_vector = get_feature_vector(
                 img_name, db_connector=db_connector)
             feature_vectors.append(feature_vector)
 
