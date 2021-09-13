@@ -277,7 +277,7 @@ def show_results(query_img_path, img_paths):
 
 def write_time():
     row = [T_MODEL, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
-    save_to_csv("./experiments/256.csv", row)
+    save_to_csv("./experiments/coco.csv", row)
 
 
 if __name__ == "__main__":

@@ -73,6 +73,19 @@ def insert_many_tuples(tuple_list):
         ids.append(insert_tuple(tuple, db_connector=db_connector))
     return ids
 
+def insert_tuple_list_reduced(tuple_list):
+    db_connector = DbConnector()
+    sql = """INSERT INTO reduced_features (image_name, image_vector)
+             VALUES(%s, %s) RETURNING id;"""
+
+    try:
+        print("Writing image vectors to database.")
+        id = db_connector.cursor.executemany(sql, tuple_list)
+        db_connector.connection.commit()
+        return id
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+
 
 def insert_tuple_reduced(tuple, db_connector=None):
     if not db_connector:

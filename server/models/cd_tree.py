@@ -45,7 +45,7 @@ def init_cd_tree(
 
     while curr_node is not None:
         if _check_stop_conditions(curr_node, min_node, l_max):
-            _, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
+            leaf_img_names = _get_imgs_by_id(
                 data, curr_node.ids)
 
             curr_node.make_leaf(leaf_img_names)
@@ -189,6 +189,18 @@ def _get_feature_vectors_and_imgs_by_id(data, ids):
                 data_start_index = i + 1
                 break
     return (features, img_names)
+
+
+def _get_imgs_by_id(data, ids):
+    img_names = []
+    data_start_index = 0
+    for id in ids:
+        for i in range(data_start_index, len(data)):
+            if data[i][0] == id:
+                img_names.append(data[i][1])
+                data_start_index = i + 1
+                break
+    return img_names
 
 
 def _check_stop_conditions(node, min_node, l_max):
@@ -434,7 +446,7 @@ def _create_sub_nodes(
         node_ids[node_id] = 1
 
         sub_node = Node(layer=sub_node_layer, node_id=node_id,
-                        parent_node=parent_node)
+                        )
 
         ids = []
 
@@ -507,9 +519,10 @@ def find_similar_images(root_node, query_feature_vector, n_similar_images):
             for i in range(curr_node.n_feature_vectors):
                 similar_data_points_img_names.append(
                     curr_node.img_names[i]
-
                 )
             n_data_points = len(similar_data_points_img_names)
+
+    print(n_data_points)
 
     feature_vectors = table_operations.get_reduced_feature_vectors(
         similar_data_points_img_names)

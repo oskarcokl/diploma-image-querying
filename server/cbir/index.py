@@ -140,7 +140,7 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     # normalized_feature_vectors = normalize_sk_learn(feature_vectors)
     reduced_feature_vectors = reduce_features(feature_vectors, 140)
 
-    table_operations.insert_many_tuples_reduced(
+    table_operations.insert_tuple_list_reduced(
         list(zip(img_names, reduced_feature_vectors)))
 
     new_data = []
@@ -157,7 +157,7 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
 def get_data():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    data = connector.cursor.fetchall()
+    data = connector.cursor.fetchmany(98000)
     print("Number of indexed images: ", len(data))
     data_array = np.array(data, dtype=object)
 
@@ -195,5 +195,5 @@ if __name__ == "__main__":
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 5, 10, 6)
+        root_node = init_cd_tree(data, 1, 3, 10, 3)
         print("CD-tree created")

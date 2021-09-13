@@ -2,6 +2,9 @@ import argparse
 import os
 import numpy as np
 from tensorflow.python.keras.backend import switch
+from memory_profiler import profile
+
+
 from cbir.searcher import Searcher
 from sklearn.decomposition import TruncatedSVD
 from cbir.backbone import Backbone
@@ -12,6 +15,7 @@ from csv_writer import init_csv
 from cbir import search
 
 
+@profile
 def make_queries(file_name, csv_name, datset_path, force=False):
     result_lines = []
 
@@ -58,6 +62,7 @@ def make_queries(file_name, csv_name, datset_path, force=False):
             f.write(result_line)
 
 
+@profile
 def get_feature_vectors():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
@@ -70,10 +75,11 @@ def get_feature_vectors():
     return result
 
 
+@profile
 def get_names_and_features():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    data = connector.cursor.fetchmany(1000)
+    data = connector.cursor.fetchmany(95000)
     data_array = np.array(data, dtype=object)
 
     img_names = data_array[:, 1]

@@ -1,6 +1,6 @@
 #!/bin/sh
 
 echo "Starting docker containers..."
-docker container start jolly_shirley
-#docker container start rabbitmq
+docker container start dev-postgres
+docker container start celery-rabbit
 echo "Docker containers started."

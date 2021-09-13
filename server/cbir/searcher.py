@@ -26,7 +26,7 @@ class Searcher:
         img_names = []
 
         for i in range(n_similar_images):
-            img_names.append(result_images[i][2])
+            img_names.append(result_images[i][1])
 
         return img_names, elapsed_time
 

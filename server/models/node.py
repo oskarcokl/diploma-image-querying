@@ -176,6 +176,7 @@ class Node(persistent.Persistent):
         # Only the leaf nodes should explicitly hold feature vectors,
         # all other nodes should get feature vectors from they're ids.
         self.set_img_names(img_names)
+        # self.set_feature_vectors(feature_vectors)
 
     def make_inner_node(self):
         self.is_leaf = False
