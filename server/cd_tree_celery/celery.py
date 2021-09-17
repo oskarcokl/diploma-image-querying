@@ -1,10 +1,10 @@
 from celery import Celery
 
 app = Celery(
-    "celery_app",
+    "cd_tree_celery",
     broker="amqp://",
     backend="rpc://",
-    include=["celery_app.tasks", "celery_app.cbir_tasks"],
+    include=["cd_tree_celery.tasks", "cd_tree_celery.cd_tree_tasks"],
 )
 
 # Optional configuration, see the application user guide.

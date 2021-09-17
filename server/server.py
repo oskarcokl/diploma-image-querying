@@ -12,8 +12,10 @@ from tensorflow.keras.applications.resnet import preprocess_input
 from db_utils.table_operations import get_feature_vectors
 from cbir.backbone import Backbone
 from rocchio import make_new_query
-from celery_app.cbir_tasks import cbir_query, index_add
-from celery_app.tasks import add
+from cd_tree_celery.cd_tree_tasks import cbir_query, index_add
+from cd_tree_celery.tasks import add
+from cnn_celery.cnn_tasks import get_features
+
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
@@ -138,16 +140,12 @@ class CBIRQueryHandler(BaseHandler):
 
     def post(self):
         result_json = None
-        selected_images_str = (self.get_body_argument(
-            "selectedImages", default=None, strip=False))
-        selected_images = json.loads(selected_images_str)
-
-        print(selected_images)
 
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files[0].body)
-            query_features = backbone.get_features(decoded_img_array)
-            query_features_list = query_features.tolist()
+            query_features_list = get_features.delay(
+                decoded_img_array.tolist()).get()
+
             result_imgs = cbir_query.delay(
                 cli=False, query_features=query_features_list, n_images=10
             ).get()
