@@ -1,13 +1,12 @@
 import sys
-import requests
 
 import numpy as np
 from celery import Task
 
-from .celery import app
 sys.path.insert(0, "./cbir/")
 sys.path.insert(0, "../cbir/")
 from backbone import Backbone
+from celery_app import app
 
 
 class CNNTask(Task):
