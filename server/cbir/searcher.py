@@ -10,10 +10,12 @@ from db_utils.zodb_connector import ZODBConnector
 
 
 class Searcher:
-    def search(self, query_features, n_similar_images):
-        z_connector = ZODBConnector()
-        z_connector.connect()
-        root_node = z_connector.get_root_node()
+    def search(self, query_features, n_similar_images, root_node=None):
+        if root_node is None:
+            z_connector = ZODBConnector()
+            z_connector.connect()
+            root_node = z_connector.get_root_node()
+
         search_time = Timer(name="Search", logger=None)
         search_time.start()
         result_images = cd_tree.find_similar_images(
