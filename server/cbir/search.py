@@ -183,7 +183,15 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher, feature_vec
     return result_img_names
 
 
-def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_array=None, n_images=10, feature_vectors=np.array([])):
+def find_similar_imgs(
+    backbone,
+    searcher,
+    features_query=None,
+    img_array=None,
+    n_images=10,
+    feature_vectors=np.array([]),
+    root_node=None
+):
     global T_SEARCH
     if not features_query:
         processed_img_array = preprocess_input(img_array)
@@ -200,7 +208,7 @@ def find_similar_imgs(backbone: Backbone, searcher, features_query=None, img_arr
     del feature_vectors
 
     img_names, T_SEARCH = searcher.search(
-        reduced_features_query, n_images)
+        reduced_features_query, n_images, root_node=root_node)
     del searcher
     return img_names
 

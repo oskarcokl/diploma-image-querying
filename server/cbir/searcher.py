@@ -12,9 +12,9 @@ from db_utils.zodb_connector import ZODBConnector
 class Searcher:
     def search(self, query_features, n_similar_images, root_node=None):
         if root_node is None:
-            z_connector = ZODBConnector()
-            z_connector.connect()
-            root_node = z_connector.get_root_node()
+            zodb_connector = ZODBConnector()
+            zodb_connector.connect()
+            root_node = zodb_connector.get_root_node()
 
         search_time = Timer(name="Search", logger=None)
         search_time.start()
@@ -24,7 +24,6 @@ class Searcher:
             n_similar_images=n_similar_images)
 
         elapsed_time = search_time.stop()
-        z_connector.disconnect()
         img_names = []
 
         for i in range(n_similar_images):

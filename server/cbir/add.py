@@ -58,7 +58,7 @@ def add_cli(img_list):
     zodb_connector.disconnect()
 
 
-def add(decoded_images, backbone=None):
+def add(decoded_images, backbone=None, root_node=None):
     if not backbone:
         backbone = Backbone()
 
@@ -78,22 +78,20 @@ def add(decoded_images, backbone=None):
 
     ids = adder.add_img_to_db(tuple_list)
 
-    zodb_connector = ZODBConnector()
-    print(os.curdir)
-    zodb_connector.connect("./cbir/cd_tree.fs")
-
     add_to_cd_tree(ids, np.array(feature_list),
-                   image_names, adder, zodb_connector)
-
-    zodb_connector.disconnect()
+                   image_names, adder, root_node=root_node)
 
 
-def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, zodb_connector):
+def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, root_node=None):
+    if root_node is None:
+        zodb_connector = ZODBConnector()
+        zodb_connector.connect()
+        root_node = zodb_connector.get_root_node()
+
     for i in range(len(feature_vectors)):
-        old_root_node = zodb_connector.get_root_node()
-        new_root_node = adder.add_to_cd_tree(
-            ids[i], feature_vectors[i], img_name_list[i], old_root_node)
-        zodb_connector.save_cd_tree(new_root_node)
+        root_node = adder.add_to_cd_tree(
+            ids[i], feature_vectors[i], img_name_list[i], root_node)
+        zodb_connector.save_cd_tree(root_node)
 
 
 def reduce_features(add_features, n_components=100):
