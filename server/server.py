@@ -12,17 +12,13 @@ from tensorflow.keras.applications.resnet import preprocess_input
 from db_utils.table_operations import get_feature_vectors
 from cbir.backbone import Backbone
 from rocchio import make_new_query
-from cd_tree_celery.cd_tree_tasks import cbir_query, index_add
-from cd_tree_celery.tasks import add
-from cnn_celery.cnn_tasks import get_features
+from app.cd_tree_tasks import cbir_query, index_add
+from app.cnn_tasks import get_features
 
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="run in debug mode")
 
-
-backbone = Backbone()
-print("Loaded backbone")
 
 n_images = 10
 
@@ -70,7 +66,8 @@ class AddIndexHandler(BaseHandler):
                 decoded_images.append(
                     (info["filename"], decoded_image.tolist()))
 
-            add = index_add.delay(decoded_images).get()
+            add = index_add.apply_async(
+                (decoded_images,), queue="cd_tree").get()
 
         if (add):
             self.write("ok")
@@ -108,8 +105,8 @@ class ROCCHIOQueryHandler(BaseHandler):
 
         new_query_feautres_list = new_query.tolist()
 
-        result_imgs = cbir_query.delay(
-            cli=False, query_features=new_query_feautres_list, n_images=10
+        result_imgs = cbir_query.apply_async(
+            kwargs={"cli": False, "query_features": new_query_feautres_list, "n_images": 10}, queue="cd_tree"
         ).get()
 
         result = {"ordered_result": result_imgs,
@@ -143,11 +140,12 @@ class CBIRQueryHandler(BaseHandler):
 
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files[0].body)
-            query_features_list = get_features.delay(
-                decoded_img_array.tolist()).get()
+            query_features_list = get_features.apply_async(
+                (decoded_img_array.tolist(),), queue="cnn").get()
 
-            result_imgs = cbir_query.delay(
-                cli=False, query_features=query_features_list, n_images=10
+            # This can maybe be written better but this works for now.
+            result_imgs = cbir_query.apply_async(
+                kwargs={"cli": False, "query_features": query_features_list, "n_images": 10}, queue="cd_tree"
             ).get()
 
             result = {"ordered_result": result_imgs,
@@ -163,20 +161,12 @@ class CBIRQueryHandler(BaseHandler):
         self.write(result_json)
 
 
-class CeleryHandler(BaseHandler):
-    async def get(self):
-        result = add.delay(3, 4).get()
-        print(str(result))
-        self.write(str(result))
-
-
 def main():
     parse_command_line()
     app = tornado.web.Application(
         [
             (r"/", MainHandler),
             (r"/add-index", AddIndexHandler),
-            (r"/celery", CeleryHandler),
             (r"/cbir-query", CBIRQueryHandler),
             (r"/rocchio-query", ROCCHIOQueryHandler),
         ],

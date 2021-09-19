@@ -1,9 +1,6 @@
-import sys
-
-sys.path.insert(0, "./cbir/")
-from search import search
-from add import add
-from celery_app import app
+from cbir.search import search
+from cbir.add import add
+from app.celery import app
 
 
 @app.task
