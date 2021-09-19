@@ -88,7 +88,12 @@ def search(
     else:
         if query_features:
             img_names = find_similar_imgs(
-                backbone=backbone, searcher=searcher, features_query=query_features, n_images=n_images, feature_vectors=feature_vectors
+                backbone=backbone,
+                searcher=searcher,
+                features_query=query_features,
+                n_images=n_images,
+                feature_vectors=feature_vectors,
+                root_node=root_node
             )
             return img_names
         else:
@@ -96,7 +101,12 @@ def search(
             img_array = np.expand_dims(query_img_array, axis=0)
 
             img_names = find_similar_imgs(
-                img_array=img_array, backbone=backbone, searcher=searcher, n_images=n_images, feature_vectors=feature_vectors
+                img_array=img_array,
+                backbone=backbone,
+                searcher=searcher,
+                n_images=n_images,
+                feature_vectors=feature_vectors,
+                root_node=root_node
             )
             return img_names
 

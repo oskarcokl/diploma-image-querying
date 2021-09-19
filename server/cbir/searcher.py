@@ -12,6 +12,7 @@ from db_utils.zodb_connector import ZODBConnector
 class Searcher:
     def search(self, query_features, n_similar_images, root_node=None):
         if root_node is None:
+            print("Root node is None")
             zodb_connector = ZODBConnector()
             zodb_connector.connect()
             root_node = zodb_connector.get_root_node()

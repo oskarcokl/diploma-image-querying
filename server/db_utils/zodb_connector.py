@@ -1,3 +1,5 @@
+import logging
+
 import BTrees
 import transaction
 import ZODB
@@ -29,6 +31,7 @@ class ZODBConnector:
         self.root = None
 
     def connect(self):
+        logging.info("Connection to ZODB.")
         self.db = ZODB.config.databaseFromString(conf)
         self.connection = self.db.open()
         self.root = self.connection.root
