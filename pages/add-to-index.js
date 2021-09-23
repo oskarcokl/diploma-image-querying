@@ -46,9 +46,6 @@ export default function AddToIndex(params) {
           "Content-Type": "multipart/form-data",
         },
       })
-      .catch((e) => {
-        console.log(e);
-      })
       .then((res) => {
         let toastMessage = "";
 
@@ -60,6 +57,18 @@ export default function AddToIndex(params) {
 
         console.log(res);
         toast.success(toastMessage, {
+          position: "top-center",
+          autoClose: false,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+        toast.error("Something went wrong please try again.", {
           position: "top-center",
           autoClose: false,
           hideProgressBar: false,

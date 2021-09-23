@@ -74,7 +74,7 @@ class AddIndexHandler(BaseHandler):
         if (add):
             self.write("ok")
         else:
-            self.write("notok")
+            self.send_error()
 
 
 class ROCCHIOQueryHandler(BaseHandler):

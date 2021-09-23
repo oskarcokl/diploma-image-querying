@@ -60,9 +60,9 @@ def cbir_query(
 @app.task(base=CDTreeTask, bind=True)
 def index_add(self, decoded_images):
     root_node = self.root_node
+    reload_cd_tree_task.apply_async(queue="broadcast")
     try:
         add(decoded_images, root_node=root_node)
-        reload_cd_tree_task.apply_async(queue="broadcast")
         return True
     except Exception as e:
         print(e)
