@@ -1,21 +1,23 @@
 import argparse
 import os
+
 import numpy as np
 from tensorflow.python.keras.backend import switch
 from memory_profiler import profile
+from sklearn.decomposition import TruncatedSVD
 
 
 from cbir.searcher import Searcher
-from sklearn.decomposition import TruncatedSVD
 from cbir.backbone import Backbone
 from db_utils.db_connector import DbConnector
+from db_utils.zodb_connector import ZODBConnector
 from csv_writer import init_csv
 
 
 from cbir import search
 
 
-@profile
+#@profile
 def make_queries(file_name, csv_name, datset_path, force=False):
     result_lines = []
 
@@ -24,6 +26,9 @@ def make_queries(file_name, csv_name, datset_path, force=False):
     with open(file_name, "r") as f:
         lines = f.readlines()
         backbone = Backbone()
+        zodb_connector = ZODBConnector()
+        zodb_connector.connect()
+        root_node = zodb_connector.get_root_node()
 
         if not force:
             feature_vectors = get_feature_vectors()
@@ -43,7 +48,8 @@ def make_queries(file_name, csv_name, datset_path, force=False):
                 result = search.search(query_img_path=query_img_path,
                                        cli=True, backbone=backbone,
                                        n_images=10,
-                                       feature_vectors=feature_vectors)
+                                       feature_vectors=feature_vectors,
+                                       root_node=root_node)
             else:
                 result = search.brute_force_search(
                     query_img_path=query_img_path,
@@ -66,7 +72,8 @@ def make_queries(file_name, csv_name, datset_path, force=False):
 def get_feature_vectors():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    data = connector.cursor.fetchmany(1000)
+    data = connector.cursor.fetchall()
+    #data = connector.cursor.fetchmany(1000)
     data_array = np.array(data, dtype=object)
 
     feature_vectors = data_array[:, 2]
@@ -79,7 +86,7 @@ def get_feature_vectors():
 def get_names_and_features():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
-    data = connector.cursor.fetchmany(95000)
+    data = connector.cursor.fetchmany(98000)
     data_array = np.array(data, dtype=object)
 
     img_names = data_array[:, 1]

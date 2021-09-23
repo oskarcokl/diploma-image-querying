@@ -62,28 +62,33 @@ def search(
         print("Finding similar images")
 
         img_names = find_similar_imgs(
-            img_array=img_array, backbone=backbone, searcher=searcher, n_images=n_images, feature_vectors=feature_vectors,
+            img_array=img_array,
+            backbone=backbone,
+            searcher=searcher,
+            n_images=n_images,
+            feature_vectors=feature_vectors,
+            root_node=root_node
         )
 
         # TODO uncomment
-        img_paths = [os.path.join(dataset, img_name)
-                     for img_name in img_names]
+        # img_paths = [os.path.join(dataset, img_name)
+        #              for img_name in img_names]
 
-        show_results(query_img_path, img_paths)
-        global T_ALL
-        T_ALL = t_all.stop()
-
-        # TODO Only to be used while evaluating system.
-        # ranked_img_names = []
-        # for i, img_name in enumerate(img_names):
-        #     ranked_img_name = " ".join((str(i), img_name))
-        #     ranked_img_names.append(ranked_img_name)
-
-        # line = " ".join(ranked_img_names)
+        # show_results(query_img_path, img_paths)
         # global T_ALL
         # T_ALL = t_all.stop()
-        # write_time()
-        # return line
+
+        # TODO Only to be used while evaluating system.
+        ranked_img_names = []
+        for i, img_name in enumerate(img_names):
+            ranked_img_name = " ".join((str(i), img_name))
+            ranked_img_names.append(ranked_img_name)
+
+        line = " ".join(ranked_img_names)
+        global T_ALL
+        T_ALL = t_all.stop()
+        write_time()
+        return line
 
     else:
         if query_features:
@@ -205,7 +210,7 @@ def find_similar_imgs(
     global T_SEARCH
     if not features_query:
         processed_img_array = preprocess_input(img_array)
-        features_query = backbone.get_features(processed_img_array)
+        features_query_array = backbone.get_features(processed_img_array)
     else:
         features_query_array = np.array(features_query)
 
@@ -297,7 +302,7 @@ def show_results(query_img_path, img_paths):
 
 def write_time():
     row = [T_MODEL, T_FEAT_REDUCTION, T_SEARCH, T_ALL]
-    save_to_csv("./experiments/coco.csv", row)
+    save_to_csv("./experiments/holidays.csv", row)
 
 
 if __name__ == "__main__":
