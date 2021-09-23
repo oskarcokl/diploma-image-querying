@@ -43,8 +43,9 @@ def cbir_query(
 
 @app.task(base=CDTreeTask, bind=True)
 def index_add(self, decoded_images):
+    root_node = self.root_node
     try:
-        add(decoded_images)
+        add(decoded_images, root_node=root_node)
         return True
     except:
         return False
