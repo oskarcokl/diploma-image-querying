@@ -1,6 +1,7 @@
 import logging
 
 from celery import Task
+from kombu.entity import Queue
 
 from app.celery import app
 from cbir.search import search
@@ -59,14 +60,17 @@ def index_add(self, decoded_images):
     root_node = self.root_node
     try:
         add(decoded_images, root_node=root_node)
+        reload_cd_tree_task.apply_async(queue="broadcast")
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 
 @app.task(base=CDTreeTask, bind=True)
-def reload_cd_tree(self):
+def reload_cd_tree_task(self):
     try:
+        print("Reloading CD-tree.")
         self.reload_cd_tree()
     except Exception as e:
-        logging.exception("Exception occured while reloading CD-tree", e)
+        logging.exception("Exception occured while reloading CD-tree.", e)
