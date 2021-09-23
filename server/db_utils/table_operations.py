@@ -2,6 +2,7 @@ import logging
 import sys
 
 import psycopg2
+import numpy as np
 
 sys.path.insert(0, ".")
 from .db_connector import DbConnector
@@ -171,20 +172,15 @@ def get_feature_vectors(img_names):
         print(e)
 
 
-def get_feature_vectos_all():
+def get_feature_vectors_all():
+    print("Getting feature vectors")
     try:
         connector = DbConnector()
         connector.cursor.execute("SELECT image_vector FROM cbir_index")
         data = connector.cursor.fetchall()
-
-        print(data)
-
-        # data_array = np.array(data, dtype=object)
-
-        # feature_vectors = data_array[:, 2]
-        # result = np.array([np.array(feature_vector)
-        #                    for feature_vector in feature_vectors])
-        # return result
+        data_array = np.array(data, dtype=object)
+        feature_vectors = data_array[:, 0]
+        return feature_vectors
     except (Exception, psycopg2.DatabaseError) as e:
         print(e)
 

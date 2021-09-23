@@ -9,11 +9,10 @@ import numpy as np
 from tornado.options import define, options, parse_command_line
 from tensorflow.keras.applications.resnet import preprocess_input
 
-from db_utils.table_operations import get_feature_vectors
-from cbir.backbone import Backbone
+from db_utils.table_operations import get_feature_vectors, get_feature_vectors_all
 from rocchio import make_new_query
 from app.cd_tree_tasks import cbir_query, index_add
-from app.cnn_tasks import get_features
+from app.cnn_tasks import get_features, get_feature_vectors_all_task
 
 
 define("port", default=8888, help="run on the given port", type=int)
@@ -143,6 +142,10 @@ class CBIRQueryHandler(BaseHandler):
 
         for field_name, files in self.request.files.items():
             decoded_img_array = decode_uploaded_img(files[0].body)
+
+            feature_vectors = get_feature_vectors_all_task.apply_async(
+                queue="cnn").get()
+
             query_features_list = get_features.apply_async(
                 (decoded_img_array.tolist(),), queue="cnn").get()
 

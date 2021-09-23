@@ -1,8 +1,9 @@
+from logging import exception
 import numpy as np
 from celery import Task
 
 from cbir.backbone import Backbone
-from db_utils.table_operations import get_feature_vectos_all
+from db_utils.table_operations import get_feature_vectors_all
 from app.celery import app
 
 
@@ -19,11 +20,19 @@ class CNNTask(Task):
 
     @property
     def feature_vectors(self):
-        if self._feature_vectors is None:
-            self._feature_vectors = get_feature_vectos_all()
+        if not self._feature_vectors:
+            self._feature_vectors = get_feature_vectors_all().tolist()
         return self._feature_vectors
 
 
 @app.task(base=CNNTask, bind=True)
 def get_features(self, query_img_array):
     return self.backbone.get_features(np.array(query_img_array)).tolist()
+
+
+@app.task(base=CNNTask, bind=True)
+def get_feature_vectors_all_task(self):
+    try:
+        return self.feature_vectors
+    except Exception as e:
+        print(e)
