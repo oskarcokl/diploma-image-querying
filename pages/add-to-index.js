@@ -32,16 +32,11 @@ export default function AddToIndex(params) {
     addToIndex(addImgs);
   };
 
-  const toastOnClick = (e) => {
-    e.preventDefault();
-
-    toast("Big chungus!");
-  };
-
   const addToIndex = (addImages) => {
     console.log("Uploading images to server.");
     const data = new FormData();
-    for (let i = 0; i < addImages.length; i++) {
+    nImages = addImages.length;
+    for (let i = 0; i < nImages; i++) {
       data.append("file", addImages[i]);
     }
 
@@ -55,7 +50,22 @@ export default function AddToIndex(params) {
         console.log(e);
       })
       .then((res) => {
+        if (nImages == 1) {
+          toastMessage = "Image added to index";
+        } else {
+          toastMessage = "Images added to index";
+        }
+
         console.log(res);
+        toast.success(toastMessage, {
+          position: "top-center",
+          autoClose: false,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       });
   };
 
@@ -82,7 +92,7 @@ export default function AddToIndex(params) {
             <Button
               additionalClasses="flex-none"
               name="Add to index"
-              clickHandler={toastOnClick}
+              clickHandler={onClickHandler}
             ></Button>
           </form>
         </div>
