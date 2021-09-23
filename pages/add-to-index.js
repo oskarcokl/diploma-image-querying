@@ -35,7 +35,7 @@ export default function AddToIndex(params) {
   const addToIndex = (addImages) => {
     console.log("Uploading images to server.");
     const data = new FormData();
-    nImages = addImages.length;
+    let nImages = addImages.length;
     for (let i = 0; i < nImages; i++) {
       data.append("file", addImages[i]);
     }
@@ -50,6 +50,8 @@ export default function AddToIndex(params) {
         console.log(e);
       })
       .then((res) => {
+        let toastMessage = "";
+
         if (nImages == 1) {
           toastMessage = "Image added to index";
         } else {
