@@ -7,6 +7,7 @@ import AddImages from "../components/addImages";
 import Button from "../components/button";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API = "http://localhost:8888/";
 
@@ -31,16 +32,18 @@ export default function AddToIndex(params) {
     addToIndex(addImgs);
   };
 
+  const toastOnClick = (e) => {
+    e.preventDefault();
+
+    toast("Big chungus!");
+  };
+
   const addToIndex = (addImages) => {
     console.log("Uploading images to server.");
-
     const data = new FormData();
-
     for (let i = 0; i < addImages.length; i++) {
       data.append("file", addImages[i]);
     }
-
-    //console.log(data);
 
     axios
       .post(API + "add-index", data, {
@@ -79,7 +82,7 @@ export default function AddToIndex(params) {
             <Button
               additionalClasses="flex-none"
               name="Add to index"
-              clickHandler={onClickHandler}
+              clickHandler={toastOnClick}
             ></Button>
           </form>
         </div>
