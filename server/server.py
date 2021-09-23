@@ -63,8 +63,11 @@ class AddIndexHandler(BaseHandler):
                     f.write(body)
 
                 decoded_image = decode_uploaded_img(body)
+                feature_list = get_features.apply_async(
+                    (decoded_image.tolist(),), queue="cnn").get()
+
                 decoded_images.append(
-                    (info["filename"], decoded_image.tolist()))
+                    (info["filename"], feature_list))
 
             add = index_add.apply_async(
                 (decoded_images,), queue="cd_tree").get()

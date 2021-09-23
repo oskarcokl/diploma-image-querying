@@ -58,20 +58,14 @@ def add_cli(img_list):
     zodb_connector.disconnect()
 
 
-def add(decoded_images, backbone=None, root_node=None):
-    if not backbone:
-        backbone = Backbone()
-
+def add(decoded_images, root_node=None):
     adder = Adder()
 
     feature_list = []
     image_names = []
 
     for decoded_image in decoded_images:
-        features = backbone.get_features(np.arry(decoded_image[1]))
-
-        feature_list.append(features.tolist())
-
+        feature_list.append(decoded_image[1])
         image_names.append(decoded_image[0])
 
     tuple_list = list(zip(image_names, feature_list))
