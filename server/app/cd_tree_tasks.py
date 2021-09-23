@@ -1,4 +1,5 @@
-import celery
+import logging
+
 from celery import Task
 
 from app.celery import app
@@ -10,15 +11,27 @@ from db_utils.zodb_connector import ZODBConnector
 class CDTreeTask(Task):
     abstract = True
     _root_node = None
+    _zodb_connector = None
 
     @property
     def root_node(self):
         if self._root_node is None:
-            zodb_connector = ZODBConnector()
-            zodb_connector.connect()
-            root_node = zodb_connector.get_root_node()
+            self.zodb_connector = ZODBConnector()
+            self.zodb_connector.connect()
+            root_node = self.zodb_connector.get_root_node()
             self._root_node = root_node
         return self._root_node
+
+    def reload_cd_tree(self):
+        if self._root_node is None:
+            self.zodb_connector = ZODBConnector()
+            self.zodb_connector.connect()
+        else:
+            self.zodb_connector.disconnect()
+            self.zodb_connector.connect()
+
+        root_node = self.zodb_connector.get_root_node()
+        self._root_node = root_node
 
 
 @app.task(base=CDTreeTask, bind=True)
@@ -53,4 +66,7 @@ def index_add(self, decoded_images):
 
 @app.task(base=CDTreeTask, bind=True)
 def reload_cd_tree(self):
-    pass
+    try:
+        self.reload_cd_tree()
+    except Exception as e:
+        logging.exception("Exception occured while reloading CD-tree", e)
