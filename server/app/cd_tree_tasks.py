@@ -49,3 +49,8 @@ def index_add(self, decoded_images):
         return True
     except:
         return False
+
+
+@app.task(base=CDTreeTask, bind=True)
+def reload_cd_tree(self):
+    pass
