@@ -151,7 +151,7 @@ class CBIRQueryHandler(BaseHandler):
 
             # This can maybe be written better but this works for now.
             result_imgs = cbir_query.apply_async(
-                kwargs={"cli": False, "query_features": query_features_list, "n_images": 10}, queue="cd_tree"
+                kwargs={"cli": False, "query_features": query_features_list, "n_images": 10, "feature_vectors": feature_vectors}, queue="cd_tree"
             ).get()
 
             result = {"ordered_result": result_imgs,

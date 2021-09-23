@@ -42,7 +42,8 @@ def cbir_query(
     query_img_list=None,
     cli=False,
     query_features=None,
-    n_images=10
+    n_images=10,
+    feature_vectors=None
 ):
     root_node = self.root_node
     result = search(
@@ -50,6 +51,7 @@ def cbir_query(
         cli=cli,
         query_features=query_features,
         n_images=n_images,
+        feature_vectors=feature_vectors,
         root_node=root_node
     )
     return result

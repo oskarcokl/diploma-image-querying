@@ -66,7 +66,7 @@ def search(
             backbone=backbone,
             searcher=searcher,
             n_images=n_images,
-            feature_vectors=feature_vectors,
+            feature_vectors=np.array(feature_vectors),
             root_node=root_node
         )
 
@@ -204,7 +204,7 @@ def find_similar_imgs(
     features_query=None,
     img_array=None,
     n_images=10,
-    feature_vectors=np.array([]),
+    feature_vectors=None,
     root_node=None
 ):
     global T_SEARCH
@@ -214,7 +214,7 @@ def find_similar_imgs(
     else:
         features_query_array = np.array(features_query)
 
-    if not np.any(feature_vectors):
+    if feature_vectors is None:
         feature_vectors = get_feature_vectors()
 
     reduced_features_query = reduce_features_query(
