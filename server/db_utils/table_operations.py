@@ -171,5 +171,23 @@ def get_feature_vectors(img_names):
         print(e)
 
 
+def get_feature_vectos_all():
+    try:
+        connector = DbConnector()
+        connector.cursor.execute("SELECT image_vector FROM cbir_index")
+        data = connector.cursor.fetchall()
+
+        print(data)
+
+        # data_array = np.array(data, dtype=object)
+
+        # feature_vectors = data_array[:, 2]
+        # result = np.array([np.array(feature_vector)
+        #                    for feature_vector in feature_vectors])
+        # return result
+    except (Exception, psycopg2.DatabaseError) as e:
+        print(e)
+
+
 if __name__ == "__main__":
     drop_table("cbir_index")
