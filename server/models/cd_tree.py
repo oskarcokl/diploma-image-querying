@@ -347,7 +347,6 @@ def _find_leaf_node_for_adding(id, feature_vector, img_name, root_node):
 
         curr_node = sub_node
 
-    curr_node.add_feature_vector(feature_vector.tolist())
     curr_node.add_img(img_name)
 
     return (curr_node, n_feature_vectors_parent)
@@ -380,7 +379,10 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
     # Split the leaf node into two nodes if parent n features * gama is
     # smaller than then feature of the leaf node.
     if node.n_feature_vectors > gama * n_feature_vectors_parent:
-        feature_vectors_array = np.array(node.feature_vectors)
+        feature_vectors = table_operations.get_reduced_feature_vectors(
+            node.img_names)
+
+        feature_vectors_array = np.array(feature_vectors)
 
         gmm = mixture.GaussianMixture(
             n_components=2, covariance_type="diag").fit(feature_vectors_array)
@@ -399,7 +401,7 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
 
         # Node ID could be removed, or I have to somehow presistently store the curr
         # counter.
-        sub_nodes = _create_sub_nodes(
+        sub_nodes, sub_node_ids = _create_sub_nodes(
             ids_with_clusters,
             node.layer + 1,
             2,
@@ -408,15 +410,16 @@ def add_to_cd_tree(id, feature_vector, img_name, root_node):
 
         data = []
         for i in range(len(node.ids)):
-            data.append((node.ids[i], node.img_names[i],
-                        node.feature_vectors[i]))
+            data.append((node.ids[i], node.img_names[i]))
 
         for sub_node in sub_nodes:
-            leaf_feature_vectors, leaf_img_names = _get_feature_vectors_and_imgs_by_id(
+            print(sub_node.ids)
+            leaf_img_names = _get_imgs_by_id(
                 data, sub_node.ids)
-            sub_node.make_leaf(leaf_feature_vectors, leaf_img_names)
+            sub_node.make_leaf(leaf_img_names)
 
         node.set_sub_nodes(sub_nodes)
+        node.set_sub_node_ids(sub_node_ids)
         node.n_sub_clusters = 2
         node.make_inner_node()
 

@@ -17,6 +17,7 @@ from adder import Adder
 from db_utils.zodb_connector import ZODBConnector
 from backbone import Backbone
 from db_utils.db_connector import DbConnector
+from db_utils.table_operations import insert_many_tuples_reduced
 
 
 def add_cli(img_list):
@@ -58,7 +59,7 @@ def add_cli(img_list):
     zodb_connector.disconnect()
 
 
-def add(decoded_images, root_node=None):
+def add(decoded_images, feature_vectors=None, root_node=None, zodb_connector=None):
     adder = Adder()
 
     feature_list = []
@@ -68,15 +69,23 @@ def add(decoded_images, root_node=None):
         feature_list.append(decoded_image[1])
         image_names.append(decoded_image[0])
 
+    if feature_vectors is None:
+        feature_vectors = get_data()
+
+    reduced_features = reduce_features(feature_list, feature_vectors, 140)
+
     tuple_list = list(zip(image_names, feature_list))
 
     ids = adder.add_img_to_db(tuple_list)
 
-    add_to_cd_tree(ids, np.array(feature_list),
-                   image_names, adder, root_node=root_node)
+    insert_many_tuples_reduced(
+        list(zip(image_names, reduced_features.tolist())))
+
+    add_to_cd_tree(ids, reduced_features,
+                   image_names, adder, root_node=root_node, zodb_connector=zodb_connector)
 
 
-def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, root_node=None):
+def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, root_node=None, zodb_connector=None):
     if root_node is None:
         zodb_connector = ZODBConnector()
         zodb_connector.connect()
@@ -88,8 +97,7 @@ def add_to_cd_tree(ids, feature_vectors, img_name_list, adder, root_node=None):
         zodb_connector.save_cd_tree(root_node)
 
 
-def reduce_features(add_features, n_components=100):
-    feature_vectors = get_data()
+def reduce_features(add_features, feature_vectors, n_components=100):
     feature_vectors_plus = np.append(
         feature_vectors, np.array(add_features), axis=0)
 

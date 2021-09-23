@@ -9,10 +9,11 @@ import numpy as np
 from tornado.options import define, options, parse_command_line
 from tensorflow.keras.applications.resnet import preprocess_input
 
-from db_utils.table_operations import get_feature_vectors, get_feature_vectors_all
+from db_utils.table_operations import get_feature_vectors
 from rocchio import make_new_query
 from app.cd_tree_tasks import cbir_query, index_add
 from app.cnn_tasks import get_features, get_feature_vectors_all_task
+from cbir.add import add
 
 
 define("port", default=8888, help="run on the given port", type=int)
@@ -62,16 +63,22 @@ class AddIndexHandler(BaseHandler):
                     f.write(body)
 
                 decoded_image = decode_uploaded_img(body)
+
                 feature_list = get_features.apply_async(
                     (decoded_image.tolist(),), queue="cnn").get()
 
                 decoded_images.append(
                     (info["filename"], feature_list))
 
-            add = index_add.apply_async(
-                (decoded_images,), queue="cd_tree").get()
+            feature_vectors = get_feature_vectors_all_task.apply_async(
+                queue="cnn").get()
 
-        if (add):
+            #result = add(decoded_images, feature_vectors=feature_vectors)
+
+            result = index_add.apply_async(
+                (decoded_images, feature_vectors), queue="cd_tree").get()
+
+        if (result):
             self.write("ok")
         else:
             self.send_error()
