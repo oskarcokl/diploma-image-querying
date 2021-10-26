@@ -1,12 +1,3 @@
-cli = "../db_utils/database.ini"
-server = "./db_utils/database.ini"
-
-
-"""
-Config file for PostgreSQL database.
-"""
-
-
 def config():
     db = {
         "host": "localhost",
