@@ -7,10 +7,8 @@ import ZODB.FileStorage
 import ZODB.config
 from ZODB.POSException import ConnectionStateError
 
-
-cli = "../db_utils/zodb.zconfig"
-server = "./db_utils/zodb.zconfig"
-
+# Configuration for relstorage package. Relstorage allows us to
+# use PostgreSQL as storage for ZODB.
 conf = """
 %%import relstorage
 <zodb main>
@@ -62,9 +60,9 @@ class ZODBConnector:
 
         self.root.cd_tree = BTrees.OOBTree.BTree()
         self.root.cd_tree["root_node"] = root_node
-        print("Saving cd tree")
+        logging.info("Saving cd tree")
         transaction.commit()
-        print("CD tree saved")
+        logging.info("CD tree saved")
 
     def get_root_node(self):
         if self.connection is None or self.db is None or self.root is None:
