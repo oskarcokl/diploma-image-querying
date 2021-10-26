@@ -25,6 +25,23 @@ conf = """
 
 
 class ZODBConnector:
+    """
+    ZODBConnector is used to connect to the ZODB database.
+
+    It is also responsible for some basic operations with the
+    database. Such as saving the CD-tree and retrieving it.
+
+    Attributes
+    ----------
+    db : ZODB.DB
+        a ZODB object databse object.
+    connection : IConnection
+        a IConnection which has a connection to the database. 
+    root: Root object of database
+        top level object in database. Root node of CD-tree is
+        a sub object of the root.
+    """
+
     def __init__(self):
         self.db = None
         self.connection = None
