@@ -175,7 +175,7 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher, feature_vec
         print("no feature vectors")
         feature_vectors = get_feature_vectors()
 
-    n_features = 140
+    n_features = 100
 
     # We are almost doing the same operation twice. but since we are adding
     # the query features in reduce features query. The reduction would not be the same.
@@ -189,12 +189,13 @@ def find_similar_imgs_force(img_array, backbone: Backbone, searcher, feature_vec
         print("Getting img names")
         img_names = get_img_names()
 
-    # reduced_feature_query = reduce_features_query(
-    #     features_query.reshape(1, -1), feature_vectors, n_features)
+    # TODO Comment for original dim search.
+    reduced_feature_query = reduce_features_query(
+        features_query.reshape(1, -1), feature_vectors, n_features)
 
     global T_SEARCH
     result_img_names, T_SEARCH = searcher.search_force(
-        features_query.reshape(1, -1), reduced_feature_vectors, img_names, n_images)
+        reduced_feature_query, reduced_feature_vectors, img_names, n_images)
     return result_img_names
 
 
@@ -218,7 +219,7 @@ def find_similar_imgs(
         feature_vectors = get_feature_vectors()
 
     reduced_features_query = reduce_features_query(
-        features_query_array.reshape(1, -1), feature_vectors, 140)
+        features_query_array.reshape(1, -1), feature_vectors, 200)
 
     del feature_vectors
 

@@ -58,7 +58,8 @@ class AddIndexHandler(BaseHandler):
             for info in files:
                 body = info["body"]
 
-                path_to_save = os.path.join("./test", info["filename"])
+                path_to_save = os.path.join(
+                    "../public/dataset", info["filename"])
                 with open(path_to_save, "wb") as f:
                     f.write(body)
 

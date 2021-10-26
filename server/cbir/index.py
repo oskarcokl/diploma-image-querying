@@ -138,7 +138,7 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
     feature_vectors = [item[2] for item in data]
     img_names = [item[1] for item in data]
     # normalized_feature_vectors = normalize_sk_learn(feature_vectors)
-    reduced_feature_vectors = reduce_features(feature_vectors, 140)
+    reduced_feature_vectors = reduce_features(feature_vectors, 200)
 
     table_operations.insert_tuple_list_reduced(
         list(zip(img_names, reduced_feature_vectors)))
@@ -195,5 +195,5 @@ if __name__ == "__main__":
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
         data = get_data()
-        root_node = init_cd_tree(data, 1, 3, 20, 4)
+        root_node = init_cd_tree(data, 1, 3, 20, 3)
         print("CD-tree created")

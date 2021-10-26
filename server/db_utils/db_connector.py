@@ -2,9 +2,12 @@ import sys
 
 import psycopg2
 
-
 sys.path.insert(0, ".")
 from .config import config
+
+"""
+DbConncector 
+"""
 
 
 class DbConnector:

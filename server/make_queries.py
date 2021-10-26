@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 from tensorflow.python.keras.backend import switch
-from memory_profiler import profile
 from sklearn.decomposition import TruncatedSVD
 
 
@@ -17,7 +16,6 @@ from csv_writer import init_csv
 from cbir import search
 
 
-#@profile
 def make_queries(file_name, csv_name, datset_path, force=False):
     result_lines = []
 
@@ -34,10 +32,12 @@ def make_queries(file_name, csv_name, datset_path, force=False):
             feature_vectors = get_feature_vectors()
         else:
             img_names, feature_vectors = get_names_and_features()
-            #svd = TruncatedSVD(n_components=140)
-            # svd.fit(feature_vectors)
-            #reduced_feature_vectors = svd.transform(feature_vectors)
-            reduced_feature_vectors = feature_vectors
+            svd = TruncatedSVD(n_components=100)
+            svd.fit(feature_vectors)
+            reduced_feature_vectors = svd.transform(feature_vectors)
+
+            return
+            #reduced_feature_vectors = feature_vectors
 
         for line in lines:
             query_img_name = line[:-1]
@@ -68,7 +68,6 @@ def make_queries(file_name, csv_name, datset_path, force=False):
             f.write(result_line)
 
 
-@profile
 def get_feature_vectors():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
@@ -82,7 +81,6 @@ def get_feature_vectors():
     return result
 
 
-@profile
 def get_names_and_features():
     connector = DbConnector()
     connector.cursor.execute("SELECT * FROM cbir_index")
