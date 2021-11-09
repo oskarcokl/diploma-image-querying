@@ -9,6 +9,7 @@ from .db_connector import DbConnector
 
 # Type definitions
 Vector = "list[float]"
+Data = "list[list[int, string, Vector]]"
 Tuple = "tuple[str, Vector]"
 TupleList = "list[Tuple]"
 
@@ -373,5 +374,26 @@ def get_feature_vectors_all(db_connector: DbConnector = None) -> "list[Vector]":
         data_array = np.array(data, dtype=object)
         feature_vectors = data_array[:, 0]
         return feature_vectors
+    except (Exception, psycopg2.DatabaseError) as e:
+        logging.error(e)
+
+
+def get_data_all(db_connector: DbConnector = None) -> Data:
+    """
+    Get all table entries from cbir_index table
+
+    Parameters
+    ----------
+    db_connector: DbConnector
+        Optional DbConnector object 
+    """
+    if not db_connector:
+        db_connector = DbConnector()
+    try:
+        db_connector.cursor.execute("SELECT * FROM cbir_index")
+        data = db_connector.cursor.fetchall()
+        logging.info("Number of indexed images: ", len(data))
+        data_array = np.array(data, dtype=object)
+        return data_array
     except (Exception, psycopg2.DatabaseError) as e:
         logging.error(e)
