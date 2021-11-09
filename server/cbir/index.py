@@ -10,7 +10,6 @@ import ZODB.FileStorage
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
 
-# Local application imports
 sys.path.insert(0, "../")
 from backbone import Backbone
 from db_utils.db_connector import DbConnector

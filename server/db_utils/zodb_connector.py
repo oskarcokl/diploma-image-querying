@@ -7,6 +7,9 @@ import ZODB.FileStorage
 import ZODB.config
 from ZODB.POSException import ConnectionStateError
 
+
+from ..models.node import Node
+
 # Configuration for relstorage package. Relstorage allows us to
 # use PostgreSQL as storage for ZODB.
 conf = """
@@ -54,7 +57,7 @@ class ZODBConnector:
     def disconnect(self):
         self.db.close()
 
-    def save_cd_tree(self, root_node):
+    def save_cd_tree(self, root_node: Node):
         if self.connection is None or self.db is None or self.root is None:
             raise ConnectionStateError("ERROR: Not connected to ZODB database")
 
@@ -64,7 +67,7 @@ class ZODBConnector:
         transaction.commit()
         logging.info("CD tree saved")
 
-    def get_root_node(self):
+    def get_root_node(self) -> Node:
         if self.connection is None or self.db is None or self.root is None:
             raise ConnectionStateError("ERROR: Not connected to ZODB database")
         return self.root.cd_tree["root_node"]
