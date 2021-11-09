@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import sys
 
@@ -17,10 +18,28 @@ from models import cd_tree
 from db_utils import table_operations
 from db_utils.zodb_connector import ZODBConnector
 
+# Type definitions
+Vector = "list[float]"
+Data = "list[list[int, string, Vector]]"
+FeatureList = "list[Vector]"
 
-# This function is intented to be run only when setting up the initial db.
-# WARNING! The function will drop cbir_index table if it already exists!
-def init_db(dataset_src):
+"""
+This script is used to initialize and create various parts of the system.
+Mianly creating database tables and initializing the CD-tree.
+"""
+
+
+def init_db(dataset_src: str):
+    """
+    Function creates cbir_index database (it drops it if it already exists
+    so be carefull). It then populates the table with tuple entries of
+    (image_name, image_feautres).
+
+    Parameters
+    ----------
+    dataset_src : str
+        Path to dataset you want to use to populate the table
+    """
     command = """
         CREATE TABLE cbir_index (
             id SERIAL PRIMARY KEY,
@@ -30,16 +49,14 @@ def init_db(dataset_src):
         """
 
     if table_operations.table_exists("cbir_index"):
-        print("Deleting previous table")
+        logging.info("Deleting previous table")
         table_operations.drop_table("cbir_index")
 
-    print("Creating cbir_index table")
+    logging.info("Creating cbir_index table")
     db_connector = DbConnector()
     table_operations.create_table(command, db_connector)
 
     backbone = Backbone()
-
-    #bar = Bar("Extracting features", max=len(os.listdir(dataset_src)))
 
     for img_name in os.listdir(dataset_src):
         img_path = os.path.join(dataset_src, img_name)
@@ -52,65 +69,12 @@ def init_db(dataset_src):
 
         table_operations.insert_tuple(
             (img_name, features.tolist()), db_connector)
-    #     bar.next()
-
-    # bar.finish()
 
 
-def shift_features(features_list, scalar=1000):
-    scaled_features_list = []
-
-    for feature_vector in features_list:
-        scaled_features_list.append((feature_vector * scalar).tolist())
-
-    return scaled_features_list
-
-
-def normalize_sk_learn(feature_list):
-    feature_array = np.array(feature_list)
-    normalized_feature_array = preprocessing.normalize(
-        feature_array, norm="l2")
-    normalized_feature_list = normalized_feature_array.tolist()
-
-    return normalized_feature_list
-
-
-def residuals(feature_list):
-    normalized_feature_list = []
-
-    for feature_vector in feature_list:
-        normalized_feature_vector = feature_vector - \
-            int(np.mean(feature_vector))
-        normalized_feature_list.append(normalized_feature_vector.tolist())
-
-    return normalized_feature_list
-
-
-def min_max_normalization(feature_list):
-    scaled_feature_list = []
-
-    for feature_vector in feature_list:
-        max = feature_vector.max()
-        min = feature_vector.min()
-        scaled_feature_vector = [float((x - min) / (max - min)
-                                 for x in feature_vector)]
-        scaled_feature_list.append(scaled_feature_vector)
-
-    return scaled_feature_list
-
-
-def normalize_features(feature_list):
-    # Feature_list is a list of nd_arrays
-    normalized_feature_list = []
-    for feature_vector in feature_list:
-        normalizd_feature_vector = feature_vector / np.sum(feature_vector)
-
-        normalized_feature_list.append(normalizd_feature_vector.tolist())
-
-    return normalized_feature_list
-
-
-def reduce_features(feature_list, n_components=100):
+def reduce_features(feature_list: FeatureList, n_components: int = 100) -> FeatureList:
+    """
+    Reduce features of given features list to specified number of dimensions.
+    """
     feature_array = np.array(feature_list)
     svd = TruncatedSVD(n_components=n_components)
     svd.fit(feature_array)
@@ -118,7 +82,24 @@ def reduce_features(feature_list, n_components=100):
     return result.tolist()
 
 
-def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
+def init_cd_tree(data: Data, min_clusters: int, max_clusters: int, min_node: int, l_max: int):
+    """
+    Init CD-tree with provided paramaters. While initing also 
+    add reduced features to  reduced_features table
+
+    Paramaters
+    ----------
+    data : [[id, image_name, feature_vector]]
+        Array of where each line contains information about an image
+    min_clusters : int
+        Minum number of clusters on each layer of CD-tree 
+    max_clusters : int
+        Maximum number of allowed clusters on each layer of CD-tree
+    min_node : int
+        If number of images in node smaller than this then node becomes leaf
+    l_max : int
+        Max allowed depth of CD-tree 
+    """
     command = """
         CREATE TABLE reduced_features (
             id SERIAL PRIMARY KEY,
@@ -128,16 +109,15 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
         """
 
     if table_operations.table_exists("reduced_features"):
-        print("Deleting previous table")
+        logging.info("Deleting previous table")
         table_operations.drop_table("reduced_features")
 
-    print("Creating reduced_features table")
+    logging.info("Creating reduced_features table")
     db_connector = DbConnector()
     table_operations.create_table(command, db_connector)
 
     feature_vectors = [item[2] for item in data]
     img_names = [item[1] for item in data]
-    # normalized_feature_vectors = normalize_sk_learn(feature_vectors)
     reduced_feature_vectors = reduce_features(feature_vectors, 200)
 
     table_operations.insert_tuple_list_reduced(
@@ -145,23 +125,18 @@ def init_cd_tree(data, min_clusters, max_clusters, min_node, l_max):
 
     new_data = []
     for i, item in enumerate(data):
-        # Appending tuples here.
         new_data.append((item[0], item[1], reduced_feature_vectors[i]))
 
     zodb_connector = ZODBConnector()
     zodb_connector.connect()
     cd_tree.init_cd_tree(
-        new_data, min_clusters, max_clusters, min_node=min_node, l_max=l_max, zodb_connector=zodb_connector)
-
-
-def get_data():
-    connector = DbConnector()
-    connector.cursor.execute("SELECT * FROM cbir_index")
-    data = connector.cursor.fetchmany(98000)
-    print("Number of indexed images: ", len(data))
-    data_array = np.array(data, dtype=object)
-
-    return data_array
+        new_data,
+        min_clusters,
+        max_clusters,
+        min_node=min_node,
+        l_max=l_max,
+        zodb_connector=zodb_connector
+    )
 
 
 if __name__ == "__main__":
@@ -194,6 +169,6 @@ if __name__ == "__main__":
     if args.get("init_db"):
         init_db(args.get("dataset"))
     elif args.get("init_cd_tree"):
-        data = get_data()
+        data = table_operations.get_data_all()
         root_node = init_cd_tree(data, 1, 3, 20, 3)
-        print("CD-tree created")
+        logging.info("CD-tree created")
